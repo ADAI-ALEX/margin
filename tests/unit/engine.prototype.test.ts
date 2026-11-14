@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { evaluate, distance, classify, robustness, rank } from "@/lib/engine";
-import { ALL_RUNS, ALL_INVESTIGATIONS } from "@/design-exploration/shared/data";
-import { PRESETS, HAZARD_MAP } from "@/design-exploration/shared/content";
+import { ALL_RUNS, ALL_INVESTIGATIONS } from "@/lib/data";
+import { PRESETS, HAZARD_MAP } from "@/content/curated";
 import type { Run, Scenario } from "@/lib/schema";
 
 const base: Run = { id: "x", investigation: "X", tier: "T1_PSI_RUN", fuelClass: "solid-thin", material: null, gravity: "micro", o2Pct: 21, o2Basis: "measured", pressureKPa: 100, pressureBasis: "measured", flowCmS: 10, flowBasis: "measured", flowRegime: "concurrent", outcome: null, measures: {}, original: {}, conversions: [], flags: [], source: { kind: "psi-table", ref: "", url: "" } };

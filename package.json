@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "data:fetch": "node pipeline/fetch-psi.mjs",
+    "data:build": "node pipeline/build-data.mjs",
+    "check": "npm run typecheck && npm run lint && npm test"
   },
   "dependencies": {
     "d3-array": "^3.2.5",
@@ -19,6 +25,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/d3-array": "^3.2.2",
     "@types/d3-contour": "^3.0.6",
@@ -32,5 +39,9 @@
     "tailwindcss": "4.3.3",
     "typescript": "^5",
     "vitest": "^5.1.0"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
   }
 }
