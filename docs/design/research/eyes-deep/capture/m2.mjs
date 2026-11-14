@@ -1,0 +1,16 @@
+import { LAUNCH, chromium, URL, shot } from "./lib.mjs";
+const b = await chromium.launch(LAUNCH);
+const UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: UA }); const p = await ctx.newPage();
+await p.goto(URL, { waitUntil: "domcontentloaded" }); await p.locator(".story-block .story-container").first().waitFor({ timeout: 60000 }); await p.waitForTimeout(7000);
+await p.locator(".mobile-collapse-button").tap(); await p.waitForTimeout(1500);
+const out = {};
+out.before = await p.evaluate(() => ({ rc: getComputedStyle(document.querySelector("nav.time-controls .rate-controls")).opacity, vis: getComputedStyle(document.querySelector("nav.time-controls .rate-controls")).visibility }));
+await p.locator("nav.time-controls h3.rate").tap(); await p.waitForTimeout(800);
+out.afterTapRate = await p.evaluate(() => ({ cls: document.querySelector("nav.time-controls").className, rc: getComputedStyle(document.querySelector("nav.time-controls .rate-controls")).opacity }));
+await p.locator("button[aria-label='Increase time rate']").tap({ force: true }); await p.waitForTimeout(400);
+await p.locator("button[aria-label='Increase time rate']").tap({ force: true }); await p.waitForTimeout(1000);
+out.rate = await p.evaluate(() => document.querySelector("nav.time-controls h3.rate").innerText);
+await shot(p, "mobile-08-time-rate-increased");
+console.log(JSON.stringify(out));
+await b.close();

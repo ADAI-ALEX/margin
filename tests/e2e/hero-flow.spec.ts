@@ -72,11 +72,19 @@ test.describe("hero flow (demo path)", () => {
     await expect.poll(() => params(page).get("g")).toBe("moon");
     await expectVerdict(expectFor(EA_MOON_PUB), "Moon + published");
 
-    // the Moon sheet is the selected regime and shows no PSI tests
+    // the Moon plate in the regimes overview is the selected regime and shows no PSI tests
+    // (redesign: the four regime plates moved from an always-visible strip into the overview, opened from the field tools)
+    await page.getByRole("button", { name: "Regimes overview" }).click();
+    await expect.poll(() => params(page).get("view")).toBe("overview");
     const sheets = page.getByTestId("gravity-sheets");
+    await expect(sheets.getByRole("radio")).toHaveCount(4);
     const moonSheet = sheets.getByRole("radio", { name: /^Lunar \(0\.165 g\):/ });
     await expect(moonSheet).toHaveAttribute("aria-checked", "true");
     await expect(moonSheet).toContainText("No PSI tests");
+    // Esc returns to the field; the scenario is untouched
+    await page.keyboard.press("Escape");
+    await expect(sheets).toHaveCount(0);
+    expect(params(page).get("g")).toBe("moon");
     await expect(page.getByRole("heading", { name: /Partial gravity/ })).toBeVisible();
 
     // PSI-only at the Moon: NONE (toggle off, check, toggle back on)

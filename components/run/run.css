@@ -1,0 +1,52 @@
+/* Run inspector. Tokens only. */
+.run-insp { display: grid; gap: var(--s4); min-width: 0; font-size: var(--fs-sm); color: var(--text-2); }
+.run-insp:focus-within { outline: none; }
+.run-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); }
+.run-tier { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-2); font-weight: 500; }
+.run-glyph { flex: none; }
+.run-title { font-size: var(--fs-2xl); font-weight: 300; letter-spacing: var(--track-tight); line-height: 1.05; color: var(--text); }
+.run-title:focus, .run-title:focus-visible { outline: none; box-shadow: none; }
+.run-sub { color: var(--text-2); font-size: var(--fs-sm); line-height: 1.45; margin-top: calc(-1 * var(--s3)); }
+.run-id { color: var(--text-3); font-size: var(--fs-xs); margin-top: calc(-1 * var(--s3)); }
+.run-sec { display: grid; gap: var(--s2); padding-top: var(--s3); border-top: 1px solid var(--line-faint); min-width: 0; }
+.run-sec > h4 { display: flex; align-items: center; gap: 8px; }
+.run-dl { display: grid; gap: 0; margin: 0; }
+.run-dl > div { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: var(--s3); padding: 5px 0; border-bottom: 1px solid var(--line-faint); }
+.run-dl > div:last-child { border-bottom: 0; }
+.run-dl dt { color: var(--text-3); font-size: var(--fs-xs); padding-top: 1px; }
+.run-dl dd { margin: 0; color: var(--text); line-height: 1.45; min-width: 0; overflow-wrap: anywhere; }
+.run-val { color: var(--text); }
+.run-q { color: var(--text-3); }
+.run-basis { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-left: 6px; color: var(--text-3); font-size: var(--fs-xs); }
+.run-nr { color: var(--text-3); font-style: italic; }
+.run-note { color: var(--text-2); line-height: 1.5; }
+.run-micro { color: var(--text-3); font-size: var(--fs-xs); line-height: 1.5; }
+.run-dline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+.run-dlabel { color: var(--text-3); font-size: var(--fs-sm); }
+.run-dval { color: var(--text); font-size: var(--fs-3xl); font-weight: 300; line-height: 1; letter-spacing: var(--track-tight); }
+.run-dclass { color: var(--text); font-size: var(--fs-xs); font-weight: 700; letter-spacing: var(--track-caps-wide); }
+.run-dmeta { color: var(--text-3); font-size: var(--fs-xs); }
+.run-gaps { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.run-gaps th { width: 92px; text-align: left; font-weight: 500; color: var(--text); padding: 6px 0; vertical-align: middle; }
+.run-scale { display: block; color: var(--text-3); font-size: 10.5px; font-weight: 400; }
+.run-barcell { padding: 6px 8px; }
+.run-track { position: relative; display: block; height: 6px; background: var(--surface-3); border-radius: var(--r-xs); }
+.run-zero { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--text-3); }
+/* Gaps are distances between conditions, not tolerances: neutral ink, never pass/fail colours. */
+.run-bar { position: absolute; top: 0; bottom: 0; background: var(--text-2); border-radius: var(--r-xs); }
+.run-bar.is-clipped { background: repeating-linear-gradient(90deg, var(--text-2) 0 6px, transparent 6px 8px); }
+.run-gapval { width: 104px; text-align: right; color: var(--text); white-space: nowrap; font-size: var(--fs-xs); }
+.run-gaps tr[data-off] th { color: var(--text-3); }
+.run-src { display: grid; gap: 4px; color: var(--text-2); overflow-wrap: anywhere; }
+.run-srclink { display: inline-flex; align-items: center; gap: 4px; width: fit-content; max-width: 100%; }
+.run-quote { margin: 0; padding: 2px 0 2px 12px; border-left: 2px solid var(--line-strong); color: var(--text-2); font-size: var(--fs-sm); line-height: 1.5; }
+.run-flags { margin: 0; display: grid; gap: 6px; }
+.run-flags > div { display: grid; gap: 2px; }
+.run-flags dt { color: var(--text); font-size: var(--fs-xs); }
+.run-flags dd { margin: 0; color: var(--text-2); line-height: 1.45; }
+.run-details > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.run-details > summary::-webkit-details-marker { display: none; }
+.run-details > summary::before { content: "+"; width: 14px; color: var(--text-3); font-size: 13px; }
+.run-details[open] > summary::before { content: "−"; }
+.run-orig { max-height: 260px; }
+.run-actions { display: flex; flex-wrap: wrap; gap: var(--s2); }

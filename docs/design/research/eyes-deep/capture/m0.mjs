@@ -1,0 +1,12 @@
+import { LAUNCH, chromium, open, shot, dom } from "./lib.mjs";
+import { writeFileSync } from "node:fs";
+const S = process.argv[2];
+const b = await chromium.launch(LAUNCH);
+const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1" });
+const p = await ctx.newPage();
+await p.goto("https://eyes.nasa.gov/apps/solar-system/", { waitUntil: "domcontentloaded", timeout: 60000 });
+await p.waitForTimeout(14000);
+await shot(p, "mobile-01-home");
+writeFileSync(`${S}/dom-mobile.txt`, await dom(p, "#ui", 9));
+writeFileSync(`${S}/dom-mobile-labels.txt`, await dom(p, "#main-viewport", 2));
+await b.close();

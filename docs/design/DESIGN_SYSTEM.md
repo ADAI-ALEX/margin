@@ -1,97 +1,138 @@
-# MARGIN design system
+# MARGIN design system: "an observatory for evidence"
 
-Direction: **"instrument graphite"** — a precise, quiet research instrument. The data is the brightest thing on screen; chrome recedes. Derived from the research in [DESIGN_RESEARCH.md](DESIGN_RESEARCH.md). Tokens live in [`app/globals.css`](../../app/globals.css); fonts in [`lib/fonts.ts`](../../lib/fonts.ts). Feature CSS (`components/*/…css`) must consume tokens and never hard-code colours, fonts, radii or spacing.
+Status: current (redesign `redesign/eyes`, 2026-11-14). The previous interim system ("instrument graphite") is preserved on the branch `wip/instrument-graphite`. Research behind every decision: [`DESIGN_RESEARCH.md`](DESIGN_RESEARCH.md).
 
-## 1. Brand
+MARGIN is a full-screen scientific exploration environment for condition space. The O₂ × pressure plane of one gravity regime is the "universe"; NASA tests, published results, planned experiments and reference cabin atmospheres are its "bodies"; iso-distance contours of evidence coverage are its "orbits"; the user's scenario is a probe. Everything else appears as context when the probe or a test is selected.
 
-**Mark.** Two iso-distance contours — DIRECT (filled) inside NEAR (outlined) coverage of tested conditions — and the user's scenario point (amber) outside them, joined by a dashed gap: the *margin* between a scenario and the nearest evidence. Source: `components/site/BrandMark.tsx` (paths exported as `MARK_PATHS`), `app/icon.svg`, `docs/assets/branding/`.
+## 1. Principles
 
-**Wordmark.** `MARGIN` in Archivo, width 125, weight 700, tracking +0.14 em. Always uppercase; never in a box.
+1. **The field is the hero.** On the Atlas the evidence field fills the viewport; panels float over it and collapse. The data is the brightest thing on screen; chrome is typographic, quiet and pushed to the edges.
+2. **Instruments, not forms.** Console, regime detents and tool rail read as parts of one instrument.
+3. **Typographic annotation.** Landmarks, the probe and the selected run are labelled in the field (tracked caps for landmarks, sentence case for runs), placed without collisions. The key explains; it is never needed to read the field.
+4. **Context on demand.** Verdict first and always visible; detail in tabs, the run inspector, drawers.
+5. **Honest emptiness.** A regime without comparable evidence shows an empty, finely hatched plane and a plain statement. Never decorated away.
+6. **Motion explains state change**, never decorates, never loops (§5).
+7. **One identity across every route**: one shell, one type system, one token set, one component set.
 
-**Usage.** Minimum mark size 16 px. Clear space = the height of the scenario dot on every side. The mark is always shown on `--bg` or `--surface-1`; never recoloured, rotated or placed on photography. No NASA insignia anywhere in the product or repository; MARGIN does not imply NASA endorsement.
+## 2. Colour (tokens in `app/globals.css`)
 
-**Voice.** Plain, exact, unexcited. Say what was measured, computed, stated or assumed. Never "safe", "risk", "predicts", "certified".
+Canvas `--canvas #05070a`: near-black with a trace of the evidence hue. Pure black (the reference's `#010101`) makes thin hairlines and small light text halate; this value keeps the darkest possible field while letting `--line` steps read. Surfaces are **opaque** (no glass, no blur, no shadows): depth comes from luminance steps and hairlines, as in the reference.
 
-## 2. Colour
-
-| Token | Value | Role |
+| Token | Value | Use |
 |---|---|---|
-| `--bg` | `#0B0F14` | Canvas (graphite-navy, never pure black) |
-| `--surface-1` | `#10151C` | Panels, rails |
-| `--surface-2` | `#151B24` | Raised controls, table headers |
-| `--surface-3` | `#1C2430` | Selected segment, hover on raised |
-| `--line` / `--line-strong` / `--line-soft` | `#262F3C` / `#34404F` / `#1B222C` | Hairlines; separation is by 1 px lines plus luminance steps, not shadows |
-| `--text` / `--text-2` / `--text-3` | `#E6EAF0` / `#A6B0BD` / `#858F9D` | Three text levels only; contrast ≥ 12.9 / 7.1 / 5.1 : 1 on every surface |
-| `--signal`, `--signal-strong` | `#5CC8D6`, `#8FE0EA` | **Evidence coverage** and focus. One hue only |
-| `--ev-direct`, `--ev-near`, `--ev-edge` | cyan at 34 % / 12 % / edge line | Coverage bands (D ≤ 1, D ≤ 2.5) |
-| `--scenario` | `#F0A53C` | **The user's scenario** and cautions (partial match, boundary proximity) |
-| `--tier-pub` | `#9DB0FF` | Published evidence (not in PSI); always also a ring shape |
-| `--tier-plan` | `#8D97A5` | Planned experiments; always dashed |
-| `--limit` | `#C9A7F0` | Reported limits (thresholds, not tests); ring with tick |
-| `--claim-*` | see file | Claim-ledger badges |
+| `--surface-1` | `#0e1114` | floating panels |
+| `--surface-2` | `#14181c` | cards, inputs, table heads |
+| `--surface-3` | `#1b2025` | hover, selected |
+| `--surface-4` | `#232930` | pressed, tooltips |
+| `--line-faint` / `--line` / `--line-strong` | `#161a1f` / `#2a3138` / `#3a424b` | hairlines |
+| `--text` | `#eef1f4` | primary text (≥ 12.9:1 on every surface) |
+| `--text-2` | `#acb4bd` | secondary text (≥ 7.0:1) |
+| `--text-3` | `#8b949e` | tertiary text (≥ 4.77:1 on `--surface-4`, 6.56:1 on canvas) |
 
-**Rules.**
-- Evidence uses a single cool hue whose *lightness* encodes closeness. Never red/amber/green ramps, never a warm colour on coverage — a coverage map must not read as a hazard map.
-- Amber means "yours" or "careful". It is never used for data categories.
-- A verdict class (DIRECT / NEAR / DISTANT / NONE) is always written as a word; colour never carries it alone.
-- No gradients in UI chrome, no glows, no glassmorphism (the sticky header uses a single 8 px backdrop blur for legibility only).
+Exactly three text levels. Contrast was computed (WCAG relative luminance) for every text token on every surface; the lowest pair is `--text-3` on `--surface-4` at 4.77:1.
 
-## 3. Typography
+**Semantic hues, one meaning each** (never mix):
 
-| Role | Face | Settings |
+| Meaning | Token(s) | Shape that carries the same meaning |
 |---|---|---|
-| Display (wordmark, page titles, verdict class, hero numerals) | Archivo (variable `wdth`) | width 112–125, weight 600–700, tracking −1.5 % (titles) / +2 % (verdict class) |
-| Interface and reading text | IBM Plex Sans | 400 / 500 / 600; body 14 px / 1.5, small 12.5 px, labels 11 px / 600 |
-| Measurements, ids, file names, dates | IBM Plex Mono | 400 / 500, tabular figures |
+| Evidence coverage (closeness of tested conditions) | `--ev #56c6dc`, `--ev-direct` (30 %), `--ev-near` (11 %), `--ev-edge`, `--ev-edge-soft` | filled bands with thin edges; dashed envelopes |
+| The user's scenario and cautions (partial match, boundary proximity, assumed) | `--scenario #f2a93b` | the probe; caution rules |
+| Published evidence (not in PSI) | `--tier-pub #97a9ff` | ring |
+| Reported limits | `--limit #d29cf2` | ring + horizontal tick |
+| Planned (never evidence) | `--tier-plan #8f98a3` | dashed ring |
+| PSI runs | `--tier-psi`, `--tier-psi-muted` | dot (other fuel class: smaller, dimmer) |
+| Snapshot status | `--text-3` | hollow square; never a green "live" dot |
 
-Scale (px): 11 · 12.5 · 14 · 16 · 20 · 28 · 40. Mono is never used for sentences. Uppercase is reserved for the wordmark, claim badges, and tracked map annotations.
+Rules: coverage uses only `--ev*` (single hue, lightness = closeness), never a red/amber/green ramp, never warm colours. Amber is never metadata. Verdict classes are always written as words. No gradients in chrome, no neon, no glow.
 
-## 4. Space, grid, shape
+Claim badges (`.claim[data-kind]`): MEASURED (`--ev-strong`), COMPUTED (`--text`), PUBLISHED/STATED (`--tier-pub`), NOMINAL/ASSUMED (`--scenario`, a caution), REPORTED LIMIT (`--limit`), PLANNED/DRAFT (`--text-3`, dashed border). The word is always printed.
 
-- 4 px base: `--s1`…`--s8` = 4, 8, 12, 16, 24, 32, 48, 64.
-- Page gutter 24 px (16 px ≤ 640 px). Header 56 px, sticky.
-- Radii: 2 px (segments, badges), 4 px (controls), 6 px (panels). No pill shapes except status dots.
-- Atlas workspace grid (≥ 1180 px): `scenario rail 288 px | map (fluid) | inspector 380 px`; 900–1180 px: rail + map, inspector below; < 900 px: single column, controls collapse into a summary bar that expands.
+## 3. Typography (`lib/fonts.ts`)
 
-## 5. Surfaces
+- **Albert Sans** (variable 100–900, SIL OFL 1.1, Google Fonts, self-hosted by `next/font`) for everything readable. A contemporary geometric grotesque that does what the reference's Metropolis does: light (300) at large sizes, 600 with wide tracking for uppercase labels, tabular figures. Not Inter, not a serif.
+- **IBM Plex Mono** (OFL) only for run ids, file names, source locators and original table cells.
 
-`bg` (canvas) → `surface-1` (rails, panels) → `surface-2` (inputs, table heads, raised) → `surface-3` (selected). One step = one level of emphasis. Panels: 1 px `--line`, radius 6 px, no shadow. Dialog/drawer: `surface-1`, 1 px `--line-strong`, shadow `0 24px 64px rgba(0,0,0,.45)` (the only shadow in the system).
-
-## 6. Components
-
-| Component | Spec |
+| Role | Size / weight / tracking |
 |---|---|
-| Header | Mark + wordmark, dimmed tagline, nav links with a 2 px `--signal` underline for the current page, mono status ("PSI snapshot · runs"), GitHub icon |
-| Button `.btn` | 30 px, `surface-2`, 1 px `line-strong`, radius 4; pressed = cyan tint + cyan border; `.btn-quiet` transparent |
-| Segmented `.seg` | 2 px inset track on `surface-1`; selected segment `surface-3` + inset hairline (no fill colour) |
-| Input / select | 32 px, `surface-1`, 1 px `line-strong`; numeric inputs in mono; focus = cyan border + focus ring |
-| Switch | 28 × 16 track; on = cyan track |
-| Tabs `.tabs` | text tabs with a 2 px cyan underline, no boxes |
-| Panel `.panel` | `surface-1`, hairline, radius 6; `.panel-head` 13 px / 600 title |
-| Claim badge `.claim` | mono 10 px uppercase, 1 px border in the claim colour, 8 % tinted fill; dashed for DRAFT / PLANNED / ASSUMED |
-| Tables | header row `surface-2`, 11 px / 600 labels; body rows 1 px `line-soft`; numbers right-aligned mono; wide tables scroll inside their own focusable region |
-| Tooltip | `surface-3`, 1 px `line-strong`, radius 4, 12 px text; appears on hover and focus |
-| Drawer | right-side, 440 px, Esc closes and focus returns |
+| Page title | 48 px / 300 / −0.025 em (34 px on mobile) |
+| Readout (verdict word, D) | 30–34 px / 300 / +0.1 em on class words |
+| Card title (expedition, run) | 20–26 px / 300 / −0.02 em, leading ≈ 1.02 |
+| Field title | 20 px / 300 |
+| Body (reading) | 16 px / 400 / 1.55 |
+| UI body | 14 px / 400 |
+| Small | 12.5 px, 11.5 px |
+| Caps label (`.caps`, `.ui-label`) | 10.5 px / 600 / +0.16 em, uppercase |
+| Wide caps (card metadata, landmarks) | 10.5–11 px / 600 / +0.20–0.24 em |
 
-## 7. Chart language
+Numbers: `.num` (tabular, lining figures) everywhere a value is shown.
 
-- **Frame**: plot on `--bg` inside a `surface-1` panel; axis lines `--line-strong`; gridlines 1 px `--line-soft`, dashed `2 4`; tick labels mono 10.5 px `--text-3` with units; axis titles 11 px Plex Sans `--text-2`.
-- **Coverage bands**: `--ev-near` fill + `--ev-edge` 1 px edge at D = 2.5; `--ev-direct` at D = 1; outside: 45° hatch in `--ev-none-hatch`. Dashed thin cyan contours for the ½× / 2× scale envelopes.
-- **Marks**: PSI comparable run = 2.5 px dot `--tier-psi`; other fuel class = 1.5 px dot `--text-3` at 45 %; published = 4 px ring `--tier-pub`; reported limit = ring + tick `--limit`; planned = dashed ring `--tier-plan`; landmark atmospheres = small hollow triangle + tracked caps label; **scenario** = amber pin with crosshair rules to both axes and a mono readout.
-- **Labels**: direct labels beside marks (OWID); tracked uppercase for landmarks (NASA Eyes); never a legend you must decode before reading the chart — the key sits under the plot and repeats "not a hazard map".
-- **Source line** under every chart: what is drawn and where it comes from.
-- Small multiples (gravity regimes) share axes and scales; the active regime has a cyan top rule.
+## 4. Space and shape
 
-## 8. Interaction & motion
+4 px base (`--s1`…`--s9`: 4, 8, 12, 16, 20, 24, 32, 48, 64). Radii: `--r-sm 3px` controls, `--r-md 6px` panels and cards, `--r-round` only for the switch track. Hit targets: icon controls 32 × 32 px (≥ 28 px visible), primary controls 44 px on touch (regime detents on mobile). Header height 64 px (56 px on mobile). Reading measure 70 ch.
 
-- Hover: +1 surface step. Focus: 2 px cyan ring offset by 2 px of `--bg`. Selected: cyan underline (tabs, nav) or `surface-3` (segments).
-- Motion: 140 ms `cubic-bezier(.2,.7,.2,1)` for colour/opacity; the scenario pin glides 250 ms on preset jumps. `prefers-reduced-motion` disables all transitions.
-- Progressive disclosure: verdict first; breakdown, sensitivity, ranking, findings and sources behind tabs; run details in a drawer.
+## 5. Motion
 
-## 9. Responsive behaviour
+| Token | Value | Use |
+|---|---|---|
+| `--dur-1` | 120 ms | hover, colour |
+| `--dur-2` | 200 ms | panels, drawers, dim/highlight |
+| `--dur-3` | 360 ms | view transitions (zoom to a run, probe glide on a preset jump) |
+| `--ease` | `cubic-bezier(0.2, 0.7, 0.2, 1)` | decelerate |
+| `--ease-in-out` | `cubic-bezier(0.45, 0, 0.2, 1)` | view moves |
 
-1440 / 1280: three-column Atlas. 768: map full width, scenario controls in a two-column grid above, inspector below. 390: one column; map ≥ 320 px tall; tap to place the pin (no drag); nav becomes a horizontal scroller under the header. No page-level horizontal scroll at any width (tested).
+Regime changes are cuts: points never travel between regimes. No idle animation, no loops, no particles. `prefers-reduced-motion` makes every transition instant (global rule in `globals.css`; the field's zoom animation checks it in JS).
 
-## 10. Accessibility
+## 6. Components (one implementation each)
 
-WCAG 2.1 AA: all text ≥ 4.5 : 1 (tested with axe in CI on every route at desktop and mobile); non-text marks ≥ 3 : 1 against `--bg`; every chart has a text summary (`aria-label`) and a tabular alternative (run tables, ranking); all controls keyboard-operable (segmented controls use arrow keys; pin moves with arrow keys); scroll regions are focusable; the verdict is announced with `aria-live="polite"`.
+| Component | File | Notes |
+|---|---|---|
+| App shell: header, footer | `components/site/SiteHeader.tsx`, `SiteFooter.tsx`, `site.css` | header transparent over the Atlas, solid elsewhere; nav `aria-label="Primary"`; footer hidden on the desktop Atlas (credit line instead) |
+| Brand mark | `components/site/BrandMark.tsx` | one geometry for header, favicon, banner, OG |
+| Floating / collapsible panel | `components/ui/Panel.tsx` | `.ui-panel`, light label + hairline + square collapse button |
+| Card | `.ui-card` (`ui.css`) | expedition and investigation cards |
+| Icon rail button + tooltip | `components/ui/IconButton.tsx` | visible tooltip on hover and focus = accessible name |
+| Radio group: segmented / detents | `components/ui/controls.tsx` `RadioGroup` | roving tabindex, arrows/Home/End; detents for the regime selector |
+| Switch, Select, Number field with unit toggle | `controls.tsx` | number fields commit on blur/Enter |
+| Tabs | `components/ui/Tabs.tsx` | `TabList` + `tabPanelProps` |
+| Drawer / inspector sheet | `components/ui/Drawer.tsx` | right on wide, bottom sheet on narrow; Esc, focus return, focus trap |
+| Tooltip | `.ui-tip` (rail), `.fld-tip` (field hover) | |
+| Table | `.ui-table`, `.ui-table-scroll` (focusable region) | |
+| Claim badge | `components/ui/misc.tsx` `ClaimBadge`, `.claim` | |
+| Chart frame | `misc.tsx` `ChartFrame` | title → definition → plot → source line → actions |
+| Key / legend | `misc.tsx` `KeyList`, `components/atlas/ToolRail.tsx` `FieldKey` | |
+| Breadcrumb | `misc.tsx` `Breadcrumb` | |
+| Command search | `components/ui/CommandSearch.tsx` | ⌘K / Ctrl K, local index loaded on demand |
+| Toast | `components/ui/Toast.tsx` | "Link copied" |
+| Run inspector | `components/run/RunInspector.tsx` | the single run view used by Atlas, Investigations and dossiers |
+| Document page frame | `.ui-page`, `.ui-page-head`, `.ui-page-title`, `.ui-page-lede` | Method, Sources, Investigations, dossiers |
+
+Feature CSS (`components/atlas/atlas.css`, `components/casefile/*.module.css`, `components/dossier/*`, `components/docs/docs.css`) consumes tokens only: no hex or rgb literals, no font stacks, no ad-hoc radii.
+
+## 7. The field encoding (`.mk-*` in `ui.css`)
+
+| Mark | Meaning |
+|---|---|
+| small dot (`--tier-psi`) | comparable PSI run (shape by fuel class: ● solid, ◆ droplet, + gas burner, ■ smoke source) |
+| smaller, dimmer dot | PSI run of another fuel class |
+| ring (`--tier-pub`) | published result (not in PSI) |
+| ring + tick (`--limit`) | reported limit (a threshold, not a tested condition) |
+| dashed ring (`--tier-plan`) | planned experiment (never evidence) |
+| hollow triangle + tracked caps | reference cabin atmosphere |
+| amber ring + dot, crosshairs, axis tags | the scenario probe (the one amber element) |
+| `--ev-direct` band, `--ev-near` band, thin edges | D ≤ 1 and D ≤ 2.5 regions |
+| dashed thin contour | the D = 2.5 boundary at ½× and 2× scales |
+| faint hatch | no comparable evidence (D > 2.5) |
+
+Frame: O₂ linear (10–45 %), pressure log (20–520 kPa, psia secondary axis). Never tilted. Every field carries "Evidence proximity, not a safety rating", "Not a hazard map" and a source line.
+
+## 8. Brand
+
+- **Mark**: two iso-distance contours of tested conditions (DIRECT filled inside NEAR, `--ev`) and the user's scenario probe outside them (`--scenario`), joined by a dashed gap: the margin between a scenario and the nearest evidence. Drawn on a 32-unit grid (`MARK_PATHS`).
+- **Wordmark**: MARGIN in uppercase, Albert Sans 600, tracking +0.26 em.
+- **Clear space**: one probe diameter (≈ 5.4 grid units, 17 % of the mark) on every side; between mark and wordmark, 0.5 × mark height.
+- **Minimum size**: mark 16 px (favicon); mark + wordmark 20 px mark height.
+- On dark only (canvas or `--surface-1`). No NASA insignia, no space imagery, no endorsement implied.
+
+## 9. Don'ts
+
+Inter-everywhere, purple/blue gradients, neon glow, glass cards, pill buttons everywhere, emoji icons, marketing heroes, dashboards of identical cards, starfields, planets, spacecraft, a tilted data plane, a gravity slider, anything that interpolates between regimes, warm colours on coverage, a green "live" indicator.

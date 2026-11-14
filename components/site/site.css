@@ -1,0 +1,71 @@
+/* Site chrome: header, footer, brand mark. Tokens only (app/globals.css). */
+
+.site-mark { display: block; flex: none; }
+.site-mark-near { fill: color-mix(in srgb, var(--ev) 14%, transparent); stroke: var(--ev); stroke-width: 1.6; }
+.site-mark-direct { fill: var(--ev); fill-opacity: 0.75; }
+.site-mark-gap { fill: none; stroke: var(--scenario); stroke-width: 1.5; stroke-dasharray: 1.6 1.7; stroke-linecap: round; }
+.site-mark-probe { fill: var(--scenario); }
+
+.site-wordmark { font-weight: 600; font-size: 15px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--text); line-height: 1; padding-left: 0.1em; }
+
+/* ------------------------------------------------------------------ header */
+.site-header {
+  position: sticky; top: 0; z-index: 40;
+  height: var(--header-h);
+  display: flex; align-items: center; gap: var(--s7);
+  padding: 0 var(--gutter);
+  background: var(--canvas);
+  border-bottom: 1px solid var(--line-faint);
+}
+/* Over the Atlas: no background, no border; the field runs underneath (NASA Eyes-style chrome). */
+.site-header[data-mode="overlay"] { position: fixed; left: 0; right: 0; background: transparent; border-bottom-color: transparent; pointer-events: none; }
+.site-header[data-mode="overlay"] > * { pointer-events: auto; }
+
+.site-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); flex: none; }
+.site-brand:hover { color: var(--text); }
+.site-tagline { font-size: var(--fs-sm); color: var(--text-3); font-weight: 400; white-space: nowrap; padding-left: 12px; border-left: 1px solid var(--line); line-height: 16px; }
+
+.site-nav { display: flex; gap: var(--s6); align-items: center; }
+.site-nav a { color: var(--text-2); text-decoration: none; font-size: var(--fs-md); font-weight: 500; padding: 6px 0; border-bottom: 1px solid transparent; transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+.site-nav a:hover { color: var(--text); }
+.site-nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--text); }
+
+.site-actions { margin-left: auto; display: flex; align-items: center; gap: var(--s2); }
+.site-status { display: inline-flex; align-items: center; gap: 8px; color: var(--text-3); font-size: var(--fs-xs); font-weight: 500; letter-spacing: 0.04em; white-space: nowrap; margin-right: var(--s3); font-variant-numeric: tabular-nums; }
+/* A dated snapshot, never "live": a hollow square, not a green dot. */
+.site-status-glyph { width: 7px; height: 7px; border: 1px solid var(--text-3); flex: none; }
+.site-action {
+  display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px;
+  background: transparent; border: 1px solid transparent; border-radius: var(--r-sm); color: var(--text-2);
+  font-size: var(--fs-md); font-weight: 400; cursor: pointer; text-decoration: none;
+  transition: color var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+.site-action:hover { color: var(--text); background: var(--surface-2); border-color: var(--line); }
+.site-kbd { margin-left: 2px; }
+.ui-kbd { font-family: var(--font-ui); font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-3); border: 1px solid var(--line); border-radius: var(--r-xs); padding: 1px 5px; line-height: 14px; background: var(--surface-1); }
+
+@media (max-width: 1279px) { .site-tagline { display: none; } }
+@media (max-width: 1100px) { .site-status { display: none; } .site-header { gap: var(--s6); } }
+@media (max-width: 900px) { .site-action-text, .site-kbd { display: none; } .site-action { padding: 0 8px; } }
+
+/* Narrow screens: brand + actions on the first row, the primary nav on a second row (always visible). */
+@media (max-width: 767px) {
+  .site-header { height: auto; flex-wrap: wrap; row-gap: 0; column-gap: var(--s3); padding-top: 10px; }
+  .site-header[data-mode="overlay"] { position: sticky; background: var(--canvas); pointer-events: auto; border-bottom-color: var(--line-faint); }
+  .site-brand { height: 36px; }
+  .site-actions { gap: 0; }
+  .site-nav { order: 3; width: 100%; gap: var(--s5); height: 40px; overflow-x: auto; }
+  .site-nav a { font-size: var(--fs-md); padding: 10px 0; white-space: nowrap; }
+}
+
+/* ------------------------------------------------------------------ footer */
+.site-footer { border-top: 1px solid var(--line-faint); background: var(--canvas); padding: var(--s7) var(--gutter) var(--s8); }
+.site-footer-inner { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--s7); }
+.site-footer-brand { display: flex; align-items: center; gap: 10px; align-self: start; }
+.site-footer-brand .site-wordmark { font-size: 13px; }
+.site-footer-text { display: grid; gap: var(--s3); max-width: var(--measure); color: var(--text-2); font-size: var(--fs-sm); line-height: 1.6; }
+.site-footer-text strong { color: var(--text); font-weight: 600; }
+@media (max-width: 767px) { .site-footer-inner { grid-template-columns: 1fr; gap: var(--s4); } }
+
+/* The desktop Atlas is a full-viewport instrument: its attribution lives in the field's credit line. */
+@media (min-width: 768px) { body[data-route="atlas"] .site-footer { display: none; } }
