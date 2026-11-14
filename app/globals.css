@@ -96,7 +96,7 @@
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.2, 1);
 
-  --focus-ring: 0 0 0 2px var(--canvas), 0 0 0 4px var(--ev-strong);
+  --focus-ring: 0 0 0 2px var(--canvas), 0 0 0 4px var(--text);   /* neutral: cyan means evidence */
   --scrim: rgba(5, 7, 10, 0.62);   /* behind modal drawers and search */
 
 }
@@ -151,6 +151,11 @@ a:hover { color: var(--ev-strong); text-decoration-color: var(--ev); }
 .claim[data-kind="REPORTED LIMIT"] { color: var(--claim-limit); }
 .claim[data-kind="PUBLISHED"], .claim[data-kind="STATED"] { color: var(--claim-published); }
 .claim[data-kind="PLANNED"], .claim[data-kind="DRAFT"] { color: var(--claim-draft); border-style: dashed; }
+
+/* shared-link hydration: scenario views stay hidden until the URL scenario is applied (app/layout.tsx) */
+html[data-pending] [data-scenario-view] { visibility: hidden; }
+.pending-note { display: none; }
+html[data-pending] .pending-note { display: block; position: fixed; z-index: 50; left: 50%; top: 45%; transform: translateX(-50%); color: var(--text-2); font-size: var(--fs-sm); letter-spacing: 0.02em; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }

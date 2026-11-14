@@ -102,7 +102,7 @@ export default function EvidenceField(p: Props) {
   const tap = useRef<{ x: number; y: number; id: number } | null>(null);
 
   const { W, H, free, compact, domain } = p;
-  const m = compact ? { l: 42, r: 34, t: 30, b: 58 } : { l: 58, r: 52, t: 84, b: 72 };
+  const m = compact ? { l: 42, r: 34, t: 72, b: 58 } : { l: 58, r: 52, t: 104, b: 72 };
   const x0 = free.l + m.l, y0 = free.t + m.t;
   const iw = Math.max(140, W - free.l - free.r - m.l - m.r), ih = Math.max(140, H - free.t - free.b - m.t - m.b);
 
@@ -302,16 +302,16 @@ export default function EvidenceField(p: Props) {
         <rect className="fld-frame" x={x0} y={y0} width={iw} height={ih} />
         <g className="fld-axis">
           {o2Ticks.map((t) => (
-            <g key={`tx${t}`} transform={`translate(${x(t)},${y0 + ih})`}><line y2={5} /><text y={18} textAnchor="middle">{t}</text></g>
+            <g key={`tx${t}`} transform={`translate(${x(t)},${y0 + ih})`}><line y2={5} />{Math.abs(x(t) - px) > 34 && <text y={18} textAnchor="middle">{t}</text>}</g>
           ))}
           {pTicks.map((t) => (
-            <g key={`ty${t}`} transform={`translate(${x0},${y(t)})`}><line x2={-5} /><text x={-9} dy="0.32em" textAnchor="end">{t}</text></g>
+            <g key={`ty${t}`} transform={`translate(${x0},${y(t)})`}><line x2={-5} />{Math.abs(y(t) - py) > 12 && <text x={-9} dy="0.32em" textAnchor="end">{t}</text>}</g>
           ))}
           {psiaTicks.map(({ t, k }) => (
             <g key={`tp${t}`} transform={`translate(${x0 + iw},${r2(sy(k))})`}><line x2={4} /><text x={8} dy="0.32em">{t}</text></g>
           ))}
           <text className="fld-axis-title" x={x0 + iw / 2} y={y0 + ih + (compact ? 34 : 40)} textAnchor="middle">Oxygen, % by volume</text>
-          <text className="fld-axis-title" transform={`translate(${x0 - (compact ? 32 : 44)},${y0 + ih / 2}) rotate(-90)`} textAnchor="middle">Total pressure, kPa (log)</text>
+          <text className="fld-axis-title" transform={`translate(${x0 - (compact ? 34 : 50)},${py > y0 + ih / 2 ? y0 + ih * 0.3 : y0 + ih * 0.7}) rotate(-90)`} textAnchor="middle">Total pressure, kPa (log)</text>
           <text className="fld-axis-title" transform={`translate(${x0 + iw + (compact ? 26 : 40)},${y0 + ih / 2}) rotate(90)`} textAnchor="middle">psia</text>
         </g>
 
@@ -353,7 +353,7 @@ export default function EvidenceField(p: Props) {
           {p.layers.landmarks && landmarkGroups.map((g) => {
             const l = lm(`lm:${g.id}`);
             const active = g.items.some((it) => it.id === p.activePreset);
-            const name = `Preset: ${g.items.map((it) => it.label).join(" and ")}, ${g.items[0].o2Pct}% O₂, ${g.items[0].pressureKPa} kPa`;
+            const name = `${g.label}: preset ${g.items.map((it) => it.label).join(" and ")}, ${g.items[0].o2Pct}% O₂, ${g.items[0].pressureKPa} kPa`;
             return (
               <g key={g.id} data-role="landmark" role="button" tabIndex={0} aria-label={name} aria-pressed={active}
                 className={`fld-landmark${active ? " is-active" : ""}`}
@@ -372,7 +372,7 @@ export default function EvidenceField(p: Props) {
           <line x1={px} x2={px} y1={py} y2={y0 + ih} />
           <line x1={x0} x2={px} y1={py} y2={py} />
           <g transform={`translate(${px},${y0 + ih})`} className="fld-probe-tag"><rect x={-24} y={3} width={48} height={16} rx={2} /><text y={15} textAnchor="middle">{fmt(s.o2Pct)}%</text></g>
-          <g transform={`translate(${x0},${py})`} className="fld-probe-tag"><rect x={-54} y={-8} width={50} height={16} rx={2} /><text x={-29} y={4} textAnchor="middle">{fmt(s.pressureKPa)}</text></g>
+          <g transform={`translate(${x0},${py})`} className="fld-probe-tag"><rect x={-46} y={-8} width={42} height={16} rx={2} /><text x={-25} y={4} textAnchor="middle">{fmt(s.pressureKPa)}</text></g>
         </g>
         <g data-role="probe" className="fld-probe" style={{ transform: `translate(${px}px, ${py}px)` }} tabIndex={0} role="button"
           aria-roledescription="movable scenario probe"
@@ -389,7 +389,7 @@ export default function EvidenceField(p: Props) {
       <div className="fld-title" style={{ left: pc(x0, W), top: pc(free.t + (compact ? 6 : 12), H), width: pc(iw, W) }}>{p.title}</div>
 
       {p.empty && (
-        <div className="fld-empty" style={{ left: pc(x0, W), top: pc(y0, H), width: pc(iw, W), height: pc(ih, H) }}>
+        <div className="fld-empty" data-v={py < y0 + ih / 2 ? "bottom" : "top"} data-h={px < x0 + iw / 2 ? "right" : "left"} style={{ left: pc(x0, W), top: pc(y0, H), width: pc(iw, W), height: pc(ih, H) }}>
           <div className="fld-empty-inner">{p.empty}</div>
         </div>
       )}

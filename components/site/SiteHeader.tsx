@@ -27,7 +27,7 @@ export default function SiteHeader({ status }: { status: string }) {
   useEffect(() => { document.body.dataset.route = overlay ? "atlas" : "doc"; }, [overlay]);
   return (
     <header className="site-header" data-mode={overlay ? "overlay" : "solid"}>
-      <Link href={q ? `/?${q}` : "/"} className="site-brand" aria-label="MARGIN home">
+      <Link href={q ? `/?${q}` : "/"} className="site-brand">
         <BrandMark size={24} />
         <span className="site-wordmark">MARGIN</span>
         <span className="site-tagline">How close is the evidence?</span>
@@ -44,7 +44,7 @@ export default function SiteHeader({ status }: { status: string }) {
         <span className="site-status" title="Bundled NASA PSI snapshot; the app makes no calls to NASA at run time">
           <span className="site-status-glyph" aria-hidden="true" />{status}
         </span>
-        <button type="button" className="site-action" onClick={openSearch} aria-keyshortcuts="Meta+K Control+K" aria-label="Search (Ctrl K)">
+        <button type="button" className="site-action" onClick={openSearch} aria-keyshortcuts="Meta+K Control+K" aria-label="Search ⌘K (Ctrl K on Windows and Linux)">
           <IconSearch /><span className="site-action-text">Search</span><kbd className="ui-kbd site-kbd" aria-hidden="true">⌘K</kbd>
         </button>
         <button type="button" className="site-action" onClick={copyCurrentUrl} aria-label="Share: copy the link to this view">

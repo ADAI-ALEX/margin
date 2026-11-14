@@ -44,6 +44,12 @@ export const defaultCandidates = (gap = 9, h = 12) => [
   { dx: -gap, dy: -gap, anchor: "end" as const },
   { dx: gap, dy: gap + h * 0.6, anchor: "start" as const },
   { dx: -gap, dy: gap + h * 0.6, anchor: "end" as const },
+  { dx: 0, dy: -gap - h - 6, anchor: "middle" as const },
+  { dx: 0, dy: gap + h * 1.8 + 6, anchor: "middle" as const },
+  { dx: gap + 12, dy: -gap - h, anchor: "start" as const },
+  { dx: -gap - 12, dy: -gap - h, anchor: "end" as const },
+  { dx: gap + 12, dy: gap + h * 1.6, anchor: "start" as const },
+  { dx: -gap - 12, dy: gap + h * 1.6, anchor: "end" as const },
 ];
 
 const overlaps = (a: Box, b: Box, pad = 2) => a.x < b.x + b.w + pad && b.x < a.x + a.w + pad && a.y < b.y + b.h + pad && b.y < a.y + a.h + pad;

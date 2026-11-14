@@ -273,7 +273,7 @@ export function Ladder(props: {
                     : AXIS_KEYS.map((axis) => <AxisCell key={axis} row={row} axis={axis} s={s} />)}
                   <div className={css.rD}>
                     {row.nearest ? (
-                      <button type="button" className={css.dBtn} onClick={() => openRun(row.nearest!.run)} aria-label={`D_min ${fmt(row.Dmin, 2)}, Evidence: ${v}. Open provenance of nearest run ${row.nearest.run.id}`}>
+                      <button type="button" className={css.dBtn} onClick={() => openRun(row.nearest!.run)} aria-label={`${fmt(row.Dmin, 2)} ${v}: D_min ${fmt(row.Dmin, 2)}, evidence ${v}. Open provenance of nearest run ${row.nearest.run.id}`}>
                         <span className={`num ${css.dVal}`}>{fmt(row.Dmin, 2)}</span>
                         <span className={css.dClass}>{v}</span>
                       </button>

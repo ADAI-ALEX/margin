@@ -50,6 +50,9 @@ export function useMargin(initialPreset = "iss") {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [initialPresetRef]);
 
+  // Reveal the scenario views once the URL scenario has been applied and rendered (see app/layout.tsx).
+  useEffect(() => { if (hydrated) document.documentElement.removeAttribute("data-pending"); }, [hydrated]);
+
   // Never write the URL before hydration has read it (Strict Mode runs effects twice in dev).
   useEffect(() => {
     if (!hydrated) return;

@@ -89,7 +89,7 @@ export default function CasefileApp() {
   const focusRow = rows.find((r) => r.inv.id === focusId) ?? null;
 
   return (
-    <main id="main" className={`ui-page ${css.root}`} data-dock={pinned.length > 0 || undefined}>
+    <main id="main" data-scenario-view className={`ui-page ${css.root}`} data-dock={pinned.length > 0 || undefined}>
       <header className="ui-page-head">
         <Breadcrumb items={[{ label: "Atlas", href: "/" }, { label: "Investigations" }]} />
         <h1 className="ui-page-title">Investigations</h1>

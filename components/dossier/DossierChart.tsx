@@ -67,7 +67,7 @@ function Panel({ runs, g, acronym }: { runs: Run[]; g: Gravity; acronym: string 
         <line x1={M.l} x2={W - M.r} y1={H - M.b} y2={H - M.b} className={css.frame} />
         <text x={(M.l + W - M.r) / 2} y={H - 8} textAnchor="middle" className={css.axisTitle}>O₂, % by volume (ambient)</text>
         <text x={13} y={(M.t + H - M.b) / 2} transform={`rotate(-90 13 ${(M.t + H - M.b) / 2})`} textAnchor="middle" className={css.axisTitle}>Pressure, kPa (log scale)</text>
-        <Landmarks g={geom} items={PRESETS.map((p) => ({ label: p.short, o2: p.o2Pct, p: p.pressureKPa }))} />
+        <Landmarks g={geom} items={PRESETS.map((p) => ({ label: p.short, o2: p.o2Pct, p: p.pressureKPa }))} marks={runs.map((r) => ({ x: geom.x(r.o2Pct as number), y: geom.y(r.pressureKPa as number) }))} />
         {groups.map((g) => (
           <g key={g.key}>
             <title>{`${g.n > 1 ? `${g.n} runs` : g.first.id} · ${fmt(g.o2, 1)}% O₂ · ${fmt(g.p, 1)} kPa${g.n === 1 ? ` · ${g.first.material ?? "material not recorded"}` : ""}`}</title>

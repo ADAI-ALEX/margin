@@ -243,3 +243,13 @@
 .nf-links { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s3); }
 .ui-loading { display: grid; gap: var(--s3); padding: var(--s7) var(--gutter); max-width: 1240px; margin: 0 auto; color: var(--text-2); }
 .ui-loading-bar { height: 1px; width: min(320px, 60vw); background: var(--line); position: relative; overflow: hidden; }
+
+/* ------------------------------------------------------------------ touch: primary controls ≥ 44 px, icon controls ≥ 40 px */
+@media (pointer: coarse) {
+  .ui-sq { width: 40px; height: 40px; }
+  .ui-rg--segmented .ui-rg-opt, .ui-rg--sm.ui-rg--segmented .ui-rg-opt { min-height: 40px; }
+  .ui-btn, .ui-select, .ui-num { min-height: 44px; }
+  .ui-tab { min-height: 44px; }
+  .ui-switch { min-height: 44px; }
+  .ui-link-btn { padding: 4px 0; }
+}

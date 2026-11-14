@@ -186,7 +186,7 @@ export function Dossier({ id }: { id: string }) {
         <section className={css.section} aria-labelledby="dos-sum-h" data-testid="summary-rows">
           <h2 className={css.h2} id="dos-sum-h">Summary rows (not runs)</h2>
           <p className={css.sub}>{summaries.length} summary rows from <span className="mono">{sumFiles}</span>, as they appear in PSI.</p>
-          <div className={`ui-table-scroll ${css.tableMax}`} tabIndex={0} role="region" aria-label="Summary rows">
+          <div className="ui-table-scroll" tabIndex={0} role="region" aria-label="Summary rows">
             <table className="ui-table">
               <caption className="sr-only">{summaries.length} summary rows from {sumFiles}, as they appear in PSI</caption>
               <thead><tr><th scope="col">Row</th>{sumCols.map((c) => <th key={c} scope="col">{c}</th>)}</tr></thead>

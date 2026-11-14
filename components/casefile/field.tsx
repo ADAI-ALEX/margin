@@ -3,6 +3,7 @@
  * chart window (O₂ linear 10–45 %, pressure log 20–520 kPa), hairline grid, tick labels and axis titles.
  * Server-safe (no hooks). Marks come from components/atlas/marks.tsx and the .mk-* classes in ui.css.
  */
+import { placeLabels, textWidth } from "@/lib/view/labels";
 import type { ReactNode } from "react";
 import { O2_DOMAIN, P_DOMAIN, r2 } from "@/components/atlas/geo";
 import css from "./field.module.css";
@@ -70,9 +71,16 @@ export function Probe({ g, o2, p }: { g: FieldGeom; o2: number; p: number }) {
 
 /**
  * Reference cabin atmospheres: hollow triangles with tracked-caps labels. Atmospheres at the same condition
- * share one label; each label takes the first candidate position that collides with no other label or mark.
+ * share one label. Labels use the Atlas placement routine (lib/view/labels.ts): never over another label or
+ * a reserved area, avoiding data marks where possible, hidden only when nothing fits.
  */
-export function Landmarks({ g, items }: { g: FieldGeom; items: { label: string; o2: number; p: number }[] }) {
+export function Landmarks({ g, items, marks = [], reserve = [] }: {
+  g: FieldGeom; items: { label: string; o2: number; p: number }[];
+  /** Screen positions of data marks to avoid (soft obstacles). */
+  marks?: { x: number; y: number }[];
+  /** Areas labels must never cover (e.g. an empty-state message). */
+  reserve?: { x: number; y: number; w: number; h: number }[];
+}) {
   const merged = new Map<string, { label: string; o2: number; p: number }>();
   for (const a of items) {
     if (!g.inWindow(a.o2, a.p)) continue;
@@ -80,34 +88,22 @@ export function Landmarks({ g, items }: { g: FieldGeom; items: { label: string; 
     const m = merged.get(k);
     if (m) m.label = `${m.label} / ${a.label}`; else merged.set(k, { ...a });
   }
-  const pts = [...merged.values()].sort((a, b) => a.o2 - b.o2).map((a) => ({ ...a, cx: g.x(a.o2), cy: g.y(a.p) }));
-  type Box = { x0: number; y0: number; x1: number; y1: number };
-  const hit = (a: Box, b: Box) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
-  const boxes: Box[] = pts.map((p) => ({ x0: p.cx - 6, y0: p.cy - 6, x1: p.cx + 6, y1: p.cy + 6 }));
-  const placed = pts.map((p) => {
-    const w = p.label.length * 7 + 4, h = 11;
-    const cands: { x: number; y: number; anchor: "start" | "end" | "middle" }[] = [
-      { x: p.cx + 8, y: p.cy - 6, anchor: "start" }, { x: p.cx + 8, y: p.cy + 13, anchor: "start" },
-      { x: p.cx - 8, y: p.cy - 6, anchor: "end" }, { x: p.cx - 8, y: p.cy + 13, anchor: "end" },
-      { x: p.cx, y: p.cy - 10, anchor: "middle" }, { x: p.cx, y: p.cy + 18, anchor: "middle" },
-    ];
-    const boxOf = (c: (typeof cands)[number]): Box => {
-      const x0 = c.anchor === "start" ? c.x : c.anchor === "end" ? c.x - w : c.x - w / 2;
-      return { x0, y0: c.y - h + 2, x1: x0 + w, y1: c.y + 2 };
-    };
-    const inside = (b: Box) => b.x0 >= g.M.l && b.x1 <= g.W - g.M.r && b.y0 >= g.M.t && b.y1 <= g.H - g.M.b;
-    const pick = cands.find((c) => { const b = boxOf(c); return inside(b) && !boxes.some((o) => hit(o, b)); }) ?? cands.find((c) => inside(boxOf(c))) ?? cands[0];
-    boxes.push(boxOf(pick));
-    return { ...p, t: pick };
-  });
+  const pts = [...merged.values()].map((a) => ({ ...a, label: a.label.toUpperCase(), cx: g.x(a.o2), cy: g.y(a.p) }));
+  const placed = new Map(placeLabels(
+    pts.map((p) => ({ id: p.label, x: p.cx, y: p.cy, w: textWidth(p.label, "caps") * 0.92, h: 11, priority: 1 })),
+    { x: g.M.l + 2, y: g.M.t + 2, w: g.W - g.M.l - g.M.r - 4, h: g.H - g.M.t - g.M.b - 4 },
+    [...pts.map((p) => ({ x: p.cx - 6, y: p.cy - 6, w: 12, h: 12 })), ...reserve],
+    marks.map((m) => ({ x: m.x - 3, y: m.y - 3, w: 6, h: 6 })),
+  ).map((l) => [l.id, l]));
   return (
     <g className={css.landmarks}>
-      {placed.map((a) => {
+      {pts.map((a) => {
         const r = 4.6;
+        const l = placed.get(a.label);
         return (
           <g key={a.label}>
             <polygon points={`${a.cx},${r2(a.cy - r)} ${r2(a.cx + r * 0.9)},${r2(a.cy + r * 0.6)} ${r2(a.cx - r * 0.9)},${r2(a.cy + r * 0.6)}`} className="mk-landmark" />
-            <text x={r2(a.t.x)} y={r2(a.t.y)} textAnchor={a.t.anchor} className={css.lmLabel}>{a.label}</text>
+            {l && !l.hidden && <text x={r2(l.x)} y={r2(l.y)} textAnchor={l.anchor} className={css.lmLabel}>{a.label}</text>}
           </g>
         );
       })}

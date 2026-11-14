@@ -67,7 +67,9 @@ export function DossierStage({ runs, acronym, invId }: { runs: Run[]; acronym: s
         <FieldAxes g={G} />
         {drawn.length === 0 && <rect x={G.M.l} y={G.M.t} width={G.W - G.M.l - G.M.r} height={G.H - G.M.t - G.M.b} fill="url(#dos-hatch)" className={css.hatchFill} />}
         <g>{context.map((c) => <circle key={`${c.x}|${c.y}`} cx={c.x} cy={c.y} r={1.3} className="mk-dot mk-dot--muted" />)}</g>
-        <Landmarks g={G} items={lm} />
+        <Landmarks g={G} items={lm}
+          marks={[...drawn.map((r) => ({ x: G.x(r.o2Pct!), y: G.y(r.pressureKPa!) })), ...context]}
+          reserve={drawn.length === 0 ? [{ x: (G.M.l + G.W - G.M.r) / 2 - 150, y: (G.M.t + G.H - G.M.b) / 2 - 16, w: 300, h: 24 }] : []} />
         <g>{psi.map((r) => <Dot key={r.id} x={G.x(r.o2Pct!)} y={G.y(r.pressureKPa!)} r={2.6} shape={fuelShape(r.fuelClass)} />)}</g>
         <g>{tiers.map((r) => <TierMark key={r.id} run={r} x={G.x(r.o2Pct!)} y={G.y(r.pressureKPa!)} scale={1.15} />)}</g>
         {drawn.length === 0 && <text x={(G.M.l + G.W - G.M.r) / 2} y={(G.M.t + G.H - G.M.b) / 2} textAnchor="middle" className={css.emptyText}>No run of {acronym} can be placed here</text>}

@@ -17,7 +17,7 @@ import { parseViewQuery, viewToQuery } from "@/lib/state/viewQuery";
 import { ALL_RUNS, COUNTS, HEADLINE, SNAP } from "@/lib/data";
 import { ATMOSPHERES, HAZARDS, PRESETS } from "@/content/curated";
 import { GRAVITY_LABEL } from "@/lib/format";
-import { REGIMES, occupancy } from "@/lib/view/regimes";
+import { REGIMES, REGIME_G, REGIME_SHORT, occupancy } from "@/lib/view/regimes";
 import { EXPEDITIONS, expeditionScenario, type Expedition } from "@/lib/view/expeditions";
 import { registerSearchHandler } from "@/lib/view/searchBus";
 import { parseScenarioQuery } from "@/lib/state/scenarioQuery";
@@ -33,7 +33,7 @@ import Expeditions from "./Expeditions";
 import Console from "./Console";
 import Inspector from "./Inspector";
 import RegimeStrip from "./RegimeStrip";
-import ToolRail from "./ToolRail";
+import ToolRail, { FieldKey } from "./ToolRail";
 import Overview, { type PlateData } from "./Overview";
 import "./atlas.css";
 
@@ -291,15 +291,16 @@ export default function AtlasApp() {
     <>
       <h1 className="fld-h1">Evidence field <span className="fld-h1-regime">· {GRAVITY_LABEL[s.gravity]}</span></h1>
       <Breadcrumb className="fld-crumbs" items={[{ label: "Atlas" }, { label: GRAVITY_LABEL[s.gravity] }, { label: ctx }, ...(selected ? [{ label: selected.id }] : [])]} />
-      <p className="fld-source"><strong>Evidence proximity, not a safety rating.</strong> Not a hazard map. Source: NASA PSI run tables ({STATUS.date}){includePublished ? " + published papers (Sources)" : ""}.</p>
+      <p className="fld-source"><strong>Evidence proximity, not a safety rating.</strong> Not a hazard map.</p>
+      <p className="fld-source">Source: NASA PSI run tables (snapshot {STATUS.date}){includePublished ? " and the published papers listed under Sources" : ""}.</p>
     </>
   );
   const emptyNote = noEvidence ? (
     <>
-      <p className="fld-empty-title">No comparable evidence in {GRAVITY_LABEL[s.gravity].toLowerCase()}</p>
+      <p className="fld-empty-title">No comparable evidence in the {REGIME_SHORT[s.gravity]} regime ({REGIME_G[s.gravity]})</p>
       <p className="fld-empty-text">
         {s.gravity !== "micro"
-          ? <>PSI holds {COUNTS.partialGravityRuns === 0 ? "no" : COUNTS.partialGravityRuns} combustion tests outside microgravity for this question{includePublished ? ", and no published point here is comparable" : ""}. The plane is left empty on purpose: nothing is estimated from other regimes.</>
+          ? <>Every PSI combustion run in this snapshot was flown in microgravity, so PSI has no test here{includePublished ? "; no published point here is comparable for this question either" : ""}. The plane is left empty on purpose: nothing is estimated from other regimes.</>
           : <>No test in this regime is comparable for {hazardLabel.toLowerCase()} at {flowLabel}. The plane is left empty on purpose.</>}
       </p>
       {!includePublished && s.gravity !== "micro" && <button type="button" className="ui-btn fld-empty-btn" onClick={() => m.update({ includePublished: true }, true)}>Include published evidence</button>}
@@ -307,7 +308,27 @@ export default function AtlasApp() {
   ) : null;
 
   return (
-    <main id="main" className="atlas" data-mode={app ? "app" : "stack"} data-left={app && leftOpen ? "open" : "closed"} data-right={app && rightOpen ? "open" : "closed"} data-wide={wide || undefined} data-overview={overview || undefined}>
+    <main id="main" className="atlas" data-scenario-view data-mode={app ? "app" : "stack"} data-left={app && leftOpen ? "open" : "closed"} data-right={app && rightOpen ? "open" : "closed"} data-wide={wide || undefined} data-overview={overview || undefined}>
+      <div className="atlas-left" data-open={!app || leftOpen || undefined}>
+        {app && !leftOpen ? (
+          <button type="button" className="atlas-left-tab" onClick={() => setLeftOpen(true)} aria-label="Show expeditions and scenario" aria-expanded={false} aria-controls="atlas-exp">
+            <IconExpand /><span>Expeditions · Scenario</span>
+          </button>
+        ) : (
+          <>
+            <Panel id="atlas-exp" name="Expeditions" label="Expeditions" className="atlas-exp-panel"
+              actions={app ? <button type="button" className="ui-sq" onClick={() => setLeftOpen(false)} aria-label="Collapse expeditions and scenario" aria-expanded aria-controls="atlas-exp"><IconCollapse /></button> : undefined}>
+              <Expeditions scenario={s} preset={m.preset} onGo={applyExpedition} />
+            </Panel>
+            <Panel id="atlas-console" name="Scenario" label="Scenario" className="atlas-con-panel" collapseAxis="vertical"
+              collapsed={app && !consoleOpen} onToggle={app ? () => setConsoleOpen((v) => !v) : undefined} summary={leftSummary}>
+              <Console scenario={s} preset={m.preset} update={m.update} applyPreset={(id) => { m.applyPreset(id); setSelectedId(null); }} />
+            </Panel>
+            {app && <p className="atlas-credit">MARGIN, created by Alex de Gentile for NASA Space Apps 2026 · Apache-2.0 · NASA PSI data; no NASA endorsement · AI-assisted development, disclosed under <a href="/sources#si">Sources</a></p>}
+          </>
+        )}
+      </div>
+
       <div className="atlas-field" ref={fieldRef}>
         {overview ? (
           <div className="atlas-ov" style={app ? { paddingLeft: free.l, paddingRight: free.r, paddingTop: free.t + 12, paddingBottom: free.b } : undefined}>
@@ -329,26 +350,6 @@ export default function AtlasApp() {
         )}
       </div>
 
-      <div className="atlas-left" data-open={!app || leftOpen || undefined}>
-        {app && !leftOpen ? (
-          <button type="button" className="atlas-left-tab" onClick={() => setLeftOpen(true)} aria-label="Show expeditions and scenario" aria-expanded={false} aria-controls="atlas-exp">
-            <IconExpand /><span>Expeditions · Scenario</span>
-          </button>
-        ) : (
-          <>
-            <Panel id="atlas-exp" name="Expeditions" label="Expeditions" className="atlas-exp-panel"
-              actions={app ? <button type="button" className="ui-sq" onClick={() => setLeftOpen(false)} aria-label="Collapse expeditions and scenario" aria-expanded aria-controls="atlas-exp"><IconCollapse /></button> : undefined}>
-              <Expeditions scenario={s} preset={m.preset} onGo={applyExpedition} />
-            </Panel>
-            <Panel id="atlas-console" name="Scenario" label="Scenario" className="atlas-con-panel" collapseAxis="vertical"
-              collapsed={app && !consoleOpen} onToggle={app ? () => setConsoleOpen((v) => !v) : undefined} summary={leftSummary}>
-              <Console scenario={s} preset={m.preset} update={m.update} applyPreset={(id) => { m.applyPreset(id); setSelectedId(null); }} />
-            </Panel>
-            {app && <p className="atlas-credit">MARGIN, created by Alex de Gentile for NASA Space Apps 2026 · Apache-2.0 · NASA PSI data; no NASA endorsement · AI-assisted development, disclosed under <a href="/sources#si">Sources</a></p>}
-          </>
-        )}
-      </div>
-
       <div className="atlas-strip-wrap">
         <RegimeStrip gravity={s.gravity} onChange={selectGravity} verdict={m.evaluation.verdict} D={nearestD} status={STATUS} occupancy={occ} />
       </div>
@@ -365,14 +366,18 @@ export default function AtlasApp() {
         />
       </div>
 
-      {app && (
+      {(
         <div className="atlas-rail-wrap">
           <ToolRail layers={layerState} setLayer={setLayer} zoomIn={zoomIn} zoomOut={zoomOut} reset={resetView}
             canZoomIn={zoom < MAX_ZOOM - 0.01} canZoomOut={zoom > 1.01} isZoomed={zoom > 1.01}
             overview={overview} toggleOverview={() => setOverview((v) => !v)} />
         </div>
       )}
-      {!app && (
+      <details className="atlas-mkey">
+        <summary>Key: what the marks mean</summary>
+        <FieldKey />
+      </details>
+      {(
         <nav className="atlas-sheet-nav" aria-label="Atlas sections">
           <a href="#atlas-console">Scenario</a>
           <a href="#atlas-notes-title">Verdict</a>
