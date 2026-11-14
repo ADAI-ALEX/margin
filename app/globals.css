@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Neutral base only. Each concept owns its tokens under its own root class. */
+:root { color-scheme: light dark; }
+html, body { margin: 0; padding: 0; }
+body { background: #0e1013; color: #e9edf1; font-family: ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+*, *::before, *::after { box-sizing: border-box; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
