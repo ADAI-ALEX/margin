@@ -89,7 +89,9 @@ export default function SourcesPage() {
 
         <Sec id="published" n={3}>Published values</Sec>
         <p>
-          {checked.length} of {published.length} published or planned values have been checked against their primary source; the rest are labelled as not yet checked wherever they appear.
+          {checked.length === published.length
+            ? <>All {published.length} published or planned values have been checked against their primary source (SI-assisted; human sign-off pending), each with its page or table and a short verbatim quote.</>
+            : <>{checked.length} of {published.length} published or planned values have been checked against their primary source; the rest are labelled as not yet checked wherever they appear.</>}
           Reported limits are thresholds inferred by the authors, not tested conditions. Planned experiments are never counted as evidence.
         </p>
         <div className="doc-tablewrap"><table>
