@@ -30,7 +30,7 @@ _(Word count ≈ 140. Check after edits; aim ≤ 150.)_
 
 ## 4. Link to Final Project
 
-> TODO (owner/lead): production URL (Vercel). The repository link goes in field 5 and in the README.
+> https://margin-two-rho.vercel.app
 
 ## 5. Detailed Project Description (target 4,000–6,000 characters)
 
@@ -44,15 +44,15 @@ _(Word count ≈ 140. Check after edits; aim ≤ 150.)_
 >
 > **What it found.** The highest O₂ in any of PSI's 140 solid-material tests with a recorded O₂ value is 22.2% [S3]; none reaches the Artemis habitat's 26.5% or the Exploration Atmosphere's 34% [S4]. For the Exploration Atmosphere at 10 cm/s ventilation, the nearest PSI test is DISTANT (D 6.28) [S6]. Adding published results brings the Saffire VI SIBAL fabric test into range, but the verdict stays DISTANT (D 2.51), just above the NEAR boundary; at 20 cm/s, a different scenario, it is NEAR (D 1.51) [S6][S7]. MARGIN shows this flow sensitivity instead of choosing the flow that looks best. PSI holds no partial-gravity combustion runs [S13]. In NASA drop-tower tests of Mylar at 10.2 psia, the lunar limiting O₂ (15.6%) was below both the 0 g (17.0%) and 1 g (21.2%) values [S5]: microgravity and Earth results did not bound lunar behaviour for this material. MARGIN therefore treats gravity as four separate regimes with no slider and no interpolation.
 >
-> TODO (owner): add up to three verified findings from the insight cards (BASS-II 1-g screening comparison, smoke-detector results, ventilation shut-off), only after each has been checked against its source.
+> Three published findings the app surfaces, each checked against its primary source: BASS-II PMMA rods on the ISS kept burning at 13.5% O₂ in low-speed flow, below the 15.4% 1-g upward-spread limit (NASA/TM-20210011385, §6.1.4.4, p. 76). In Saffire VI, both PMMA fires reached a 2 mg/m³ aerosol alarm threshold only after CO had risen above the 24-hour crew limit (ICES-2026-577, Table 1, p. 6). In Saffire IV–V, turning the airflow off did not reliably put fires out (ICES-2021-266, §III.A, pp. 4–5).
 >
 > **Who it is for.** Spacecraft and habitat fire-safety and materials engineers, combustion researchers, students, and mission planners who need to see quickly where NASA's evidence is dense, where it is thin, and which investigation to read first.
 >
-> **What is live and what is not.** Live: the Atlas with coverage map, gravity sheets, verdict, robustness and field notes; the ranked Investigations view with claim ledger, provenance, flow sensitivity and compare tray; a dossier for each PSI investigation; the Method and Sources pages. TODO (lead): confirm the final list (export, light theme). Not built: runtime SI features.
+> **What is live and what is not.** Live: the Atlas with coverage map, gravity sheets, verdict, robustness and field notes; the ranked Investigations view with claim ledger, provenance, flow sensitivity and compare tray; a dossier for each PSI investigation; the Method and Sources pages. Not built: an export/brief download and any runtime SI features.
 >
 > **Limitations.** D measures evidence coverage, not flammability. The scales are expert judgement (robustness shown). Tested configurations are narrow. Partial-gravity evidence is three materials in 5-second drops plus one preliminary rotating flight. Published values differ between papers and all are shown. Some pressures are nominal, not measured.
 >
-> **Tools.** TypeScript, Next.js 16 and React 19 (statically generated, deployed on Vercel), d3 (scales, contours), zod, Vitest, Playwright and axe-core, GitHub Actions. Code: TODO (repository URL), Apache-2.0.
+> **Tools.** TypeScript, Next.js 16 and React 19 (statically generated, deployed on Vercel), d3 (scales, contours), zod, Vitest, Playwright and axe-core, GitHub Actions. Code: https://github.com/ADAI-ALEX/margin, Apache-2.0.
 
 _(Approx. 4,300 characters before the TODO items. Check the final count in the form.)_
 

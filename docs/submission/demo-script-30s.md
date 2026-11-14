@@ -17,7 +17,7 @@ us, not captions.
 - **Burned-in English captions** for every line. Voice-over optional; if used, read the captions.
 - **No music** (copyright risk). Silence or room tone is fine.
 - No minors on screen or in audio. No SI-generated imagery.
-- Start URL: `<!-- PRODUCTION_URL -->/` (default ISS view). Do one full dry run first so routes are warm.
+- Start URL: `https://margin-two-rho.vercel.app/` (default ISS view). Do one full dry run first so routes are warm.
 
 ## Script (second by second)
 
@@ -30,7 +30,7 @@ us, not captions.
 | 0:15–0:18 | Flow "20" in the toolbar. Verdict changes to **NEAR**, D 1.51. Flow-sensitivity chart visible in field notes if it fits the frame. | **At 20 cm/s, a different scenario, it is NEAR. MARGIN shows the sensitivity; it does not pick the flow. [S6][S7]** |
 | 0:18–0:23 | Gravity "Moon". The Moon sheet is selected and reads "No PSI tests"; the partial-gravity dot plot shows Mylar Moon 15.6, 0 g 17.0, 1 g 21.2 as separate points. | **Moon: PSI has no partial-gravity tests. For Mylar, the lunar limit sat below both 0 g and 1 g. [S13][S5]** |
 | 0:23–0:26 | Click the nearest-test link in the field notes. Specimen card opens with original values and its NTRS source link; hover the link. | **Every number links to its source: NASA PSI rows and NTRS papers.** |
-| 0:26–0:28 | End card (or hold on the Atlas) with the short URL. | **Evidence proximity, not a safety rating.** · TODO short URL |
+| 0:26–0:28 | End card (or hold on the Atlas) with the short URL. | **Evidence proximity, not a safety rating.** · margin-two-rho.vercel.app |
 
 Total: 0:28 maximum. If the cut runs long, shorten 0:03–0:07 to 3 s first, then trim the end card
 to 1.5 s. Never cut the flow-sensitivity beat: showing that NEAR at 20 cm/s is a different scenario,

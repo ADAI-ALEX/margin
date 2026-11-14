@@ -3,7 +3,7 @@
 Draft for the project page fields 7 (NASA Data) and 8 (Space Agency Partner Data and Other
 References), and the README. The authoritative in-app list is the Sources page (`/sources`), built
 from `content/` and the snapshot; if the two disagree, the Sources page wins and this file must be
-updated. **TODO (lead):** reconcile with `content/references.ts` once source verification is done.
+updated. Source verification is complete (SI-assisted, human sign-off pending); `content/references.ts` is authoritative.
 
 ## 1. NASA Physical Sciences Informatics (PSI) — combustion science
 
@@ -74,11 +74,9 @@ its page or table. Documents are cited and linked, not redistributed. Regenerate
 | Norcross et al., NASA/TM-2013-217377 | Norcross, J., Norsk, P., Law, J., Arias, D., Conkin, J., Perchonok, M., Menon, A., Huff, J., et al., “Effects of the 8 psia / 32% O2 Atmosphere on the Human in the Spaceflight Environment”, NASA/TM-2013-217377, 2013. | Exploration Atmosphere updated to 8.2 psia / 34% O₂ | NTRS 20130013505 | https://ntrs.nasa.gov/citations/20130013505 | NTRS record copyright field: PUBLIC_USE_PERMITTED |
 | NASA-STD-6001B w/Change 2 | NASA, “Flammability, Offgassing, and Compatibility Requirements and Test Procedures”, NASA-STD-6001B w/Change 2, 2016. | Ambient conditions 20.9% O₂, 101.4 kPa (14.7 psia) used for the ISS preset |  | https://standards.nasa.gov/sites/default/files/standards/NASA/B-w/CHANGE-2/2/NASA-STD-6001B-w-Change-2_Admin-Change.pdf | Approved for public release; distribution is unlimited (as stated on each page) |
 
-### Not yet in `content/references.ts`
+### Removed during verification
 
-| Reference | Where it is used | Action |
-|---|---|---|
-| Dietrich, D. L., et al., 2014, *Microgravity Science and Technology*, doi:10.1007/s12217-014-9372-2 | `content/curated.ts` insight `i-loi` (FLEX limiting O₂ 0.15 heptane / 0.12 methanol) | **TODO (verification workstream):** add to `content/references.ts`, or re-source the insight to NASA/TP-2015-216046 (already listed) |
+Dietrich et al. 2014 (doi:10.1007/s12217-014-9372-2) is no longer cited: the `i-loi` finding was re-sourced to NASA's Researcher's Guide (claim) and JASMAC-33 (methanol value), and the heptane 0.15 value was dropped as unverifiable against an accessible primary source.
 
 ## 4. Software, fonts and tools
 

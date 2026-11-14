@@ -8,12 +8,12 @@ MARGIN maps every test run in NASA's Physical Sciences Informatics (PSI) combust
 
 Built in about 39 hours for [NASA Space Apps 2026](https://www.spaceappschallenge.org/), challenge "Flame in Freefall".
 
-- **Live site:** <!-- PRODUCTION_URL --> _TODO: production URL_
+- **Live site:** https://margin-two-rho.vercel.app
 - **30-second demo:** _TODO: video URL_
-- **Repository:** _TODO: GitHub URL_
+- **Repository:** https://github.com/ADAI-ALEX/margin
 
 <!-- SCREENSHOTS: add 4–6 PNGs from production (see docs/submission/screenshot-shotlist.md) -->
-_Screenshots: TODO_
+![The MARGIN Atlas: the Exploration Atmosphere on a map of NASA combustion-test coverage, with field notes showing Evidence: DISTANT, D 2.51](app/opengraph-image.png)
 
 ---
 
@@ -132,7 +132,7 @@ In line with the NASA Space Apps rules, we disclose our use of Super Intelligenc
 - **Tool:** Anthropic Claude through Claude Code (a lead agent and task-specific sub-agents).
 - **Ideation and research:** SI assisted with background research and concept analysis before the event.
 - **Build:** SI wrote most of the source code, the data-pipeline code, the tests and the documentation, and drafted the curated evidence entries. Commits carry a `Co-Authored-By: Claude` trailer.
-- **Review and verification:** SI reviewed code and science. People check each curated scientific value against its cited source; until a value has been checked, the app labels it as an unverified transcription and insight cards stay hidden. _TODO (owner): update this line when verification is complete._
+- **Review and verification:** SI agents reviewed the code and the method independently, and checked every published value and finding against its primary NASA source (page or table locator plus a short verbatim quote, recorded in `docs/verification/source-verification.md`). These checks are SI-assisted; human sign-off is pending and the app says so. Findings not checked against a primary source stay hidden (currently 1 of 19).
 - **No runtime SI.** The deployed app makes no SI calls. All numbers come from the deterministic engine and the cited data.
 - **No SI imagery.** No SI-generated images, video or audio are used.
 

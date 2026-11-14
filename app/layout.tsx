@@ -5,7 +5,10 @@ import SiteFooter from "@/components/site/SiteFooter";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL
+      ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000"),
+  ),
   title: { default: "MARGIN · How close is the evidence?", template: "%s · MARGIN" },
   description:
     "An evidence-coverage atlas of NASA PSI combustion tests. For a crewed atmosphere, see how close real NASA test conditions come, by gravity regime, with every number traced to its source. Evidence proximity, not a safety rating.",
