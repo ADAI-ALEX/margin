@@ -58,7 +58,7 @@ _(Approx. 4,300 characters before the TODO items. Check the final count in the f
 
 ## 6. Use of Super Intelligence (SI)
 
-> We used Anthropic Claude through Claude Code. Before the event, SI assisted our research into the competition rules, combustion literature and NASA data access, and our analysis of the concept. TODO (owner): one sentence on how the team originated and chose the idea. During the event, SI agents wrote most of the source code, data-pipeline code, tests and documentation, transcribed published values with citations, and reviewed code and science; Alex de Gentile set the requirements, chose the design and directed and accepted the work; published scientific values were checked against their primary sources with SI assistance, with human sign-off TODO (owner). SI assistance is acknowledged in the README and in docs/compliance/si-usage-log.md. The deployed app makes no SI calls at run time: every number comes from a deterministic engine and cited data. We used no SI-generated images, video or audio, and no NASA branding.
+> MARGIN is Alex de Gentile's project: Alex chose the concept, decided what the tool may and may not claim, signed off the distance method and its thresholds, picked the design direction and reviewed every change. We used Anthropic Claude, through Claude Code, as a pair programmer and research assistant. Before the event, it helped us research the competition rules, combustion literature and NASA data access. TODO (owner): one sentence on how the idea came about. During the event it wrote a large share of the code, data-pipeline code, tests and documentation under our direction, helped transcribe published values with citations, and helped review the code and the science; published values were cross-checked against their primary sources with its help, with human sign-off TODO (owner). This is acknowledged in the README and in docs/compliance/si-usage-log.md. The deployed app makes no AI calls: every number comes from a deterministic engine and cited data. No AI-generated images, video or audio are used, and no NASA branding.
 
 ## 7. NASA Data
 
@@ -72,7 +72,7 @@ _(Approx. 4,300 characters before the TODO items. Check the final count in the f
 > - Space agency partner data: none used.
 > - Non-NASA publication: Dietrich et al. 2014, FLEX limiting oxygen index, Microgravity Science and Technology, doi:10.1007/s12217-014-9372-2.
 > - Software (open source): Next.js (MIT), React (MIT), d3-array / d3-contour / d3-scale / d3-shape (ISC), zod (MIT); development: TypeScript (Apache-2.0), Vitest (MIT), Playwright (Apache-2.0), axe-core (MPL-2.0), ESLint (MIT), Tailwind CSS (MIT). Full list with licences in NOTICE.
-> - Fonts: Newsreader, Public Sans, JetBrains Mono (SIL Open Font License 1.1).
+> - Fonts: Albert Sans, IBM Plex Mono (SIL Open Font License 1.1).
 > - Hosting: Vercel. Repository: GitHub. SI tool: Anthropic Claude (Claude Code), build time only.
 > - Images: none from third parties; all charts are drawn in code.
 

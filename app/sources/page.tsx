@@ -209,10 +209,11 @@ export default function SourcesPage() {
           <DocSection {...sec("si")}>
             <div className="doc-disclosure">
               <p>
-                MARGIN was created by Alex de Gentile for NASA Space Apps 2026. AI (SI) tools assisted its development, which the competition rules require us to disclose.
-                SI was used for research, writing code and tests, reviewing the method, and checking published values against their primary sources. Every scientific value
-                shown is traced to a source listed on this page, and values not yet checked against their primary source are labelled as such. The running app uses no AI:
-                every result is computed by deterministic code from the bundled data.
+                MARGIN was created by Alex de Gentile for NASA Space Apps 2026. Alex chose the concept, decided what the tool may and may not claim, signed off the
+                method and reviewed every change. The competition asks teams to disclose AI (SI) use, so: we used an AI coding assistant (Anthropic&rsquo;s Claude) as a
+                pair programmer and research aid. It helped with background research, wrote a large share of the code and tests under our direction, and helped
+                cross-check published values against their primary sources. Every scientific value shown is traced to a source listed on this page, and values not yet
+                checked are labelled as such. The running app uses no AI: every result is computed by deterministic code from the bundled data.
               </p>
             </div>
           </DocSection>

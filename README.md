@@ -216,15 +216,17 @@ Created and led by **Alex de Gentile** for NASA Space Apps 2026.
 
 ### Use of SI (AI)
 
-In line with the NASA Space Apps rules, we disclose that AI (SI) tools assisted the development of MARGIN:
+The Space Apps rules ask every team to say how they used AI, so here it is plainly.
 
-- **Ideation and research:** SI assisted with background research and concept analysis before the event.
-- **Build:** AI coding tools wrote much of the source code, the data-pipeline code, the tests and the documentation, and drafted the curated evidence entries, under the direction of the project lead, who set the requirements, chose the design and accepted the work.
-- **Review and verification:** SI agents reviewed the code and the method independently, and checked every published value and finding against its primary NASA source (page or table locator plus a short verbatim quote, recorded in `docs/verification/source-verification.md`). These checks are SI-assisted; human sign-off is pending and the app says so. Findings not checked against a primary source stay hidden (currently 1 of 19).
-- **No runtime SI.** The deployed app makes no SI calls. All numbers come from the deterministic engine and the cited data.
-- **No SI imagery.** No SI-generated images, video or audio are used.
+MARGIN is Alex de Gentile's project. Alex chose the challenge and the concept, decided what the tool may and may not claim (evidence proximity, never a safety rating; no borrowing evidence across gravity levels), signed off the distance method and its thresholds, picked the design direction and reviewed every change before it shipped. We used Anthropic's Claude, through Claude Code, the way you would work with a fast pair programmer and research assistant:
 
-The full tool disclosure for the competition, by phase, is in [`docs/compliance/si-usage-log.md`](docs/compliance/si-usage-log.md).
+- **Research.** Before the event it helped us read through the competition rules, combustion papers and the NASA PSI archive.
+- **Building.** It wrote a large share of the code, tests and documentation to our specification. We steered it over many rounds, rejected what did not fit, and changed direction when something looked or read wrong.
+- **Checking.** It helped cross-check every published value against its NASA source; each check records a page or table and a short quote in `docs/verification/source-verification.md`. A human sign-off on those checks is still pending, and the app says so. Findings not yet checked stay hidden (currently 1 of 19).
+
+What it does not do: the running app makes no AI calls. Every number on screen comes from the deterministic engine and the cited data, and no AI-generated images, video or audio are used.
+
+The phase-by-phase record is in [`docs/compliance/si-usage-log.md`](docs/compliance/si-usage-log.md).
 
 ### Licence
 

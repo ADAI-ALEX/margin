@@ -43,7 +43,7 @@ jobs:
       - name: Unit, data and science tests (vitest)
         run: npm test
       - name: Build (static generation; no network calls to PSI/NTRS)
-        run: npx next build
+        run: npm run build
       - name: No secrets in the client bundle (Kickoff §H.11)
         run: |
           if grep -rIlE 'sk-ant-[A-Za-z0-9_-]{10,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}' .next/static; then
@@ -69,7 +69,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Build
-        run: npx next build
+        run: npm run build
       - name: Start production server
         run: |
           nohup npx next start -p 3000 -H 127.0.0.1 > next-start.log 2>&1 &
