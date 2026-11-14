@@ -4,12 +4,15 @@
  * (a separate, minimal parser written here — not the pipeline's).
  */
 import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import snapshot from "@/data/generated/snapshot.json";
 
 const RAW = path.resolve(__dirname, "../../pipeline/.cache/raw");
+/** The raw PSI downloads are not committed (run `npm run data:fetch`). Without them, the independent
+ * re-parse is skipped; every other test still checks the committed snapshot. */
+const HAVE_RAW = existsSync(RAW);
 const SNAP = snapshot as unknown as {
   generatedAt: string; fetchedAt: string; notice: string;
   counts: Record<string, unknown> & { totalRuns: number; distinctRuns: number; placeable: number; plottable: number; totalSummaryRows: number; byInvestigation: Record<string, number> };
@@ -62,7 +65,7 @@ const SUMMARY_TABLES: Record<string, number> = {
   "PSI-47_Experimental table_DAFT.csv": 2, "PSI-142_Experimental table_Data Summary Table.csv": 8,
 };
 
-describe("raw cache truth (§H.1, §H.2)", () => {
+describe.skipIf(!HAVE_RAW)("raw cache truth (§H.1, §H.2) — needs pipeline/.cache/raw", () => {
   it("22 experimental-table CSVs and 24 investigation records are cached", () => {
     const files = readdirSync(RAW);
     expect(files.filter((f) => f.endsWith(".csv"))).toHaveLength(22);
