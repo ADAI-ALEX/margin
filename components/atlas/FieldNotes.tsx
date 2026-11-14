@@ -125,7 +125,7 @@ export default function FieldNotes(p: NotesProps) {
           <p>
             {loc}, the nearest comparable test is{" "}
             <button type="button" className="atlas-runlink" onClick={() => p.onInspect(n.run)}>{runTitle(n.run)}</button>
-            {n.run.material ? ` (${n.run.material.replace(/\s+/g, " ").trim()})` : " (material not recorded)"}{fn.ref(runSrc(n.run))}, {fmt(n.d.D, 1)} units away
+            {n.run.material ? ` (${n.run.material.replace(/\s+/g, " ").trim()})` : " (material not recorded)"}{fn.ref(runSrc(n.run))}, {fmt(n.d.D, 2)} units away
             {n.d.partialMatch
               ? <> <strong>on {n.d.axesUsed.map((ax) => AXIS_NAME[ax]).join(" and ")} only; {n.d.flags.includes("flow-regime-mismatch") ? "flow regime differs, so flow is not compared" : `${(["o2", "pressure", "flow"] as const).filter((ax) => !n.d.axesUsed.includes(ax)).map((ax) => AXIS_NAME[ax]).join(" and ")} not recorded`}</strong>{gapPhrase(n)}.</>
               : <>{gapPhrase(n)}.</>}
