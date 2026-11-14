@@ -7,6 +7,10 @@ export type Verdict = "DIRECT" | "NEAR" | "DISTANT" | "NONE";
 export interface Scored { run: Run; d: DistanceResult }
 export interface Evaluation {
   verdict: Verdict;
+  /** Verdict of the best run compared on all three axes (NONE if there is none). */
+  verdictComplete: Verdict;
+  /** Set when the headline verdict rests on fewer than three compared axes. */
+  qualifier: null | "partial-missing-axis" | "flow-regime-mismatch";
   nearest: Scored | null;
   /** Best run compared on all three axes (O₂, pressure, flow). Shown beside `nearest` when that is a partial match. */
   nearestComplete: Scored | null;
@@ -49,5 +53,11 @@ export function evaluate(runs: Run[], s: Scenario, scales: Scales = SCALES, w: A
   limits.sort(sortScored);
   const nearest = comparable[0] ?? null;
   const nearestComplete = comparable.find((c) => !c.d.partialMatch) ?? null;
-  return { verdict: classify(nearest?.d.D ?? null), nearest, nearestComplete, comparable, context, otherGravity, limits, excludedCount };
+  const qualifier: Evaluation["qualifier"] = !nearest ? null
+    : nearest.d.flags.includes("flow-regime-mismatch") ? "flow-regime-mismatch"
+    : nearest.d.partialMatch ? "partial-missing-axis" : null;
+  return {
+    verdict: classify(nearest?.d.D ?? null), verdictComplete: classify(nearestComplete?.d.D ?? null), qualifier,
+    nearest, nearestComplete, comparable, context, otherGravity, limits, excludedCount,
+  };
 }

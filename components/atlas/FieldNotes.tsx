@@ -101,6 +101,15 @@ export default function FieldNotes(p: NotesProps) {
           <span className="atlas-disclaimer">{DISCLAIMER}</span>
         </p>
         <p className="atlas-verdict-copy">{VERDICT_COPY[verdict]}{n && <> · <span className="atlas-computed">computed</span> D <span className="atlas-num">{fmt(n.d.D, 2)}</span></>}{fn.ref(ENGINE_SRC)}</p>
+        {ev.qualifier && n && (
+          <p className="atlas-verdict-qual" data-testid="verdict-qualifier" data-qualifier={ev.qualifier}>
+            <span className="claim" data-kind="ASSUMED">partial match</span>{" "}
+            Compared on {n.d.axesUsed.map((ax) => AXIS_NAME[ax]).join(" + ")} only; {ev.qualifier === "flow-regime-mismatch" ? "the flow regimes differ, so flow is not compared" : `${(["o2", "pressure", "flow"] as const).filter((ax) => !n.d.axesUsed.includes(ax)).map((ax) => AXIS_NAME[ax]).join(" and ")} not recorded`}. A missing axis can only make a test look closer.{" "}
+            {ev.nearestComplete
+              ? <>On all three axes: <strong>{ev.verdictComplete}</strong> (D <span className="atlas-num">{fmt(ev.nearestComplete.d.D, 2)}</span>).</>
+              : <>No test in this regime is comparable on all three axes.</>}
+          </p>
+        )}
         {bm && Math.abs(bm.delta) < 0.25 && <p className="atlas-verdict-edge">D is <span className="atlas-num">{fmt(Math.abs(bm.delta), 2)}</span> {bm.delta > 0 ? "above" : "below"} the {bm.boundary === VERDICT_THRESHOLDS.near ? "NEAR/DISTANT" : "DIRECT/NEAR"} boundary ({bm.boundary}): a small change in an input or assumption changes the class.</p>}
         <p className="atlas-verdict-method">DIRECT (D ≤ {VERDICT_THRESHOLDS.direct}), NEAR (≤ {VERDICT_THRESHOLDS.near}) and DISTANT are classes defined by MARGIN&rsquo;s method, not established scientific categories. <Link href="/method#verdicts">How D is computed</Link>.</p>
       </div>
@@ -151,6 +160,7 @@ export default function FieldNotes(p: NotesProps) {
           {robust.robust
             ? <>All {robust.combos} combinations of {fx.map(factor).join(" and ")} axis scales give {robust.range[0]}.</>
             : <>Across {robust.combos} combinations of {factor(fx[0])}, 1× and {factor(fx[1])} axis scales the verdict ranges from {robust.range[0]} to {robust.range[1]} ({verdictCounts}).</>}
+          {robust.partialCells === robust.combos && <> Every combination rests on a partial match, so this says nothing about the axis that is not compared.</>}
           {robust.Drange && <> D spans <span className="atlas-num">{fmt(robust.Drange[0], 2)}–{fmt(robust.Drange[1], 2)}</span>.</>}
           {" "}The dashed contours on the map show where the NEAR boundary would sit if the O₂ and pressure scales were halved or doubled{fn.ref(ENGINE_SRC)}.
         </p>

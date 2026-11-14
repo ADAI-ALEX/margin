@@ -331,3 +331,4 @@
 .atlas-root .atlas-gaps-table { table-layout: fixed; }
 .atlas-root .atlas-gaps-table col.c-axis { width: 78px; }
 .atlas-root .atlas-gaps-table col.c-val { width: 132px; }
+.atlas-root .atlas-verdict-qual { margin: 8px 0 0; font-family: var(--sans); font-size: 12.5px; line-height: 1.45; color: var(--ink); }

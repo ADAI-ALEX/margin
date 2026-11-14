@@ -53,3 +53,19 @@ Decisions (owner, final): Atlas (B) is the primary experience on warm paper; Cas
 | 12:55 | Engine: `distanceField()` now draws only runs placeable on the O₂ × P plane (both recorded) and reports `omitted`; runs without pressure had painted full-height bands (false coverage). They still count for the verdict as partial matches, disclosed under the map. Accepts a `scales` argument; the Atlas ½×/2× envelope now calls the engine instead of a mirrored copy. |
 | 13:05 | Atlas: numeric O₂ / pressure entry with kPa ⇄ psia; per-axis signed gap bars (nearest, and best fully-compared when the nearest is partial); boundary-proximity note ("D is 0.01 above the NEAR/DISTANT boundary"); flow-sensitivity chart; method note that classes are MARGIN's, not scientific categories; insights render only when `verification.status === "primary-checked"`; published-value wording depends on the actual `unverified-transcription` flag, not a blanket banner; on-map caption "Evidence proximity, not a safety rating … not a hazard map". Gravity/flow changes keep the selected landmark. |
 | 13:15 | Method page (server-rendered; every number from engine/data). Default Next assets removed; `app/icon.svg`. Git author switched to the GitHub no-reply address and the three unpublished local commits rebuilt with `commit-tree` (no personal email in public history). |
+| 13:10 | Methodology review + pipeline workstream merged (`docs/reviews/methodology-review.md`). **PSI run rows now 1,870** (BASS "SOOT Cleaning" maintenance row removed; it was not a burn); 1,828 distinct (42 exact duplicates flagged, kept: SPICE 34, CFI 8); 887 with ambient O₂; 857 with O₂ and pressure; 274 inverse-flame runs carry `burner-fed-oxidizer`. Saffire-II/III pressure now null (no source statement); nominal pressure kept only for BASS-II and Saffire-I. Thin/thick cut moved to the cited 5.2 mm transition (PMMA 0.2–5.2 mm → solid-unknown). Droplet/burner flow: null + regime quiescent + `assumed-value` (no PSI text says "quiescent"). |
+| 13:11 | Engine diffs from review applied: D-1 `verdictComplete` + `qualifier` (partial-missing-axis / flow-regime-mismatch), D-2 robustness `partialCells`, D-3 ranking skips duplicate rows. Atlas verdict now shows "partial match — compared on … only; on all three axes: X" and robustness says when every combination rests on a partial match. |
+| 13:11 | **Lead decision (Kickoff §C.8 sanity check):** BASS-II ranks #4, not top 3, for EA + published, because every PSI investigation is ≥ 6 units away (P ≈ 0) and the scale component decides. Weights not tuned; assertion amended to "Saffire IV–VI #1, BASS-II top 4 behind only large-scale tests with P < 0.01" and that reason is tested. |
+
+### Anchors after pipeline fixes (10 cm/s unless noted)
+| Scenario | Verdict | D | Nearest |
+|---|---|---|---|
+| ISS, PSI only | DIRECT (partial: O₂ + P) | 0.003 | BASS-II r0100; best fully-compared 2.022 NEAR |
+| Artemis, PSI only | DISTANT | 2.703 | BASS-II |
+| Artemis + published | NEAR | 2.032 | Saffire V-3 (DIRECT 0.361 at 20 cm/s) |
+| EA, PSI only | DISTANT (partial: O₂ + flow) | **6.277** (supersedes 6.455) | Saffire-II, pressure not recorded; best fully-compared 7.065 |
+| **EA + published** | **DISTANT** (9 NEAR / 18 DISTANT of 27) | **2.508** | Saffire VI-2; NEAR from 10.05 cm/s; 1.513 at 20 cm/s; flow is 64 % of D² |
+| EA, Moon, PSI only | NONE | — | — |
+| EA, Moon + published | DISTANT (flow regime differs) | 7.473 | LUCI PMMA rod |
+| Smoke, ISS, PSI only | NONE | — | SAME/SAME-R record no O₂ |
+| Liquid, ISS | DIRECT (flow regime differs) | 0.050 | FLEX r0202 |

@@ -23,6 +23,7 @@ export function rank(investigations: Investigation[], runs: Run[], ev: Evaluatio
   const w = { P: weights.P / wsum, H: weights.H / wsum, S: weights.S / wsum, C: weights.C / wsum, M: weights.M / wsum };
   const byInv = new Map<string, { Dmin: number; n: number; near: number }>();
   for (const sc of ev.comparable) {
+    if (sc.run.flags.includes("duplicate-row")) continue; // count distinct runs only
     const k = sc.run.investigation;
     const cur = byInv.get(k) ?? { Dmin: Infinity, n: 0, near: 0 };
     cur.Dmin = Math.min(cur.Dmin, sc.d.D); cur.n++;
@@ -30,7 +31,7 @@ export function rank(investigations: Investigation[], runs: Run[], ev: Evaluatio
     byInv.set(k, cur);
   }
   const totals = new Map<string, number>();
-  for (const r of runs) totals.set(r.investigation, (totals.get(r.investigation) ?? 0) + 1);
+  for (const r of runs) if (!r.flags.includes("duplicate-row")) totals.set(r.investigation, (totals.get(r.investigation) ?? 0) + 1);
 
   const rows: RankRow[] = [];
   for (const inv of investigations) {
