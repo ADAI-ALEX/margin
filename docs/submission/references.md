@@ -1,0 +1,92 @@
+# References
+
+Draft for the project page fields 7 (NASA Data) and 8 (Space Agency Partner Data and Other
+References), and the README. The authoritative in-app list is the Sources page (`/sources`), built
+from `content/` and the snapshot; if the two disagree, the Sources page wins and this file must be
+updated. **TODO (lead):** reconcile with `content/references.ts` once source verification is done.
+
+## 1. NASA Physical Sciences Informatics (PSI) — combustion science
+
+Repository: https://psi.nasa.gov/physci/repo/search?q=combustion · JSON backend
+https://psi.nasa.gov/geode-py/ws/ · Fetched 2026-11-14 11:20 GMT (`snapshot.json` `fetchedAt`).
+
+Run rows per investigation from `snapshot.json` `counts.byInvestigation` (total 1,870 run rows;
+generated 2026-11-14 12:59 GMT). Licence as stated by PSI on each record.
+
+| Accession | Investigation | Title | DOI | Licence (PSI) | Run rows | Landing page |
+|---|---|---|---|---|---|---|
+| PSI-10 | ACME / Flame Design | Advanced Combustion via Microgravity Experiments / Flame Design | [10.60555/w4zy-bt45](https://doi.org/10.60555/w4zy-bt45) | **not stated** | 327 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-10 |
+| PSI-20 | ACME BRE | Advanced Combustion via Microgravity Experiments - Burning Rate Emulator | [10.60555/vb93-3y72](https://doi.org/10.60555/vb93-3y72) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-20 |
+| PSI-21 | ACME CLD Flame | Advanced Combustion via Microgravity Experiments / Coflow Laminar Diffusion Flame | [10.60555/23e1-9950](https://doi.org/10.60555/23e1-9950) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-21 |
+| PSI-22 | ACME E-FIELD Flames | Advanced Combustion via Microgravity Experiments Electric-Field Effects on Laminar Diffusion Flames | [10.60555/se5a-8c73](https://doi.org/10.60555/se5a-8c73) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-22 |
+| PSI-23 | ACME s-Flame | Advanced Combustion via Microgravity Experiments-Structure and Response of Spherical Diffusion Flames | [10.60555/k57n-p030](https://doi.org/10.60555/k57n-p030) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-23 |
+| PSI-25 | BASS-II | Burning and Suppression of Solids - II | [10.60555/4qc4-de67](https://doi.org/10.60555/4qc4-de67) | CC0-1.0 | 129 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-25 |
+| PSI-26 | BASS | Burning and Suppression of Solids | [10.60555/58h4-dy80](https://doi.org/10.60555/58h4-dy80) | CC0-1.0 | 121 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-26 |
+| PSI-39 | CFI | Cool Flames Investigation | [10.60555/m6pj-a914](https://doi.org/10.60555/m6pj-a914) | CC0-1.0 | 87 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-39 |
+| PSI-47 | DAFT / DAFT-2 | Dust and Aerosol Measurement Feasibility Test / -2 | [10.60555/ztgj-d202](https://doi.org/10.60555/ztgj-d202) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-47 |
+| PSI-60 | SPICE data analysis | Computational and Experimental Analysis of SPICE Data Sets | [10.60555/mzjm-yv57](https://doi.org/10.60555/mzjm-yv57) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-60 |
+| PSI-62 | BASS flame-spread modelling | Concurrent Flame Spread Modeling using Flamelet Generated Manifolds in Microgravity with Comparison to BASS Experiments using Two-Color Tomography | [10.60555/e9xp-ex83](https://doi.org/10.60555/e9xp-ex83) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-62 |
+| PSI-68 | FLEX-2 | Flame Extinguishment Experiment - 2 | [10.60555/byp8-h018](https://doi.org/10.60555/byp8-h018) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-68 |
+| PSI-69 | FLEX | Flame Extinguishment Experiment | [10.60555/mbq8-0451](https://doi.org/10.60555/mbq8-0451) | CC0-1.0 | 274 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-69 |
+| PSI-98 | SAFFIRE-I | Spacecraft Fire Safety Experiment-I | [10.60555/0t15-1z43](https://doi.org/10.60555/0t15-1z43) | CC0-1.0 | 2 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-98 |
+| PSI-99 | SAFFIRE-II | Spacecraft Fire Experiment-II | [10.60555/2chp-m469](https://doi.org/10.60555/2chp-m469) | CC0-1.0 | 9 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-99 |
+| PSI-100 | SAFFIRE-III | Spacecraft Fire Experiment-III | [10.60555/040q-4h36](https://doi.org/10.60555/040q-4h36) | CC0-1.0 | 2 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-100 |
+| PSI-101 | SAME-R | Smoke Aerosol Measurement Experiment-Reflight | [10.60555/2np7-jv14](https://doi.org/10.60555/2np7-jv14) | CC0-1.0 | 109 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-101 |
+| PSI-102 | SAME | Smoke and Aerosol Measurement Experiment | [10.60555/gd4k-8h62](https://doi.org/10.60555/gd4k-8h62) | CC0-1.0 | 8 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-102 |
+| PSI-106 | SLICE | Structure and Liftoff In Combustion Experiment | [10.60555/pm12-rg61](https://doi.org/10.60555/pm12-rg61) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-106 |
+| PSI-107 | SPICE | Smoke Point In Co-flow Experiment | [10.60555/9kbh-e962](https://doi.org/10.60555/9kbh-e962) | CC0-1.0 | 469 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-107 |
+| PSI-115 | SAME smoke modelling | Utilization of the Smoke Aerosol Measurement Experiment Data for Advanced Modeling and Simulation of Smoke Generation in Micro-Gravity | [10.60555/q0v5-1v28](https://doi.org/10.60555/q0v5-1v28) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-115 |
+| PSI-117 | Cool-flame CFD | Effect of External Thermo-Convective Perturbation on Cool Flame Dynamics: A Multidimensional Multi-Physics CFD Analysis | [10.60555/gz0q-b577](https://doi.org/10.60555/gz0q-b577) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-117 |
+| PSI-142 | Counterflow cool flames | Quantitative Studies of Cool Flame Transitions at Radiation / Stretch Extinction Using Counterflow Flames | [10.60555/80qf-vj95](https://doi.org/10.60555/80qf-vj95) | CC0-1.0 | 0 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-142 |
+| PSI-159 | ACME CFI-G | Advanced Combustion via Microgravity Experiments / Cool Flames Investigation with Gases | [10.60555/cyt1-kh64](https://doi.org/10.60555/cyt1-kh64) | CC0-1.0 | 333 | https://psi.nasa.gov/physci/repo/data/investigations/PSI-159 |
+
+Notes: run-row counts of 0 mean the record has no per-test experimental table (summary rows or
+none). The CFI-G inverse-flame table has 154 data rows (`snapshot.json` `tableStats`); the
+remaining 861 lines in that file are blank.
+
+## 2. NASA publications, standards and other references
+
+Generated from `content/references.ts` (the Sources page data; checked 2026-11-14 by the
+source-verification workstream, SI-assisted, **human sign-off pending**). Values transcribed from
+these documents appear in the app as "published (not in PSI)" or "planned — not evidence", each with
+its page or table. Documents are cited and linked, not redistributed. Regenerate this table if
+`content/references.ts` changes.
+
+| Short name | Citation | Used for | Ids | Link | Terms as stated by the source |
+|---|---|---|---|---|---|
+| Space Apps 2026 challenge | NASA Space Apps Challenge 2026, “Flame in Freefall: SI-Powered Fire Safety Insights from Microgravity Combustion Data”, challenge statement, 2026. | Statement that PSI holds no partial-gravity combustion data; Spacesuit atmosphere (100% O₂, 4.3 psi) |  | https://www.spaceappschallenge.org/2026/challenges/flame-in-freefall/ | not stated |
+| Researcher’s Guide: Combustion Science (2015) | Gokoglu, S. A., Dietrich, D. L., Stocker, D. P., Ferkul, P. V., Olson, S. L., Hicks, M. C., “A Researcher’s Guide to: Combustion Science”, NASA ISS Program Science Office, NP-2015-10-034-JSC, 2015. | U-shaped flammability boundary near spacecraft ventilation speeds (p. 31); FLEX: limits lower in reduced gravity, inert-gas margin (p. 12) |  | https://www.nasa.gov/wp-content/uploads/2016/05/np-2015-10-034-jsc_combustion_in_reduced_gravity-iss-mini-book-011116-508.pdf | not stated |
+| BASS-II Summary Report (2021) | Olson, S. L., Ferkul, P. V., Bhattacharjee, S., Miller, F. J., Fernandez-Pello, C., Link, S., T’ien, J. S., Wichman, I., “Burning and Suppression of Solids–II (BASS–II) Summary Report”, NASA/TM-20210011385, NASA Glenn Research Center, 2021. | BASS-II limit points 13.5% and 15.4% O₂; Ignition delay near the limit; Cabin-pressure statements (V4) | NTRS 20210011385 | https://ntrs.nasa.gov/citations/20210011385 | NTRS record copyright field: GOV_PERMITTED |
+| Olson & Ferkul, ICES-2012-3492 | Olson, S. L., Ferkul, P. V., “Evaluating Material Flammability in Microgravity and Martian Gravity Compared to the NASA Standard Normal Gravity Test”, 42nd International Conference on Environmental Systems, AIAA 2012-3492, 2012. | Table I: limiting O₂ at 1 g, Mars, Moon and 0 g for Mylar G, Ultem 1000 and Nomex HT90-40; Legacy 30% O₂ / 10.2 psia test atmosphere | NTRS 20130010991 · doi:10.2514/6.2012-3492 | https://ntrs.nasa.gov/citations/20130010991 | NTRS record copyright field: PUBLIC_USE_PERMITTED |
+| Urban et al., ICES-2026-577 | Urban, D. L., Ruff, G. A., Ferkul, P., Easton, J., Owens, J., Olson, S., Fortenberry, C., Graf, J., et al., “Heat and Smoke Emission from Tests on the SAFFIRE IV-VI Experiments”, 55th International Conference on Environmental Systems, ICES-2026-577, 2026. | Saffire IV–VI per-test conditions and results (Table 1) — primary table for the seven Saffire runs; Time to alarm and CO at alarm; Linear flame growth on thick PMMA | NTRS 20260001992 | https://ntrs.nasa.gov/citations/20260001992 | NTRS record copyright field: MAY_INCLUDE_COPYRIGHT_MATERIAL |
+| Urban et al., ICES-2021-266 | Urban, D. L., Ruff, G. A., Ferkul, P., Easton, J., Owens, J., Olson, S., Meyer, M., Fortenberry, C., et al., “Fire Safety Implications of Preliminary Results from Saffire IV and V Experiments on Large Scale Spacecraft Fires”, 50th International Conference on Environmental Systems, ICES-2021-266, 2021. | Alternative O₂, pressure and flow direction for Saffire IV–V (Table 1); Delayed extinguishment after flow-off; Stratified-vapour deflagrations; Duct-height effect on thin-fuel spread; Saffire I–III test pressure (Table 2) | NTRS 20210011521 | https://ntrs.nasa.gov/citations/20210011521 | NTRS record copyright field: MAY_INCLUDE_COPYRIGHT_MATERIAL |
+| Urban et al., ICES-2024-365 | Urban, D. L., Ruff, G. A., Ferkul, P., Easton, J., Johnston, M., Owens, J., Olson, S., Fortenberry, C., et al., “Preliminary Results from the Saffire VI Experiment”, 53rd International Conference on Environmental Systems, ICES-2024-365, 2024. | Alternative O₂, pressure, flow direction and peak heat release for Saffire VI (Tables 1 and 2) | NTRS 20240002981 | https://ntrs.nasa.gov/citations/20240002981 | NTRS record copyright field: MAY_INCLUDE_COPYRIGHT_MATERIAL |
+| Ferkul et al., ICES 2017 slides | Ferkul, P., Olson, S., Urban, D. L., Ruff, G. A., Easton, J., T’ien, J. S., Liao, Y.-T. T., Fernandez-Pello, A. C., et al., “Results of Large-Scale Spacecraft Flammability Tests”, presentation, International Conference on Environmental Systems, 2017. | Saffire-II silicone burn results (Table I, slide 29); Saffire I–II O₂ from ISS readings (cabin-pressure question V4) | NTRS 20170008805 | https://ntrs.nasa.gov/citations/20170008805 | NTRS record copyright field: PUBLIC_USE_PERMITTED |
+| Ferkul et al., LUCI (ASGSR 2025) | Ferkul, P. V., Johnston, M. C., Kralik, N., Liao, Y.-T., “Lunar Combustion Investigation: Flammability Results from a Rotating Sounding Rocket”, presentation, American Society for Gravitational and Space Research annual meeting, 2025. | LUCI SIBAL and PMMA spread rates at lunar g; O₂ fall during the PMMA burn; Coriolis caveat | NTRS 20250010653 | https://ntrs.nasa.gov/citations/20250010653 | NTRS record copyright field: GOV_PERMITTED |
+| Ferkul et al., FM2 (LPSC 2026) | Ferkul, P., Kralik, N., Liao, Y.-T., Johnston, M., “Material Flammability at Lunar and Martian Gravity”, presentation, 57th Lunar and Planetary Science Conference, 2026. | FM2 planned condition set (37/33/29/25% O₂ at 8.2 psia); Exploration Atmosphere 8.2 psia / 34% O₂ for HLS, habitat and rover; Spacesuit 100% O₂, 4.3 psia | NTRS 20260001966 | https://ntrs.nasa.gov/citations/20260001966 | NTRS record copyright field: GOV_PERMITTED |
+| Zayac et al., FM2 poster (2024) | Zayac, J., Johnston, M., Ruff, G., Ferkul, P., “Flammability of Materials on the Moon”, poster, American Society for Gravitational and Space Research annual meeting, 2024. | Earlier FM2 plan (21% O₂ / 14.7 psia and 34% O₂ / 8.2 psia) | NTRS 20240015307 | https://ntrs.nasa.gov/citations/20240015307 | NTRS record copyright field: GOV_PERMITTED |
+| Fortenberry et al., fire detection white paper | Fortenberry, C., Wang, X., Cleary, T., Easton, J., Berger, G., Meyer, M., “Research Questions and Challenges for Improved Spacecraft Fire Detection”, white paper for the NASEM Decadal Survey on Biological and Physical Sciences Research in Space 2023–2032, 2021. | SAME: ISS detector missed Kapton smoke in half and Teflon smoke in two-thirds of tests (review statement) | NTRS 20210022143 | https://ntrs.nasa.gov/citations/20210022143 | NTRS record copyright field: MAY_INCLUDE_COPYRIGHT_MATERIAL |
+| Urban et al., SAME-2 (AIAA 2012-3536) | Urban, D. L., Ruff, G. A., Greenberg, P. S., Fischer, D., Meyer, M., Mulholland, G., Yuan, Z.-G., Bryg, V., et al., “Particle Morphology and Size Results from the Smoke Aerosol Measurement Experiment-2”, 42nd International Conference on Environmental Systems, AIAA 2012-3536, 2012. | SAME-2 test conditions: five materials heated below ignition, flow quiescent to 8 cm/s | NTRS 20130000422 · doi:10.2514/6.2012-3536 | https://ntrs.nasa.gov/citations/20130000422 | NTRS record copyright field: PUBLIC_USE_PERMITTED |
+| Nayagam et al., FLEX (JASMAC-33) | Nayagam, V., Dietrich, D. L., Williams, F. A., “Isolated Single Droplet Combustion: FLEX Experiments onboard the International Space Station”, presentation, 33rd Academic Lecture Meeting of the Japan Society of Microgravity Application (JASMAC-33), 2021. | Methanol limiting oxygen index ≈12–13% at atmospheric pressure; Quasi-steady cool flames and re-ignition concern | NTRS 20210022617 | https://ntrs.nasa.gov/citations/20210022617 | NTRS record copyright field: PUBLIC_USE_PERMITTED |
+| Dietrich et al., FLEX results TP (2015) | Dietrich, D. L., Ferkul, P. V., Bryg, V. M., Nayagam, M. V., Hicks, M. C., Williams, F. A., Dryer, F. L., Shaw, B. D., et al., “Detailed Results from the Flame Extinguishment Experiment (FLEX) March 2009 to December 2011”, NASA/TP-2015-216046, 2015. | FLEX test matrices (checked; the report does not state LOI values) | NTRS 20150023456 | https://ntrs.nasa.gov/citations/20150023456 | NTRS record copyright field: PUBLIC_USE_PERMITTED |
+| Abney et al., ICES-2022-45 | Abney, M. B., Bagdigian, R. M., Hopkins, C., Knox, J. C., Pedley, M. D., Macatangay, A. V., Cagle, H. A., “Evaluation of Heritage Hardware for Use in Cabin Environments with Reduced Pressure and Increased Oxygen Concentration”, 51st International Conference on Environmental Systems, ICES-2022-45, 2022. | HEO-DM-1006 Exploration Atmosphere (8.2 psia, O₂ ≥ 33.7%); Portable extinguishers certified at 10.2 psia / 30% O₂; Materials acceptable at 30% / 10.2 psia but unlikely at higher O₂; ISS cabin ~14.7 psia / ~21% O₂ | NTRS 20220006612 | https://ntrs.nasa.gov/citations/20220006612 | NTRS record copyright field: MAY_INCLUDE_COPYRIGHT_MATERIAL |
+| Kessler et al., Artemis Deep Space Habitation | Kessler, P., Prater, T., Nickens, T., Harris, D., “Artemis Deep Space Habitation: Enabling a Sustained Human Presence on the Moon and Beyond”, IEEE Aerospace Conference, 2022. | Artemis surface habitat nominal atmosphere (10.2 psia, 26.5% O₂) | NTRS 20220000245 | https://ntrs.nasa.gov/citations/20220000245 | NTRS record copyright field: MAY_INCLUDE_COPYRIGHT_MATERIAL |
+| Norcross et al., NASA/TM-2013-217377 | Norcross, J., Norsk, P., Law, J., Arias, D., Conkin, J., Perchonok, M., Menon, A., Huff, J., et al., “Effects of the 8 psia / 32% O2 Atmosphere on the Human in the Spaceflight Environment”, NASA/TM-2013-217377, 2013. | Exploration Atmosphere updated to 8.2 psia / 34% O₂ | NTRS 20130013505 | https://ntrs.nasa.gov/citations/20130013505 | NTRS record copyright field: PUBLIC_USE_PERMITTED |
+| NASA-STD-6001B w/Change 2 | NASA, “Flammability, Offgassing, and Compatibility Requirements and Test Procedures”, NASA-STD-6001B w/Change 2, 2016. | Ambient conditions 20.9% O₂, 101.4 kPa (14.7 psia) used for the ISS preset |  | https://standards.nasa.gov/sites/default/files/standards/NASA/B-w/CHANGE-2/2/NASA-STD-6001B-w-Change-2_Admin-Change.pdf | Approved for public release; distribution is unlimited (as stated on each page) |
+
+### Not yet in `content/references.ts`
+
+| Reference | Where it is used | Action |
+|---|---|---|
+| Dietrich, D. L., et al., 2014, *Microgravity Science and Technology*, doi:10.1007/s12217-014-9372-2 | `content/curated.ts` insight `i-loi` (FLEX limiting O₂ 0.15 heptane / 0.12 methanol) | **TODO (verification workstream):** add to `content/references.ts`, or re-source the insight to NASA/TP-2015-216046 (already listed) |
+
+## 4. Software, fonts and tools
+
+Full licence inventory: [`NOTICE`](../../NOTICE).
+
+- Next.js 16.4.6 (MIT), React 19.3.0 (MIT), d3-array / d3-contour / d3-scale / d3-shape (ISC), zod (MIT).
+- Development: TypeScript (Apache-2.0), Vitest (MIT), Playwright (Apache-2.0), axe-core and @axe-core/playwright (MPL-2.0), ESLint (MIT), Tailwind CSS (MIT).
+- Fonts: Newsreader, Public Sans, JetBrains Mono — SIL Open Font License 1.1, self-hosted via `next/font/google`.
+- Hosting: Vercel. Source control and CI: GitHub, GitHub Actions.
+- SI: Anthropic Claude via Claude Code (build time only; see `docs/compliance/si-usage-log.md`).
+- Images, icons, music: none from third parties.

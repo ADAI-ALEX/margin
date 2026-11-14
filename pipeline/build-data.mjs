@@ -408,6 +408,7 @@ const out = {
   counts, tableStats, investigations, runs, summaries,
 };
 await writeFile(OUT, JSON.stringify(out));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- omit bulky fields from the log
 const { byInvestigation, byFuelClass, byFlag, maxSolidO2Runs, ...head } = counts;
 console.log(JSON.stringify(head, null, 1));
 console.log(tableStats.map((t) => `${t.file}: rows ${t.dataRows}, kept ${t.kept}, skipped ${t.skippedNonRunRows}, blank ${t.blankLines}, dup ${t.duplicates}`).join("\n"));

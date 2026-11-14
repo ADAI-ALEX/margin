@@ -1,288 +1,359 @@
 "use client";
-import { Fragment, useMemo } from "react";
-import type { Gravity, Run, Scenario } from "@/lib/schema";
-import { classify, kPaToPsia, psiaToKPa, VERDICT_THRESHOLDS } from "@/lib/engine";
-import { HEADLINE } from "@/lib/data";
-import { FUEL_LABEL, GRAVITY_LABEL, GRAVITY_SHORT, fmt } from "@/lib/format";
-import { AXES, FAMILIES, FAMILY_SHORT, pos, inDomain, r2, r3, type AxisKey, type LadderRow, type Tick } from "./derive";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import type { Run, Scenario } from "@/lib/schema";
+import { classify, kPaToPsia, VERDICT_THRESHOLDS, SCALE_SCORE, type RankRow, type RankWeights } from "@/lib/engine";
+import { GRAVITY_LABEL, GRAVITY_SHORT, fmt } from "@/lib/format";
+import {
+  AXIS_KEYS, AXIS_LABEL, AXIS_UNIT, DOMAIN, FAMILY_LABEL, FAMILY_ORDER, axisTicks, inDomain, partialLabel, pos, r2, scenarioValue, tierShort,
+  type AxisKey, type LadderRow, type Tick,
+} from "./derive";
+import { Claim, EvidenceWord } from "./ui";
 import type { PUnit } from "./ScenarioSentence";
 import css from "./casefile.module.css";
 
-export type SortMode = "family" | "R" | "Dmin";
-export type MobileCol = "o2" | "p" | "flow" | "g" | "fuel" | "runs" | "R";
-const MOBILE_COLS: { id: MobileCol; label: string }[] = [
-  { id: "o2", label: "O₂" }, { id: "p", label: "Pressure" }, { id: "flow", label: "Flow" },
-  { id: "g", label: "Gravity" }, { id: "fuel", label: "Fuel" }, { id: "runs", label: "Runs" }, { id: "R", label: "R" },
+export type SortMode = "rank" | "dmin" | "family" | "name";
+const SORTS: { id: SortMode; label: string }[] = [
+  { id: "rank", label: "Rank R" }, { id: "dmin", label: "D_min" }, { id: "family", label: "Fuel family" }, { id: "name", label: "Name" },
 ];
-const GRAVS: Gravity[] = ["micro", "moon", "mars", "earth"];
-const LEVEL_OPACITY = [0.15, 0.35, 1] as const;
-const GRAV_HEAD = ["µg", "Mo", "Ma", "1g"];
+const COMPONENTS = ["P", "H", "S", "C", "M"] as const;
+type Comp = (typeof COMPONENTS)[number];
+const COMP_NAME: Record<Comp, string> = { P: "Proximity", H: "Hazard match", S: "Scale", C: "Coverage", M: "Measurements" };
+const COMP_DEF: Record<Comp, string> = {
+  P: "exp(−D_min) over this investigation’s comparable runs; 0 if none",
+  H: "curated hazard map: primary 1, secondary 0.5, none 0",
+  S: `large-scale ${SCALE_SCORE.large}, bench ${SCALE_SCORE.bench}, ground ${SCALE_SCORE.ground}`,
+  C: `share of the investigation’s runs within NEAR (D ≤ ${VERDICT_THRESHOLDS.near})`,
+  M: "1 if outcome + a hazard-relevant metric, 0.5 if outcome only",
+};
 
-function scenarioX(axis: AxisKey, s: Scenario) {
-  const v = axis === "o2" ? s.o2Pct : axis === "p" ? s.pressureKPa : s.flowCmS ?? 0;
-  return { x: pos(axis, v), off: !inDomain(axis, v) ? (v > AXES[axis].max ? "high" : "low") : null };
+interface Section { id: string; label: string; note?: string; rows: LadderRow[] }
+
+function byName(a: LadderRow, b: LadderRow) { return a.inv.acronym.localeCompare(b.inv.acronym); }
+function byRank(a: LadderRow, b: LadderRow) {
+  const ka = a.rank ? (a.rank.noComparable ? 1 : 0) : 2, kb = b.rank ? (b.rank.noComparable ? 1 : 0) : 2;
+  return ka - kb || (b.rank?.R ?? -1) - (a.rank?.R ?? -1) || (a.Dmin ?? Infinity) - (b.Dmin ?? Infinity) || byName(a, b);
+}
+function byD(a: LadderRow, b: LadderRow) { return (a.Dmin ?? Infinity) - (b.Dmin ?? Infinity) || byRank(a, b); }
+
+function sections(rows: LadderRow[], sort: SortMode, s: Scenario): Section[] {
+  const otherg = rows.filter((r) => r.status === "otherg").sort(byRank);
+  const planned = rows.filter((r) => r.status === "planned").sort(byName);
+  const main = rows.filter((r) => r.status !== "otherg" && r.status !== "planned");
+  const tail: Section[] = [
+    { id: "otherg", label: `Tested only in another gravity regime`, note: `No distance is computed across gravity regimes; these rows carry no evidence for ${GRAVITY_LABEL[s.gravity].toLowerCase()}.`, rows: otherg },
+    { id: "planned", label: FAMILY_LABEL.planned, note: "Planned conditions are never counted as evidence.", rows: planned },
+  ];
+  let head: Section[];
+  if (sort === "family") {
+    head = FAMILY_ORDER.filter((f) => f !== "planned").map((f) => ({ id: f, label: FAMILY_LABEL[f], rows: main.filter((r) => r.family === f).sort(byRank) }));
+  } else if (sort === "rank") {
+    head = [
+      { id: "ranked", label: "Comparable runs in this regime — ranked by R", rows: main.filter((r) => r.rank && !r.rank.noComparable).sort(byRank) },
+      { id: "meta", label: "No comparable runs — ranked on metadata only", rows: main.filter((r) => r.rank?.noComparable).sort(byRank) },
+      { id: "unranked", label: "Not ranked", note: "Published groups are ranked only when published evidence is included.", rows: main.filter((r) => !r.rank).sort(byName) },
+    ];
+  } else if (sort === "dmin") {
+    head = [
+      { id: "withd", label: "Comparable runs — nearest first", rows: main.filter((r) => r.Dmin != null).sort(byD) },
+      { id: "nod", label: "No comparable runs", rows: main.filter((r) => r.Dmin == null).sort(byName) },
+    ];
+  } else {
+    head = [{ id: "az", label: "All investigations, A–Z", rows: [...main].sort(byName) }];
+  }
+  return [...head, ...tail].filter((x) => x.rows.length);
 }
 
-function headerTicks(axis: AxisKey, pUnit: PUnit): { v: number; label: string }[] {
-  if (axis === "o2") return [10, 20, 30, 40].map((v) => ({ v, label: String(v) }));
-  if (axis === "flow") { const step = AXES.flow.max / 3; return [0, 1, 2, 3].map((i) => ({ v: i * step, label: String(i * step) })); }
-  return pUnit === "kPa"
-    ? [20, 50, 100, 200, 500].map((v) => ({ v, label: String(v) }))
-    : [5, 10, 20, 50].map((v) => ({ v: psiaToKPa(v), label: String(v) }));
-}
-
-function Rule({ axis, s }: { axis: AxisKey; s: Scenario }) {
-  const { x } = scenarioX(axis, s);
-  return <span className={css.rule} style={{ left: `${x}%` }} aria-hidden />;
-}
-
-function Strip({ ticks, axis }: { ticks: Tick[]; axis: AxisKey }) {
-  const grid = headerTicks(axis, "kPa");
+// ------------------------------------------------------------------ strip
+function Strip({ ticks, axis, s }: { ticks: Tick[]; axis: AxisKey; s: Scenario }) {
+  const sx = pos(axis, scenarioValue(axis, s));
   return (
-    <>
-      <svg className={css.strip} viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden>
-        {grid.map((g) => <line key={g.v} x1={r2(pos(axis, g.v))} x2={r2(pos(axis, g.v))} y1={0} y2={20} className={css.gridLine} vectorEffect="non-scaling-stroke" />)}
-        {ticks.filter((t) => t.tier === "T1_PSI_RUN").map((t, i) => (
-          <line
-            key={i}
-            data-l={t.level}
-            x1={r2(pos(axis, t.v))} x2={r2(pos(axis, t.v))} y1={3} y2={17}
-            className={t.basis === "nominal-stated" ? css.tickNominal : css.tick}
-            strokeOpacity={LEVEL_OPACITY[t.level]}
-            vectorEffect="non-scaling-stroke"
-          />
+    <div className={css.strip} aria-hidden="true">
+      <svg viewBox="0 0 100 16" preserveAspectRatio="none" className={css.stripSvg}>
+        {axisTicks(axis).map((v) => <line key={v} x1={pos(axis, v)} x2={pos(axis, v)} y1={0} y2={16} className={css.grid} vectorEffect="non-scaling-stroke" />)}
+        {ticks.filter((t) => t.kind === "run").map((t, i) => (
+          <line key={i} x1={t.x} x2={t.x} y1={t.level === "solid" ? 1.5 : 3.5} y2={t.level === "solid" ? 14.5 : 12.5} className={css.tick} data-level={t.level} data-nominal={t.nominal || undefined} vectorEffect="non-scaling-stroke" />
         ))}
       </svg>
-      {ticks.filter((t) => t.tier !== "T1_PSI_RUN").map((t, i) => (
-        <span
-          key={i}
-          data-l={t.level}
-          className={t.tier === "T4_PLANNED" ? css.ringPlanned : t.limit ? css.ringLimit : css.ringPub}
-          title={t.limit ? "reported limit — not a tested condition" : undefined}
-          style={{ left: `${pos(axis, t.v)}%`, opacity: t.tier === "T4_PLANNED" ? 1 : LEVEL_OPACITY[t.level] }}
-          aria-hidden
-        />
+      {ticks.filter((t) => t.kind !== "run").map((t, i) => (
+        <span key={i} className={css.ring} data-kind={t.kind} data-level={t.level} style={{ left: `${t.x}%` }} />
       ))}
-    </>
+      <span className={css.scenRule} style={{ left: `${sx}%` }} />
+    </div>
   );
 }
 
-function AxisCell({ row, axis, s, mcol }: { row: LadderRow; axis: AxisKey; s: Scenario; mcol: boolean }) {
+function axisText(row: LadderRow, axis: AxisKey) {
   const a = row.axes[axis];
-  const ticks = row.ticks[axis];
-  const showMax = axis === "o2" && row.family === "solids";
-  const range = a.min != null && a.max != null ? (a.min === a.max ? fmt(a.min, a.min < 10 ? 2 : 1) : `${fmt(a.min, 1)}–${fmt(a.max, 1)}`) : "";
-  const label = a.n === 0
-    ? `${AXES[axis].label}: not recorded — ${a.reason}`
-    : `${AXES[axis].label}: ${a.n} of ${a.total} runs recorded, ${range} ${AXES[axis].unit}${a.nominal ? `, ${a.nominal} nominal (stated), not measured` : ""}${a.limit ? `, ${a.limit} reported limits` : ""}${a.offHigh ? `, ${a.offHigh} above the chart` : ""}`;
+  const d = axis === "p" ? (a.min != null && a.min < 10 ? 2 : 1) : 1;
+  const range = a.min == null ? null : a.min === a.max ? `${fmt(a.min, d)}` : `${fmt(a.min, d)}–${fmt(a.max, d)}`;
+  return { a, range };
+}
+
+function AxisCell({ row, axis, s }: { row: LadderRow; axis: AxisKey; s: Scenario }) {
+  const { a, range } = axisText(row, axis);
+  const offHigh = a.offHigh, offLow = a.offLow;
   return (
-    <div role="cell" data-c={axis} className={`${css.axisCell} ${mcol ? css.colOpt : ""}`} title={label}>
+    <td className={css.axisCell}>
       {a.n === 0 ? (
-        <div className={css.hatch}><span>{a.reason}</span></div>
+        <div className={css.hatch}><span>{a.reason ?? "not recorded"}</span></div>
       ) : (
-        <>
-          {showMax && <span className={css.maxMark} style={{ left: `${pos("o2", HEADLINE.maxSolidO2)}%` }} aria-hidden />}
-          <Strip ticks={ticks} axis={axis} />
-          {a.offHigh > 0 && <span className={css.offChart} aria-hidden>▸{a.offHigh}</span>}
-          <span className={css.axisMeta}>
-            <span className={css.mono}>{range}</span>
-            {a.nominal > 0 && <span className={css.metaNom}>nominal (stated)</span>}
-            {a.limit > 0 && a.limit === a.n && <span className={css.metaNom}>reported limit</span>}
-            {a.n < a.total && <span className={css.metaPart}>{a.n}/{a.total} · rest not recorded</span>}
-          </span>
-        </>
+        <Strip ticks={row.ticks[axis]} axis={axis} s={s} />
       )}
-      <Rule axis={axis} s={s} />
-    </div>
+      <div className={css.axisMeta}>
+        {range && <span className="num">{range} {AXIS_UNIT[axis]}</span>}
+        {offLow > 0 && <span>◂{offLow} below chart</span>}
+        {offHigh > 0 && <span>{offHigh} above chart ▸</span>}
+        {a.nominal > 0 && <span className={css.metaNote}>{a.nominal === a.n ? "nominal (stated)" : `${a.nominal} nominal`}</span>}
+        {a.limit > 0 && <span className={css.metaNote}>{a.limit === a.n ? "reported limits" : `${a.limit} reported limits`}</span>}
+        {a.n > 0 && a.n < a.total && <span>{a.n}/{a.total} recorded</span>}
+      </div>
+      {a.burnerFed && (
+        <div className={css.burner}>
+          <span className="num">{a.burnerFed.n}</span> inverse-flame runs: burner-fed oxidizer <span className="num">{fmt(a.burnerFed.min, 0)}–{fmt(a.burnerFed.max, 0)}%</span> — not ambient O₂, not on this axis
+        </div>
+      )}
+    </td>
   );
 }
 
-function GravCell({ row, s }: { row: LadderRow; s: Scenario }) {
+function rowSummary(row: LadderRow, s: Scenario): string {
+  const parts = [`${row.inv.acronym}, ${tierShort(row.inv)}.`, `${row.chip}.`];
+  for (const axis of AXIS_KEYS) {
+    const { a, range } = axisText(row, axis);
+    parts.push(a.n === 0 ? `${AXIS_LABEL[axis]} not recorded${a.reason ? ` (${a.reason})` : ""}.` : `${AXIS_LABEL[axis]} ${range} ${AXIS_UNIT[axis]}, ${a.n} of ${a.total} runs recorded.`);
+  }
+  if (row.nearest) parts.push(`Nearest comparable run D ${fmt(row.Dmin, 2)}, Evidence: ${classify(row.Dmin)}${row.nearest.d.partialMatch ? `, ${partialLabel(row.nearest)}; on all three axes: ${row.nearestComplete ? `D ${fmt(row.nearestComplete.d.D, 2)}, ${classify(row.nearestComplete.d.D)}` : "none"}` : ""}.`);
+  else parts.push("No comparable run.");
+  if (row.rank) parts.push(`Rank R ${fmt(row.rank.R, 1)}${row.rank.noComparable ? ", ranked on metadata only" : ""}: ${COMPONENTS.map((k) => `${k} ${fmt(row.rank!.components[k], 2)}`).join(", ")}.`);
+  else parts.push("Not ranked.");
+  parts.push(`${row.comparable} of ${row.runs.length} runs comparable${row.otherRegimes.length ? `; ${row.otherRegimes.map((o) => `${o.n} in ${GRAVITY_LABEL[o.g].toLowerCase()}`).join(", ")} not drawn` : ""}.`);
+  void s;
+  return parts.join(" ");
+}
+
+// ------------------------------------------------------------------ R tooltip (fixed-position, outside the scroll box)
+interface Tip { row: RankRow; x: number; y: number }
+function RankTip({ tip, weights }: { tip: Tip | null; weights: RankWeights }) {
+  if (!tip) return null;
+  const wsum = COMPONENTS.reduce((a, k) => a + weights[k], 0) || 1;
+  const left = typeof window !== "undefined" ? Math.min(tip.x, window.innerWidth - 340) : tip.x;
   return (
-    <div role="cell" data-c="g" className={`${css.gravCell} ${css.colOpt}`}>
-      {GRAVS.map((g) => {
-        const gi = row.gravities[g];
-        const cls = gi.n === 0 ? css.gEmpty : gi.tier === "T1_PSI_RUN" ? css.gPsi : gi.tier === "T3_PUBLISHED" ? css.gPub : css.gPlan;
-        return (
-          <span key={g} className={`${css.gMini} ${cls} ${s.gravity === g ? css.gScen : ""}`} title={`${GRAVITY_LABEL[g]}: ${gi.n ? `${gi.n} ${gi.tier === "T4_PLANNED" ? "planned (not evidence)" : "runs"}` : "no tests"}`}>
-            <span className={css.srOnly}>{GRAVITY_SHORT[g]} {gi.n ? gi.n : "none"}</span>
-          </span>
-        );
-      })}
+    <div role="tooltip" id="inv-rank-tip" className={css.tip} style={{ left: Math.max(8, left), top: tip.y }}>
+      <p className={css.tipHead}>R = 100 × Σ weight × component = <b className="num">{fmt(tip.row.R, 1)}</b> <Claim kind="COMPUTED" /></p>
+      <table className={css.tipTable}>
+        <thead><tr><th scope="col">Component</th><th scope="col">Value</th><th scope="col">Weight</th><th scope="col">Points</th></tr></thead>
+        <tbody>
+          {COMPONENTS.map((k) => (
+            <tr key={k}>
+              <th scope="row"><i className={css.rseg} data-c={k} /> {k} · {COMP_NAME[k]}<span className={css.tipDef}>{COMP_DEF[k]}</span></th>
+              <td className="num">{fmt(tip.row.components[k], 2)}</td>
+              <td className="num">{fmt(weights[k] / wsum, 2)}</td>
+              <td className="num">{fmt(tip.row.contributions[k] * 100, 1)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {tip.row.noComparable && <p className={css.tipNote}>No comparable runs — ranked on metadata only (P = 0, C = 0).</p>}
     </div>
   );
-}
-
-function verdictLetter(D: number | null) {
-  return classify(D);
 }
 
 export function Ladder(props: {
   rows: LadderRow[]; s: Scenario; pUnit: PUnit; sort: SortMode; setSort: (m: SortMode) => void;
-  pinned: string[]; togglePin: (id: string) => void; openRun: (r: Run) => void;
-  mobileCol: MobileCol; setMobileCol: (c: MobileCol) => void;
+  pinned: string[]; togglePin: (id: string) => void; openRun: (r: Run) => void; weights: RankWeights;
 }) {
-  const { rows, s, pUnit, sort, setSort, pinned, togglePin, openRun, mobileCol, setMobileCol } = props;
+  const { rows, s, pUnit, sort, setSort, pinned, togglePin, openRun, weights } = props;
+  const secs = useMemo(() => sections(rows, sort, s), [rows, sort, s]);
+  const [tip, setTip] = useState<Tip | null>(null);
+  const showTip = useCallback((row: RankRow, el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    const below = r.bottom + 230 < window.innerHeight;
+    setTip({ row, x: r.left - 260, y: below ? r.bottom + 6 : Math.max(8, r.top - 236) });
+  }, []);
+  useEffect(() => {
+    if (!tip) return;
+    const close = () => setTip(null);
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("keydown", onKey);
+    return () => { window.removeEventListener("scroll", close, true); window.removeEventListener("keydown", onKey); };
+  }, [tip]);
 
-  const ordered = useMemo(() => {
-    const byR = (a: LadderRow, b: LadderRow) => (b.R ?? -1) - (a.R ?? -1) || (a.Dmin ?? Infinity) - (b.Dmin ?? Infinity) || a.inv.acronym.localeCompare(b.inv.acronym);
-    const byD = (a: LadderRow, b: LadderRow) => (a.Dmin ?? Infinity) - (b.Dmin ?? Infinity) || byR(a, b);
-    if (sort === "R") return [{ family: null, rows: [...rows].sort(byR) }];
-    if (sort === "Dmin") return [{ family: null, rows: [...rows].sort(byD) }];
-    return FAMILIES.map((f) => ({ family: f, rows: rows.filter((r) => r.family === f.id).sort(byR) })).filter((g) => g.rows.length);
-  }, [rows, sort]);
-
-  const comparableCount = rows.filter((r) => r.state === "comparable").length;
-  const solidMaxX = pos("o2", HEADLINE.maxSolidO2);
+  const comparableCount = rows.filter((r) => r.status === "comparable").length;
   const pinFull = pinned.length >= 3;
+  const wsum = COMPONENTS.reduce((a, k) => a + weights[k], 0) || 1;
 
   return (
-    <section className={css.ladderSheet} aria-labelledby="cf-ladder-h">
-      <div className={css.sheetHead}>
-        <div className={css.sheetLabel} id="cf-ladder-h"><span>§2</span> Envelope ladder <span className={css.sheetLabelNote}>{rows.length} investigations · {comparableCount} comparable for this question and regime</span></div>
-        <div className={css.sortGroup} role="group" aria-label="Sort rows">
-          <span className={css.presetLabel}>Sort</span>
-          {([["family", "Family"], ["R", "R · computed"], ["Dmin", "D_min · computed"]] as [SortMode, string][]).map(([id, l]) => (
-            <button key={id} type="button" aria-pressed={sort === id} className={css.presetTab} onClick={() => setSort(id)}>{l}</button>
+    <section className={css.ladderSec} aria-labelledby="inv-ladder-h" data-testid="ladder">
+      <div className={css.secHead}>
+        <div>
+          <h2 className={css.h2} id="inv-ladder-h">Envelope ladder</h2>
+          <p className={css.secSub}>
+            {rows.length} investigations · <span className="num">{comparableCount}</span> with comparable runs for this question in {GRAVITY_LABEL[s.gravity].toLowerCase()}.
+            Each strip shows where an investigation&rsquo;s runs sit on one axis; the vertical rule is your scenario.
+          </p>
+        </div>
+        <div className={css.sortGroup} role="group" aria-label="Sort investigations">
+          <span className={css.footLabel}>Sort</span>
+          <span className={css.seg}>
+            {SORTS.map((o) => (
+              <button key={o.id} type="button" className={css.segBtn} aria-pressed={sort === o.id} onClick={() => setSort(o.id)}>{o.label}</button>
+            ))}
+          </span>
+        </div>
+      </div>
+
+      <div className={css.legend}>
+        <ul className={css.legendList}>
+          <li><i className={css.lgTick} data-level="solid" /> comparable run, within NEAR (D ≤ {VERDICT_THRESHOLDS.near}) on the <em>other</em> compared axes</li>
+          <li><i className={css.lgTick} data-level="ghost" /> comparable, but farther than NEAR on the other axes (ghost)</li>
+          <li><i className={css.lgTick} data-level="faint" /> not comparable for this question</li>
+          <li><i className={css.lgTick} data-level="solid" data-nominal /> nominal (stated) value</li>
+          <li><i className={css.ring} data-kind="published" data-level="solid" /> published (not in PSI)</li>
+          <li><i className={css.ring} data-kind="limit" data-level="solid" /> reported limit — a threshold, not a test</li>
+          <li><i className={css.ring} data-kind="planned" /> planned — not evidence</li>
+          <li><i className={css.lgHatch} /> not recorded</li>
+          <li><i className={css.lgRule} /> your scenario</li>
+        </ul>
+        <p className={css.legendNote}>
+          Strips are marginal: a run close on O₂ can be far on pressure or flow, so a tick is drawn solid only when that run is also within NEAR on the other axes it is compared on.
+          Only runs in the scenario&rsquo;s gravity regime are drawn. Inverse-flame O₂ (fed through the burner) is listed under the O₂ strip, not placed on it.
+        </p>
+      </div>
+
+      <div className={css.tableScroll} tabIndex={0} role="region" aria-label="Envelope ladder table (scrolls sideways on small screens)">
+        <table className={css.ladder}>
+          <caption className="sr-only">
+            Envelope ladder: each NASA investigation, where its runs sit on O₂, pressure and flow relative to your scenario, its nearest comparable run (D_min), rank R and comparable runs.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" className={css.cName}>Investigation</th>
+              {AXIS_KEYS.map((axis) => {
+                const v = scenarioValue(axis, s);
+                const x = pos(axis, v);
+                const off = !inDomain(axis, v) ? (v > DOMAIN[axis].max ? "▸ " : "◂ ") : "";
+                const label = axis === "p" ? (pUnit === "kPa" ? fmt(v, 1) : fmt(kPaToPsia(v), 2)) : axis === "flow" && s.flowCmS == null ? "quiescent" : fmt(v, axis === "flow" ? 0 : 1);
+                return (
+                  <th key={axis} scope="col" className={css.axisHead}>
+                    <span className={css.axisTitle}>{AXIS_LABEL[axis]} <span className={css.quiet}>{axis === "p" ? `${pUnit}, log scale` : AXIS_UNIT[axis]}</span></span>
+                    <span className={css.axisScale} aria-hidden="true">
+                      {axisTicks(axis).map((t) => <span key={t} style={{ left: `${pos(axis, t)}%` }}>{axis === "p" && pUnit === "psia" ? fmt(kPaToPsia(t), 1) : t}</span>)}
+                    </span>
+                    <span className="sr-only">Your scenario: {label}</span>
+                    <span className={css.flagTrack} aria-hidden="true"><span className={css.scenFlag} style={{ left: `${x}%` }} data-edge={x > 85 ? "r" : x < 15 ? "l" : undefined}>{off}{label}</span></span>
+                  </th>
+                );
+              })}
+              <th scope="col" className={css.cD}>D<sub>min</sub> · evidence <Claim kind="COMPUTED" /></th>
+              <th scope="col" className={css.cR}>Rank R <Claim kind="COMPUTED" /></th>
+              <th scope="col" className={css.cRuns}>Comparable / total runs</th>
+            </tr>
+          </thead>
+          {secs.map((sec) => (
+            <tbody key={sec.id}>
+              <tr className={css.secRow}>
+                <th scope="colgroup" colSpan={7}>
+                  {sec.label} <span className="num">({sec.rows.length})</span>
+                  {sec.note && <span className={css.secNote}> — {sec.note}</span>}
+                </th>
+              </tr>
+              {sec.rows.map((row) => {
+                const isPinned = pinned.includes(row.inv.id);
+                const v = classify(row.Dmin);
+                return (
+                  <tr key={row.inv.id} data-testid="ladder-row" data-inv={row.inv.id} data-status={row.status} className={`${css.lrow} ${isPinned ? css.pinnedRow : ""}`}>
+                    <th scope="row" className={css.cName}>
+                      <div className={css.nameCell}>
+                        <button
+                          type="button"
+                          data-testid="pin-toggle"
+                          className={css.pinBtn}
+                          aria-pressed={isPinned}
+                          aria-disabled={!isPinned && pinFull ? true : undefined}
+                          aria-label={`${isPinned ? "Remove" : "Add"} ${row.inv.acronym} ${isPinned ? "from" : "to"} compare`}
+                          title={!isPinned && pinFull ? "Compare holds 3 — remove one first" : isPinned ? "Remove from compare" : "Add to compare"}
+                          onClick={() => { if (isPinned || !pinFull) togglePin(row.inv.id); }}
+                        >
+                          <span aria-hidden="true">{isPinned ? "✓" : "+"}</span>
+                        </button>
+                        <div className={css.nameText}>
+                          <Link href={`/investigations/${row.inv.id}`} className={css.invLink}>{row.inv.acronym}</Link>
+                          <span className={css.invMeta}>
+                            <span className={css.tier} data-tier={row.inv.tier}>{tierShort(row.inv)}</span>
+                            <span className="num">{row.inv.id}</span>
+                            {sort !== "family" && <span>· {FAMILY_LABEL[row.family]}</span>}
+                          </span>
+                          <span className={css.chip} data-status={row.status}>{row.chip}</span>
+                          {row.otherRegimes.length > 0 && row.status !== "otherg" && (
+                            <span className={css.otherG}>+{row.otherRegimes.map((o) => `${o.n} ${GRAVITY_SHORT[o.g]}`).join(", ")} in other regimes (not drawn)</span>
+                          )}
+                          <span className="sr-only">{rowSummary(row, s)}</span>
+                        </div>
+                      </div>
+                    </th>
+                    {AXIS_KEYS.map((axis) => <AxisCell key={axis} row={row} axis={axis} s={s} />)}
+                    <td className={css.cD}>
+                      {row.nearest ? (
+                        <button type="button" className={css.dBtn} onClick={() => openRun(row.nearest!.run)} aria-label={`D_min ${fmt(row.Dmin, 2)}, Evidence: ${v}. Open provenance of nearest run ${row.nearest.run.id}`}>
+                          <span className={css.dVal}>{fmt(row.Dmin, 2)}</span>
+                          <EvidenceWord v={v} />
+                          {row.nearest.d.partialMatch && <span className={css.partial}>{partialLabel(row.nearest)}</span>}
+                        </button>
+                      ) : null}
+                      {row.nearest?.d.partialMatch ? (
+                        row.nearestComplete
+                          ? <button type="button" className={css.allAxes} onClick={() => openRun(row.nearestComplete!.run)} aria-label={`On all three axes: D ${fmt(row.nearestComplete.d.D, 2)}, Evidence: ${classify(row.nearestComplete.d.D)}. Open provenance of ${row.nearestComplete.run.id}`}>on all three axes: <span className="num">{fmt(row.nearestComplete.d.D, 2)}</span> <EvidenceWord v={classify(row.nearestComplete.d.D)} prefix={false} /></button>
+                          : <span className={css.allAxes}>on all three axes: none</span>
+                      ) : null}
+                      {row.nearest ? null : (
+                        <span className={css.none}>{row.status === "planned" ? "planned — never counted" : row.rank?.noComparable ? "no comparable runs — ranked on metadata only" : "no comparable runs"}</span>
+                      )}
+                    </td>
+                    <td className={css.cR}>
+                      {row.rank ? (
+                        <button
+                          type="button"
+                          className={css.rBtn}
+                          aria-describedby={tip?.row.investigation.id === row.inv.id ? "inv-rank-tip" : undefined}
+                          aria-label={`Rank R ${fmt(row.rank.R, 1)}: components ${COMPONENTS.map((k) => `${COMP_NAME[k]} ${fmt(row.rank!.components[k], 2)}`).join(", ")}`}
+                          onMouseEnter={(e) => showTip(row.rank!, e.currentTarget)}
+                          onMouseLeave={() => setTip(null)}
+                          onFocus={(e) => showTip(row.rank!, e.currentTarget)}
+                          onBlur={() => setTip(null)}
+                          onClick={(e) => showTip(row.rank!, e.currentTarget)}
+                        >
+                          <span className="num">{fmt(row.rank.R, 1)}</span>
+                          <span className={css.rBar} aria-hidden="true">
+                            {COMPONENTS.map((k) => <span key={k} className={css.rseg} data-c={k} style={{ width: `${r2(Math.max(0, row.rank!.contributions[k] * 100))}%` }} />)}
+                          </span>
+                        </button>
+                      ) : <span className={css.none}>not ranked</span>}
+                    </td>
+                    <td className={css.cRuns}>
+                      {row.runs.length > 0 ? (
+                        <>
+                          <span className={`num ${css.nowrap}`}>{row.comparable} / {row.runs.length}</span>
+                          {row.comparable > 0 && <span className={css.subNum}><span className="num">{row.near}</span> within NEAR</span>}
+                        </>
+                      ) : row.inv.summaryRowCount > 0 ? (
+                        <span className={css.subNum}><span className="num">{row.inv.summaryRowCount}</span> summary rows, no runs</span>
+                      ) : <span className={css.none}>no runs</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           ))}
-        </div>
+        </table>
       </div>
-      <p className={css.legend}>
-        <span><i className={css.lgTick} style={{ opacity: 1 }} /> comparable run, D ≤ {VERDICT_THRESHOLDS.near} (NEAR or better)</span>
-        <span><i className={css.lgTick} style={{ opacity: LEVEL_OPACITY[1] }} /> comparable, farther</span>
-        <span><i className={css.lgTick} style={{ opacity: LEVEL_OPACITY[0] }} /> not comparable here</span>
-        <span><i className={css.lgRing} /> published</span>
-        <span><i className={css.lgRingLimit} /> reported limit — not a tested condition</span>
-        <span><i className={css.lgRingPlan} /> planned — not evidence</span>
-        <span><i className={css.lgNom} /> nominal (stated)</span>
-        <span><i className={css.lgHatch} /> not recorded</span>
-        <span><i className={css.lgRule} /> your scenario</span>
+      <p className={css.rankKey}>
+        <span>R components:</span>
+        {COMPONENTS.map((k) => <span key={k}><i className={css.rseg} data-c={k} /> {k} {COMP_NAME[k].toLowerCase()} ×<span className="num">{fmt(weights[k] / wsum, 2)}</span></span>)}
+        <span className={css.quiet}>Hover or focus an R value for the breakdown.</span>
       </p>
-      <p className={css.caveatLine}>
-        Strips are marginal: a tick close on O₂ can be far on pressure or flow. Full ink marks runs within D ≤ {VERDICT_THRESHOLDS.near} on all compared axes jointly — hover or focus a row to isolate those same runs in every column.
-      </p>
-      <div className={css.mobileCols} role="group" aria-label="Ladder column">
-        {MOBILE_COLS.map((c) => (
-          <button key={c.id} type="button" aria-pressed={mobileCol === c.id} onClick={() => setMobileCol(c.id)}>{c.label}</button>
-        ))}
-      </div>
-
-      <div className={css.ladder} role="table" aria-label="Envelope ladder: investigations against tested O₂, pressure, flow and gravity" data-mcol={mobileCol}>
-        <div role="row" className={`${css.lrow} ${css.lhead}`}>
-          <div role="columnheader" data-c="pin" className={css.cPin}><span className={css.srOnly}>Pin</span></div>
-          <div role="columnheader" data-c="name" className={css.cName}>Investigation</div>
-          {(["o2", "p", "flow"] as AxisKey[]).map((axis) => {
-            const sx = scenarioX(axis, s);
-            const val = axis === "o2" ? `${fmt(s.o2Pct, 1)}` : axis === "p" ? (pUnit === "kPa" ? fmt(s.pressureKPa, 1) : fmt(kPaToPsia(s.pressureKPa), 2)) : s.flowCmS == null ? "quiescent" : fmt(s.flowCmS, 0);
-            return (
-              <div key={axis} role="columnheader" data-c={axis} className={`${css.axisHead} ${css.colOpt}`}>
-                <span className={css.axisTitle}>{AXES[axis].label} <em>{axis === "p" ? `${pUnit}${AXES.p.log ? " · log" : ""}` : AXES[axis].unit}</em></span>
-                <span className={css.axisScale} aria-hidden>
-                  {headerTicks(axis, pUnit).map((t) => <span key={t.label} style={{ left: `${pos(axis, t.v)}%` }}>{t.label}</span>)}
-                </span>
-                <span className={css.scenFlag} style={{ left: `${sx.x}%` }} data-edge={sx.x > 70 ? "r" : "l"}>
-                  {sx.off === "high" ? "▸ " : sx.off === "low" ? "◂ " : ""}{val}
-                </span>
-                <Rule axis={axis} s={s} />
-              </div>
-            );
-          })}
-          <div role="columnheader" data-c="g" className={`${css.cG} ${css.colOpt}`} title="Gravity regimes with tests: µg · Moon · Mars · 1 g">
-            <span className={css.gTitle}>Gravity</span>
-            <span className={css.gHeadRow} aria-hidden>{GRAV_HEAD.map((g) => <span key={g}>{g}</span>)}</span>
-          </div>
-          <div role="columnheader" data-c="fuel" className={`${css.cFuel} ${css.colOpt}`}>Fuel class</div>
-          <div role="columnheader" data-c="runs" className={`${css.cNum} ${css.colOpt}`}>Runs</div>
-          <div role="columnheader" data-c="dmin" className={css.cNum}>D<sub>min</sub><em>computed</em></div>
-          <div role="columnheader" data-c="R" className={`${css.cNum} ${css.colOpt}`}>R<em>computed</em></div>
-        </div>
-
-        {ordered.map((g, gi) => (
-          <Fragment key={g.family?.id ?? `flat${gi}`}>
-            {g.family && (
-              <div role="row" className={`${css.lrow} ${css.lgroup}`}>
-                <div role="rowheader" className={css.groupName}>
-                  {g.family.label} <span className={css.mono}>{g.rows.length}</span>
-                </div>
-                {(["o2", "p", "flow"] as AxisKey[]).map((axis) => (
-                  <div key={axis} role="cell" data-c={axis} className={`${css.groupAxis} ${css.colOpt}`}>
-                    {axis === "o2" && g.family!.id === "solids" && (
-                      <>
-                        <span className={css.maxMark} style={{ left: `${solidMaxX}%` }} aria-hidden />
-                        <span className={css.maxLabel} style={{ left: `${solidMaxX}%` }} title={`Highest O₂ among the ${HEADLINE.solidRunsWithO2} PSI solid-material tests with a recorded O₂ value`}>solid max {fmt(HEADLINE.maxSolidO2, 1)}%</span>
-                      </>
-                    )}
-                    <Rule axis={axis} s={s} />
-                  </div>
-                ))}
-                <div role="cell" className={css.groupRest} />
-              </div>
-            )}
-            {g.rows.map((row) => {
-              const isPinned = pinned.includes(row.inv.id);
-              const dim = row.state !== "comparable";
-              const v = verdictLetter(row.Dmin);
-              return (
-                <div key={row.inv.id} role="row" className={`${css.lrow} ${dim ? css.dim : css.emph} ${isPinned ? css.pinnedRow : ""}`} data-state={row.state} data-tier={row.inv.tier}>
-                  <div role="cell" data-c="pin" className={css.cPin}>
-                    <button
-                      type="button"
-                      className={css.pinBtn}
-                      aria-pressed={isPinned}
-                      disabled={!isPinned && pinFull}
-                      aria-label={`${isPinned ? "Unpin" : "Pin"} ${row.inv.acronym} ${isPinned ? "from" : "to"} compare tray`}
-                      title={!isPinned && pinFull ? "Compare tray holds 3 — unpin one first" : isPinned ? "Unpin" : "Pin to compare"}
-                      onClick={() => togglePin(row.inv.id)}
-                    >
-                      {isPinned ? "■" : "□"}
-                    </button>
-                  </div>
-                  <div role="rowheader" data-c="name" className={css.cName}>
-                    <span className={css.invName}>
-                      <b>{row.inv.acronym}</b>
-                      <span className={css.invId}>{row.inv.id.startsWith("PSI-") ? row.inv.id : row.inv.tier === "T4_PLANNED" ? "T4" : "T3"}</span>
-                      {!g.family && <span className={css.famTag}>{FAMILY_SHORT[row.family]}</span>}
-                    </span>
-                    <span className={`${css.chip} ${css[`chip_${row.state}`] ?? ""}`}>
-                      {row.state === "comparable" ? `comparable · ${row.comparableRuns} run${row.comparableRuns === 1 ? "" : "s"} · ${row.nearRuns} near` : row.chip}
-                    </span>
-                  </div>
-                  <AxisCell row={row} axis="o2" s={s} mcol />
-                  <AxisCell row={row} axis="p" s={s} mcol />
-                  <AxisCell row={row} axis="flow" s={s} mcol />
-                  <GravCell row={row} s={s} />
-                  <div role="cell" data-c="fuel" className={`${css.cFuel} ${css.colOpt}`}>
-                    {row.fuel.length ? (
-                      <span title={row.fuel.map((f) => `${FUEL_LABEL[f.fc]}: ${f.n}`).join(" · ")}>
-                        {FUEL_LABEL[row.fuel[0].fc]}{row.fuel.length > 1 && <em> +{row.fuel.length - 1}</em>}
-                      </span>
-                    ) : <span className={css.nr}>not recorded</span>}
-                  </div>
-                  <div role="cell" data-c="runs" className={`${css.cNum} ${css.colOpt}`}>
-                    {row.runs.length > 0 ? (
-                      <span className={css.mono}>{row.runs.length}{row.inv.tier === "T4_PLANNED" && <em className={css.planNote}> planned</em>}</span>
-                    ) : row.summaryOnly ? (
-                      <span className={css.sumOnly} title="summary table only — not runs">Σ {row.inv.summaryRowCount}<em>summary</em></span>
-                    ) : <span className={css.nr}>none</span>}
-                  </div>
-                  <div role="cell" data-c="dmin" className={css.cNum}>
-                    {row.Dmin != null && row.nearest ? (
-                      <button type="button" className={css.dBtn} data-v={v} onClick={() => openRun(row.nearest!.run)} title={`Nearest comparable run ${row.nearest.run.id} — open provenance`}>
-                        {fmt(row.Dmin, 2)}<span className={css.dV}>{v}</span>
-                      </button>
-                    ) : <span className={css.nr}>—</span>}
-                  </div>
-                  <div role="cell" data-c="R" className={`${css.cNum} ${css.colOpt}`}>
-                    {row.R != null ? (
-                      <span className={css.rCell}><span className={css.mono}>{fmt(row.R, 1)}</span><span className={css.rBar}><span style={{ width: `${r3(Math.min(100, row.R))}%` }} /></span></span>
-                    ) : <span className={css.nr}>—</span>}
-                  </div>
-                </div>
-              );
-            })}
-          </Fragment>
-        ))}
-      </div>
+      <RankTip tip={tip} weights={weights} />
     </section>
   );
 }

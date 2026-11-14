@@ -1,0 +1,12 @@
+{
+  "description": "Reviewed exceptions for scripts/lint-claims.mjs. Each entry: file (repo-relative, forward slashes), text (substring of the offending source line), rule (rule id from lint-claims.mjs), reason (why this is acceptable, e.g. a verbatim NASA quotation with its source), reviewed (who/when). Add entries only after a person has read the line in context. Unused entries are reported as warnings.",
+  "entries": [
+    {
+      "file": "docs/submission/references.md",
+      "text": "| Abney et al., ICES-2022-45 |",
+      "rule": "certify",
+      "reason": "Generated copy of the content/references.ts 'usedFor' list for ICES-2022-45, which names the NASA-stated extinguisher certification envelope. Remove this entry if the source wording changes.",
+      "reviewed": "QA/compliance workstream 2026-11-14"
+    }
+  ]
+}

@@ -104,7 +104,7 @@ export default function MethodPage() {
 
         <Sec id="space" n={2}>Condition space and units</Sec>
         <p>Every test row and every scenario is described on the same axes: O₂ mole fraction (% by volume), total pressure (kPa), ventilation flow (cm/s), gravity regime, and fuel class. Units are converted with fixed constants:</p>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Unit conversions"><table>
           <caption>Unit conversions (lib/engine/constants.ts)</caption>
           <thead><tr><th scope="col">From</th><th scope="col" className="n">kPa</th></tr></thead>
           <tbody>
@@ -125,7 +125,7 @@ export default function MethodPage() {
 
         <Sec id="gate" n={3}>Comparability gate</Sec>
         <p>Before any distance is computed, a run must pass a gate. A gas-burner flame is never counted as evidence about cabin fabrics, and no distance is ever computed across gravity regimes.</p>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Fuel classes counted as evidence"><table>
           <caption>Fuel classes counted as evidence, by question (lib/engine/gate.ts)</caption>
           <thead><tr><th scope="col">Question</th><th scope="col">Comparable</th><th scope="col">Context only (never sets the verdict)</th></tr></thead>
           <tbody>
@@ -148,7 +148,7 @@ export default function MethodPage() {
 
         <Sec id="distance" n={4}>Evidence distance</Sec>
         <p>For a comparable run <em>r</em> and scenario <em>s</em>, each axis gap is divided by a scale, and D is the root of the sum of squares:</p>
-        <code className="formula">{`ΔO₂ = (O₂ᵣ − O₂ₛ) / ${SCALES.o2Pts}            percentage points
+        <code className="formula" tabIndex={0}>{`ΔO₂ = (O₂ᵣ − O₂ₛ) / ${SCALES.o2Pts}            percentage points
 ΔP  = ln(Pᵣ / Pₛ) / ln ${SCALES.pressureRatio}        pressure, on a log scale
 ΔU  = (Uᵣ − Uₛ) / ${SCALES.flowCmS}             cm/s, only if both flows are numeric
 
@@ -162,7 +162,7 @@ D = √( ${AXIS_WEIGHTS.o2}·ΔO₂² + ${AXIS_WEIGHTS.pressure}·ΔP² + ${AXIS
         <p><strong>Missing axes.</strong> If either side lacks an axis, that axis is left out and the match is labelled <em>partial</em> with the axes used. Leaving an axis out can only lower D, so MARGIN also reports the best <em>fully compared</em> test whenever the nearest is partial. Quiescent versus ventilated flow is a categorical mismatch: the flow gap is not computed and the mismatch is shown. Ties are broken complete-before-partial, then by run id.</p>
 
         <Sec id="verdicts" n={5}>Verdict classes</Sec>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Verdict classes"><table>
           <caption>Classes of the nearest comparable test (boundaries inclusive)</caption>
           <thead><tr><th scope="col">Class</th><th scope="col">Condition</th><th scope="col">Reads as</th></tr></thead>
           <tbody>
@@ -180,7 +180,7 @@ D = √( ${AXIS_WEIGHTS.o2}·ΔO₂² + ${AXIS_WEIGHTS.pressure}·ΔP² + ${AXIS
 
         <Sec id="flow" n={7}>The flow assumption</Sec>
         <p>Ventilation flow is an input you choose. MARGIN&rsquo;s presets use {ea.flowCmS} cm/s. Because flow is one of the three axes, the assumed flow can move a verdict across a class boundary. The table shows how D for the Exploration Atmosphere changes with the assumed flow, with everything else fixed.</p>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Flow sensitivity of the Exploration Atmosphere"><table>
           <caption>Exploration Atmosphere ({ea.o2Pct}% O₂, {ea.pressureKPa} kPa, microgravity, material flammability): D to the nearest comparable test by assumed flow</caption>
           <thead><tr><th scope="col">Assumed flow</th><th scope="col" className="n">D, PSI only</th><th scope="col">Class</th><th scope="col" className="n">D, with published</th><th scope="col">Class</th><th scope="col">Nearest (with published)</th></tr></thead>
           <tbody>
@@ -211,7 +211,7 @@ D = √( ${AXIS_WEIGHTS.o2}·ΔO₂² + ${AXIS_WEIGHTS.pressure}·ΔP² + ${AXIS
         <p>The shaded plane on the Atlas is D evaluated at every point of the O₂ × pressure window, with the scenario&rsquo;s flow, gravity, question and material held fixed. Dark shading is D ≤ {VERDICT_THRESHOLDS.direct}, light is D ≤ {VERDICT_THRESHOLDS.near}, hatching is further. Only runs with both O₂ and pressure recorded shape the map; runs lacking a pressure still count for the verdict as partial matches and are disclosed beneath the map. The dashed contours show where the {VERDICT_THRESHOLDS.near} boundary would sit if the O₂ and pressure scales were halved or doubled. It is a map of where tests exist, not a hazard map.</p>
 
         <Sec id="ranking" n={10}>Investigation ranking</Sec>
-        <code className="formula">{`R = 100 × ( ${RANK_WEIGHTS.P}·P + ${RANK_WEIGHTS.H}·H + ${RANK_WEIGHTS.S}·S + ${RANK_WEIGHTS.C}·C + ${RANK_WEIGHTS.M}·M )   (weights renormalised to sum to 1)`}</code>
+        <code className="formula" tabIndex={0}>{`R = 100 × ( ${RANK_WEIGHTS.P}·P + ${RANK_WEIGHTS.H}·H + ${RANK_WEIGHTS.S}·S + ${RANK_WEIGHTS.C}·C + ${RANK_WEIGHTS.M}·M )   (weights renormalised to sum to 1)`}</code>
         <dl className="defs">
           <dt>P · proximity</dt><dd>exp(−D<sub>min</sub>) over the investigation&rsquo;s comparable runs; 0 if none.</dd>
           <dt>H · question match</dt><dd>1 if the investigation primarily addresses the question, 0.5 if secondarily, else 0 (curated hazard map).</dd>
@@ -227,12 +227,12 @@ D = √( ${AXIS_WEIGHTS.o2}·ΔO₂² + ${AXIS_WEIGHTS.pressure}·ΔP² + ${AXIS
           plus {int(counts.totalSummaryRows)} summary rows that describe test series rather than single runs and are never treated as runs. {int(counts.placeable ?? counts.plottable)} runs record both O₂ and pressure and can be placed on the map.
           {counts.blankLinesIgnored ? <> The ACME CFI-G inverse-flame file contains {int(counts.blankLinesIgnored)} trailing blank lines, which are ignored.</> : null}
         </p>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Flags carried by PSI runs"><table>
           <caption>Flags carried by PSI runs (a run can carry several)</caption>
           <thead><tr><th scope="col">Flag</th><th scope="col" className="n">Runs</th><th scope="col">Meaning</th></tr></thead>
           <tbody>{flagRows.map(([k, v]) => <tr key={k}><th scope="row"><code>{k}</code></th><td className="n">{int(v)}</td><td>{FLAG_TEXT[k] ?? ""}</td></tr>)}</tbody>
         </table></div>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Experimental tables read from PSI"><table>
           <caption>Experimental tables read from PSI</caption>
           <thead><tr><th scope="col">Investigation</th><th scope="col">File</th><th scope="col">Kind</th><th scope="col" className="n">Rows</th><th scope="col" className="n">Kept</th></tr></thead>
           <tbody>{SNAP.tableStats.map((t) => <tr key={t.file}><td>{t.investigation}</td><td className="src">{t.file}</td><td>{t.kind}</td><td className="n">{t.dataRows}</td><td className="n">{t.kept}</td></tr>)}</tbody>

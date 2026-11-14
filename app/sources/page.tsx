@@ -70,7 +70,7 @@ export default function SourcesPage() {
         <p>The data licences are separate from the licence of MARGIN&rsquo;s own code (Apache-2.0, <a href="#licences">below</a>).</p>
 
         <Sec id="psi" n={2}>PSI investigations</Sec>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="PSI investigations"><table>
           <caption>The {PSI_INVESTIGATIONS.length} PSI combustion investigation records read by MARGIN</caption>
           <thead><tr><th scope="col">Accession</th><th scope="col">Investigation</th><th scope="col" className="n">Run rows</th><th scope="col">DOI</th><th scope="col">Licence (as stated by PSI)</th></tr></thead>
           <tbody>
@@ -94,7 +94,7 @@ export default function SourcesPage() {
             : <>{checked.length} of {published.length} published or planned values have been checked against their primary source; the rest are labelled as not yet checked wherever they appear.</>}
           Reported limits are thresholds inferred by the authors, not tested conditions. Planned experiments are never counted as evidence.
         </p>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Published values"><table>
           <caption>Values transcribed from publications (not in PSI)</caption>
           <thead><tr><th scope="col">Record</th><th scope="col">Material</th><th scope="col">g</th><th scope="col">Conditions</th><th scope="col">Basis</th><th scope="col">Source and locator</th><th scope="col">Status</th></tr></thead>
           <tbody>
@@ -122,7 +122,7 @@ export default function SourcesPage() {
 
         <Sec id="insights" n={4}>Findings</Sec>
         <p>{insightChecked} of {insights.length} findings have been checked against their primary source and are shown in the app. The others stay hidden until checked.</p>
-        <div className="doc-tablewrap"><table>
+        <div className="doc-tablewrap" tabIndex={0} role="region" aria-label="Findings and verification status"><table>
           <caption>Findings and their verification status</caption>
           <thead><tr><th scope="col">Finding</th><th scope="col">Validity</th><th scope="col">Source</th><th scope="col">Status</th></tr></thead>
           <tbody>

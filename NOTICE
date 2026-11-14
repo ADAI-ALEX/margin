@@ -1,0 +1,132 @@
+MARGIN — How close is the evidence?
+Copyright 2026 The MARGIN team
+
+This product's own source code is licensed under the Apache License, Version 2.0
+(see LICENSE). The licence of the code does NOT apply to the NASA data, the cited
+publications, the fonts or the third-party packages listed below; each keeps its own
+terms.
+
+Built for NASA Space Apps 2026 (challenge "Flame in Freefall"). MARGIN is an
+independent project. It is not produced, reviewed or endorsed by NASA.
+
+
+===============================================================================
+1. NASA DATA AND PUBLICATIONS (separate from the code licence)
+===============================================================================
+
+1.1 NASA Physical Sciences Informatics (PSI)
+    https://psi.nasa.gov/  ·  JSON backend https://psi.nasa.gov/geode-py/ws/
+    24 combustion-science investigation records and their "Experimental table"
+    CSVs, fetched once by pipeline/fetch-psi.mjs and normalised into
+    data/generated/snapshot.json (1,870 run rows; 130 summary rows; counts are
+    recomputed by the pipeline and stored in snapshot.json "counts").
+
+    Licence: as stated by PSI on each record (field "license" in the snapshot).
+      - 23 of the 24 records state CC0-1.0.
+      - PSI-10 (ACME / Flame Design, DOI 10.60555/w4zy-bt45) has an EMPTY licence
+        field on PSI. Its licence is "not stated"; it is attributed like the
+        others and the gap is disclosed on the Sources page (Kickoff V9).
+    Each investigation is cited by its PSI DOI (prefix 10.60555) on the Sources
+    page and in its dossier.
+
+    Attribution: "Data: NASA Physical Sciences Informatics (PSI)."
+
+1.2 NASA Technical Reports Server (NTRS) and other publications
+    Values that are not in PSI (Saffire IV–VI, BASS-II limit points, Olson & Ferkul
+    2012 Table I, LUCI, FM2 plans, FLEX limiting-O2 values) are transcribed as
+    individual numbers with a page or table citation. The documents themselves are
+    cited and linked, NOT redistributed in this repository. See
+    docs/submission/references.md and the in-app Sources page for the full list.
+
+1.3 NASA marks
+    This repository and the deployed site contain no NASA logos, insignia
+    ("meatball"), logotype ("worm"), seal, flags or mission patches. Use of NASA
+    data does not imply NASA endorsement.
+
+
+===============================================================================
+2. FONTS
+===============================================================================
+
+Served with next/font/google, which downloads the font files at build time and
+self-hosts them with the site (no request to Google from the visitor's browser).
+
+  Newsreader        Production Type             SIL Open Font License 1.1
+  Public Sans       USWDS / General Services Administration
+                                                SIL Open Font License 1.1
+  JetBrains Mono    JetBrains                   SIL Open Font License 1.1
+
+SIL OFL 1.1: https://openfontlicense.org/
+
+
+===============================================================================
+3. THIRD-PARTY SOFTWARE (production dependency tree)
+===============================================================================
+
+Generated from `npm ls --omit=dev --all` and each package's package.json
+"license" field (2026-11-14). Versions are those in package-lock.json.
+
+Direct dependencies
+  next                 16.4.6     MIT           https://github.com/vercel/next.js
+  react                19.3.0     MIT           https://github.com/facebook/react
+  react-dom            19.3.0     MIT           https://github.com/facebook/react
+  d3-array             3.2.5      ISC           https://github.com/d3/d3-array
+  d3-contour           4.0.3      ISC           https://github.com/d3/d3-contour
+  d3-scale             4.0.3      ISC           https://github.com/d3/d3-scale
+  d3-shape             3.2.1      ISC           https://github.com/d3/d3-shape
+  zod                  3.25.76    MIT           https://github.com/colinhacks/zod
+
+Transitive dependencies
+  @next/env            16.4.6     MIT           https://github.com/vercel/next.js
+  @next/swc-*          16.4.6     MIT           https://github.com/vercel/next.js   (platform binary)
+  @swc/helpers         0.5.23     Apache-2.0    https://github.com/swc-project/swc
+  baseline-browser-mapping 2.11.37 Apache-2.0   https://github.com/web-platform-dx/baseline-browser-mapping
+  caniuse-lite         1.0.30001826 CC-BY-4.0   https://github.com/browserslist/caniuse-lite
+  client-only          0.0.1      MIT           https://github.com/facebook/react
+  d3-color             3.1.1      ISC           https://github.com/d3/d3-color
+  d3-format            3.1.3      ISC           https://github.com/d3/d3-format
+  d3-interpolate       3.0.2      ISC           https://github.com/d3/d3-interpolate
+  d3-path              3.1.1      ISC           https://github.com/d3/d3-path
+  d3-time              3.1.1      ISC           https://github.com/d3/d3-time
+  d3-time-format       4.1.1      ISC           https://github.com/d3/d3-time-format
+  internmap            2.0.3      ISC           https://github.com/mbostock/internmap
+  nanoid               3.3.20     MIT           https://github.com/ai/nanoid
+  picocolors           1.1.1      ISC           https://github.com/alexeyraspopov/picocolors
+  postcss              8.5.23     MIT           https://github.com/postcss/postcss
+  scheduler            0.28.0     MIT           https://github.com/facebook/react
+  semver               7.8.6      ISC           https://github.com/npm/node-semver
+  source-map-js        1.2.2      BSD-3-Clause  https://github.com/7rulnik/source-map-js
+  styled-jsx           5.1.6      MIT           https://github.com/vercel/styled-jsx
+  tslib                2.9.1      0BSD          https://github.com/Microsoft/tslib
+
+Optional dependencies of next (installed but not used by MARGIN, which does not
+use next/image optimisation or Playwright at run time)
+  sharp                0.35.5     Apache-2.0    https://github.com/lovell/sharp
+  @img/sharp-*         0.35.5     Apache-2.0    https://github.com/lovell/sharp      (platform binary)
+  @img/sharp-libvips-* 1.3.4      LGPL-3.0-or-later https://github.com/lovell/sharp-libvips (platform binary)
+  @img/colour          1.1.0      MIT           https://github.com/lovell/colour
+  detect-libc          2.1.2      Apache-2.0    https://github.com/lovell/detect-libc
+  @playwright/test, playwright, playwright-core
+                       1.65.1     Apache-2.0    https://github.com/microsoft/playwright
+
+caniuse-lite data: CC BY 4.0, (c) Alexis Deveria and contributors.
+
+Development-only tools (not shipped to the browser): TypeScript (Apache-2.0),
+ESLint and eslint-config-next (MIT), Vitest (MIT), Playwright (Apache-2.0),
+@axe-core/playwright and axe-core (MPL-2.0), Tailwind CSS (MIT), @types/*
+(MIT).
+
+The full licence text of each package is in node_modules/<package>/LICENSE after
+`npm ci`.
+
+
+===============================================================================
+4. SUPER INTELLIGENCE (SI / AI) ACKNOWLEDGEMENT
+===============================================================================
+
+Source code, data-pipeline code, tests and documentation in this repository
+were written with SI assistance (Anthropic Claude via Claude Code). Commits
+carry a "Co-Authored-By: Claude" trailer. Scientific values were checked
+against their cited sources by people. The deployed app makes no SI calls at
+run time, and the project contains no SI-generated images, video or audio.
+See README.md ("Use of SI") and docs/compliance/si-usage-log.md.

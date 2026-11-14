@@ -13,7 +13,7 @@
   --paper-raised: #f8f5ee;
   --ink: #1b1e23;
   --ink-2: #464a51;
-  --ink-3: #6b6e73;     /* ≥ 4.5:1 on --paper for body-size text */
+  --ink-3: #5f6267;     /* 5.3:1 on --paper, 4.9:1 on --paper-deep (WCAG AA text) */
   --rule: rgba(27, 30, 35, 0.22);
   --rule-soft: rgba(27, 30, 35, 0.1);
   /* evidence-distance ramp (single hue) */
@@ -25,13 +25,13 @@
   /* tiers */
   --tier-psi: #1b1e23;
   --tier-pub: #5a4d8c;
-  --tier-plan: #8a8d92;
+  --tier-plan: #74777c;  /* ≥ 3:1 for dashed planned marks (non-text) */
   /* claim types (ledger badges) */
   --claim-measured: #2d5c60;
   --claim-computed: #1b1e23;
   --claim-nominal: #7a5a1e;
   --claim-limit: #5a4d8c;
-  --claim-draft: #8a8d92;
+  --claim-draft: #5f6267; /* used as badge text: AA contrast */
 
   --serif: var(--font-serif), "Newsreader", Georgia, serif;
   --sans: var(--font-sans), "Public Sans", "Helvetica Neue", Arial, sans-serif;

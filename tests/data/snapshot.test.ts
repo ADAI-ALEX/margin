@@ -15,6 +15,7 @@ const SNAP = snapshot as unknown as {
   counts: Record<string, unknown> & { totalRuns: number; distinctRuns: number; placeable: number; plottable: number; totalSummaryRows: number; byInvestigation: Record<string, number> };
   tableStats: { investigation: string; file: string; kind: string; dataRows: number; kept: number; skippedNonRunRows: number; blankLines: number; duplicates: number; columns: string[] }[];
   investigations: { id: string; acronym: string; title: string; license: string | null; licenseNote?: string; platformNote?: string; hasRunTable: boolean; runCount: number; landingUrl: string; doi: string | null }[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- raw JSON rows are probed loosely; shape is checked by zod below
   runs: Record<string, any>[];
   summaries: { investigation: string; file: string; row: number; original: Record<string, string> }[];
 };

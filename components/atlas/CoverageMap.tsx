@@ -222,7 +222,7 @@ export default function CoverageMap(p: Props) {
         height={height}
         className={`atlas-map${dragging ? " is-dragging" : ""}`}
         data-testid="coverage-map"
-        role="img"
+        role="group"
         aria-label={summary}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}

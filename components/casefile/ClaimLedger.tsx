@@ -1,260 +1,269 @@
 "use client";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import type { Run, Scenario } from "@/lib/schema";
-import { SCALES, VERDICT_THRESHOLDS, classify, kPaToPsia, type Evaluation, type Robustness, type Scored, type Verdict } from "@/lib/engine";
+import { SCALES, VERDICT_THRESHOLDS, ROBUSTNESS_FACTORS, classify, kPaToPsia, SENSITIVITY_FLOWS, type Evaluation, type FlowSensitivity, type Robustness, type Scored, type Verdict } from "@/lib/engine";
 import { HAZARDS, INSIGHTS, OLSON_FERKUL_2012, PLANNED } from "@/content/curated";
-import { COUNTS, HEADLINE, SNAP, invById } from "@/lib/data";
-import { DISCLAIMER, GRAVITY_LABEL, VERDICT_COPY, basisLabel, fmt, fmtSigned } from "@/lib/format";
-import { fetchedDate } from "./derive";
+import { ALL_RUNS, COUNTS, HEADLINE, SNAP, invById } from "@/lib/data";
+import { DISCLAIMER, GRAVITY_LABEL, fmt, fmtSigned } from "@/lib/format";
+import { AXIS_KEYS, AXIS_LABEL, AXIS_UNIT, BASIS, BASIS_TEXT, FIELD, factorLabel, fetchedDate, notCompared, partialLabel, valueKinds, verification, type ClaimKind } from "./derive";
+import { Claim, EvidenceWord, MethodNote, SourceRef } from "./ui";
 import css from "./casefile.module.css";
 
-type ClaimType = "MEASURED" | "COMPUTED" | "NOMINAL" | "REPORTED LIMIT" | "MODEL" | "EXTRAPOLATED" | "DRAFT" | "PLANNED";
-interface Claim { id: string; types: ClaimType[]; title: ReactNode; body?: ReactNode; source: ReactNode; draft?: boolean }
+export interface FlowRow { u: number; current: boolean; ev: Evaluation }
+interface Entry { id: string; kinds: ClaimKind[]; body: ReactNode; source: ReactNode }
 
 const VERDICTS: Verdict[] = ["DIRECT", "NEAR", "DISTANT", "NONE"];
-const AXIS_NAME = { o2: "O₂", pressure: "pressure", flow: "flow" } as const;
-const ALL_AXES = ["o2", "pressure", "flow"] as const;
-function comparedOn(sc: Scored) {
-  const used = sc.d.axesUsed.map((a) => AXIS_NAME[a]);
-  const missing = ALL_AXES.filter((a) => !sc.d.axesUsed.includes(a)).map((a) => AXIS_NAME[a]);
-  return { used: used.join(", "), missing: missing.join(", ") };
+const AX = { o2: "O₂", pressure: "pressure", flow: "flow" } as const;
+const uniq = (k: (ClaimKind | null | undefined)[]) => Array.from(new Set(k.filter((x): x is ClaimKind => !!x)));
+
+function RunButton({ run, openRun }: { run: Run; openRun: (r: Run) => void }) {
+  return <button type="button" className={css.runLink} onClick={() => openRun(run)}>{run.id}</button>;
 }
-export const Badge = ({ t }: { t: ClaimType }) => <span className={css.badge} data-t={t}>{t}</span>;
-
-const basisType = (b: Run["o2Basis"]): ClaimType | null => (b === "measured" ? "MEASURED" : b === "nominal-stated" ? "NOMINAL" : b === "limit-reported" ? "REPORTED LIMIT" : null);
-
-function srcLabel(r: Run) {
-  return `${r.source.ref}${r.source.row != null ? ` · row ${r.source.row}` : ""}${r.source.page ? ` · ${r.source.page}` : ""}`;
-}
-
-function RunSource({ run, openRun }: { run: Run; openRun: (r: Run) => void }) {
-  return (
-    <>
-      <button type="button" className={css.linkBtn} onClick={() => openRun(run)}>{srcLabel(run)}</button>
-      {" · "}
-      <a href={run.source.url} target="_blank" rel="noreferrer">source ↗</a>
-    </>
-  );
+function Engine({ fn }: { fn: string }) {
+  return <>MARGIN engine · <code>{fn}</code> · <Link href="/method">method</Link></>;
 }
 
 function Gaps({ sc }: { sc: Scored }) {
-  const { d } = sc;
-  const cell = (label: string, gap: number | null, raw: string, used: boolean) => (
-    <span className={css.gap}>
-      <span className={css.gapLabel}>{label}</span>
-      <span className={css.mono}>{used ? raw : "not used"}</span>
-      {used && gap != null && <span className={css.gapUnits}>{fmtSigned(gap, 2)} u</span>}
-    </span>
+  const d = sc.d;
+  const item = (label: string, used: boolean, raw: string, u: number | null, mismatch = false) => (
+    <li>{label}: {used ? <><span className="num">{raw}</span> <span className={css.quiet}>({fmtSigned(u, 2)} units)</span></> : <span className={css.nr}>{mismatch ? "not compared — flow regime differs" : "not compared — not recorded"}</span>}</li>
   );
   return (
-    <span className={css.gaps}>
-      {cell("O₂", d.gaps.o2, `${fmtSigned(d.raw.o2Pts, 1)} pts`, d.axesUsed.includes("o2"))}
-      {cell("Pressure", d.gaps.pressure, `${fmtSigned(d.raw.pressurePct, 0)} %`, d.axesUsed.includes("pressure"))}
-      {cell("Flow", d.gaps.flow, d.flags.includes("flow-regime-mismatch") ? "regime mismatch" : `${fmtSigned(d.raw.flowCmS, 1)} cm/s`, d.axesUsed.includes("flow"))}
-    </span>
+    <ul className={css.gapList}>
+      {item("O₂", d.axesUsed.includes("o2"), `${fmtSigned(d.raw.o2Pts, 1)} pts`, d.gaps.o2)}
+      {item("Pressure", d.axesUsed.includes("pressure"), `${fmtSigned(d.raw.pressurePct, 0)} %`, d.gaps.pressure)}
+      {item("Flow", d.axesUsed.includes("flow"), `${fmtSigned(d.raw.flowCmS, 1)} cm/s`, d.gaps.flow, d.flags.includes("flow-regime-mismatch"))}
+    </ul>
   );
 }
 
-export function VerdictGlyph({ v }: { v: Verdict }) {
+/** One line per axis value of a run, each typed by its own basis and verification state. */
+function RunValues({ run }: { run: Run }) {
   return (
-    <span className={css.vGlyph} aria-hidden>
-      {VERDICTS.map((x) => <span key={x} data-on={x === v} />)}
-    </span>
+    <ul className={css.gapList}>
+      {AXIS_KEYS.map((axis) => {
+        const v = run[FIELD[axis]];
+        return (
+          <li key={axis}>
+            {AXIS_LABEL[axis]}: {v == null ? <span className={css.nr}>not recorded</span> : <>
+              <span className="num">{fmt(v, axis === "p" ? 1 : 1)} {AXIS_UNIT[axis]}</span>{axis === "p" && <span className={css.quiet}> ({fmt(kPaToPsia(v), 2)} psia)</span>}
+              {" "}<span className={css.quiet}>{BASIS_TEXT[run[BASIS[axis]]]}</span> {valueKinds(run, axis).map((k) => <Claim key={k} kind={k} />)}
+            </>}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
-export function Finding({ s, ev, psiOnly, robust, openRun }: { s: Scenario; ev: Evaluation; psiOnly: Evaluation; robust: Robustness; openRun: (r: Run) => void }) {
+export function FlowSensitivity({ rows, s }: { rows: FlowRow[]; s: Scenario }) {
+  return (
+    <div className={css.tableScroll} data-testid="flow-sensitivity">
+      <table className={css.dataTable}>
+        <caption className={css.capLeft}>
+          Verdict at other ventilation flows, everything else as in your scenario ({fmt(s.o2Pct, 1)}% O₂, {fmt(s.pressureKPa, 1)} kPa, {GRAVITY_LABEL[s.gravity].toLowerCase()}, {s.includePublished ? "PSI + published" : "PSI only"}). <Claim kind="COMPUTED" />
+        </caption>
+        <thead><tr><th scope="col">Flow</th><th scope="col">D</th><th scope="col">Evidence</th><th scope="col">Nearest comparable run</th></tr></thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.u} data-current={r.current || undefined} className={r.current ? css.currentRow : undefined}>
+              <th scope="row"><span className="num">{fmt(r.u, r.u % 1 ? 1 : 0)} cm/s</span>{r.u === 0 && <span className={css.quiet}> (quiescent)</span>}{r.current && <b className={css.youMark}> ← your scenario</b>}</th>
+              <td className="num">{r.ev.nearest ? fmt(r.ev.nearest.d.D, 2) : "—"}</td>
+              <td><EvidenceWord v={r.ev.verdict} prefix={false} /></td>
+              <td>{r.ev.nearest ? <><span className="num">{r.ev.nearest.run.id}</span>{r.ev.nearest.d.partialMatch && <span className={css.quiet}> (partial)</span>}</> : <span className={css.nr}>none</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function ClaimLedger({ s, ev, psiOnly, robust, flowRows, crossings, openRun }: { s: Scenario; ev: Evaluation; psiOnly: Evaluation; robust: Robustness; flowRows: FlowRow[]; crossings: FlowSensitivity["crossings"]; openRun: (r: Run) => void }) {
+  const out: Entry[] = [];
   const n = ev.nearest;
-  return (
-    <section className={css.finding} aria-labelledby="cf-finding-h">
-      <div className={css.sheetLabel} id="cf-finding-h"><span>§3</span> Finding</div>
-      <div className={css.verdictRow} aria-live="polite">
-        <h2 className={css.verdict}>Evidence: <b>{ev.verdict}</b></h2>
-        <span className={css.disclaimer}>{DISCLAIMER}</span>
-      </div>
-      <p className={css.verdictCopy}>
-        <VerdictGlyph v={ev.verdict} /> {VERDICT_COPY[ev.verdict]}{s.gravity !== "micro" ? ` · ${GRAVITY_LABEL[s.gravity]}` : ""}
-      </p>
-      <dl className={css.figures}>
-        <div><dt>D nearest <em>computed</em></dt><dd className={css.mono}>{n ? fmt(n.d.D, 2) : "—"}</dd></div>
-        {s.includePublished && <div><dt>PSI only <em>computed</em></dt><dd className={css.mono}>{psiOnly.verdict} · {psiOnly.nearest ? fmt(psiOnly.nearest.d.D, 2) : "—"}</dd></div>}
-        <div><dt>Comparable runs</dt><dd className={css.mono}>{ev.comparable.length}</dd></div>
-        <div><dt>Robustness <em>{robust.combos} combos</em></dt><dd className={css.mono}>{robust.robust ? "Robust" : "Sensitive"}</dd></div>
-      </dl>
-      {n ? (
-        <div className={css.nearestBox}>
-          <span className={css.nearestHead}>Nearest comparable run</span>
-          <button type="button" className={css.nearestBtn} onClick={() => openRun(n.run)}>
-            <span className={css.mono}>{n.run.id}</span> · {n.run.material ?? "material not recorded"} <span className={css.open}>provenance →</span>
-          </button>
-          <Gaps sc={n} />
-          {n.d.partialMatch && (
-            <p className={css.partialNote}>
-              Partial match: compared on {comparedOn(n).used} only; {comparedOn(n).missing} not compared (not recorded or flow-regime mismatch).
-            </p>
-          )}
-          {n.d.partialMatch && (ev.nearestComplete ? (
-            <button type="button" className={css.nearestBtn} onClick={() => openRun(ev.nearestComplete!.run)}>
-              <span className={css.nearestHead}>Best fully-compared run</span>{" "}
-              <span className={css.mono}>{ev.nearestComplete.run.id}</span> · D <b className={css.mono}>{fmt(ev.nearestComplete.d.D, 2)}</b> ({classify(ev.nearestComplete.d.D)}) <span className={css.open}>provenance →</span>
-            </button>
-          ) : <p className={css.partialNote}>No comparable run is compared on all three axes.</p>)}
-        </div>
-      ) : (
-        <p className={css.noneBox}>No comparable run in {GRAVITY_LABEL[s.gravity].toLowerCase()} for this question{s.includePublished ? "" : " (PSI only)"}.</p>
-      )}
-    </section>
-  );
-}
+  const hazard = HAZARDS.find((h) => h.id === s.hazard)?.label ?? s.hazard;
+  const psiSrc = <>NASA PSI run tables, fetched {fetchedDate(SNAP.fetchedAt)} · <a href="https://psi.nasa.gov/" target="_blank" rel="noreferrer">psi.nasa.gov ↗</a></>;
 
-export function ClaimLedger({ s, ev, psiOnly, robust, openRun }: { s: Scenario; ev: Evaluation; psiOnly: Evaluation; robust: Robustness; openRun: (r: Run) => void }) {
-  const claims: Claim[] = [];
-  const n = ev.nearest;
-  const engineSrc = <>MARGIN engine · <code>evaluate()</code> · scales O₂ {SCALES.o2Pts} pts, pressure ×{SCALES.pressureRatio}, flow {SCALES.flowCmS} cm/s per unit</>;
-
-  claims.push({
-    id: "verdict", types: ["COMPUTED"],
-    title: <>Evidence <b>{ev.verdict}</b>: {VERDICT_COPY[ev.verdict].toLowerCase()}{n ? <> — D = <span className={css.mono}>{fmt(n.d.D, 2)}</span></> : null}.</>,
-    body: <>Thresholds DIRECT ≤ {VERDICT_THRESHOLDS.direct}, NEAR ≤ {VERDICT_THRESHOLDS.near}. {ev.comparable.length} comparable runs passed the gate for “{HAZARDS.find((h) => h.id === s.hazard)?.label}” in {GRAVITY_LABEL[s.gravity].toLowerCase()}. <i>{DISCLAIMER}</i></>,
-    source: engineSrc,
+  out.push({
+    id: "verdict", kinds: ["COMPUTED"],
+    body: <>
+      <p className={css.claimLead}><EvidenceWord v={ev.verdict} />{n && <> · nearest comparable run D = <b className="num">{fmt(n.d.D, 2)}</b></>}{ev.qualifier && n && <span className={css.partial}>{partialLabel(n)}</span>}. <i>{DISCLAIMER}</i></p>
+      {ev.qualifier && <p>On all three axes (O₂, pressure and flow): <EvidenceWord v={ev.verdictComplete} />{ev.nearestComplete ? <> (D = <span className="num">{fmt(ev.nearestComplete.d.D, 2)}</span>)</> : <> — no comparable run records all three</>}.</p>}
+      <p>{ev.comparable.length} runs pass the comparability gate for “{hazard}” in {GRAVITY_LABEL[s.gravity].toLowerCase()} ({s.includePublished ? "PSI + published" : "PSI only"}). Thresholds: DIRECT D ≤ {VERDICT_THRESHOLDS.direct}, NEAR D ≤ {VERDICT_THRESHOLDS.near}.</p>
+      <p><MethodNote /></p>
+    </>,
+    source: <Engine fn="evaluate()" />,
   });
-  if (s.includePublished) {
-    claims.push({
-      id: "psionly", types: ["COMPUTED"],
-      title: <>Without published evidence the verdict is <b>{psiOnly.verdict}</b>{psiOnly.nearest ? <> (D = <span className={css.mono}>{fmt(psiOnly.nearest.d.D, 2)}</span>)</> : null}.</>,
-      body: <>Published values are transcribed and await human verification.</>,
-      source: engineSrc,
-    });
-  }
+
   if (n) {
     const r = n.run;
-    const types = Array.from(new Set([basisType(r.o2Basis), basisType(r.pressureBasis)].filter((x): x is ClaimType => !!x)));
-    claims.push({
-      id: "nearest", types,
-      title: <>Nearest comparable run <span className={css.mono}>{r.id}</span>: {r.material ?? "material not recorded"}{r.tier === "T3_PUBLISHED" ? " (published)" : ""}.{n.d.partialMatch ? <> Compared on {comparedOn(n).used} only; {comparedOn(n).missing} not compared.</> : null}</>,
-      body: (
-        <span className={css.kv}>
-          <span>O₂ <b className={css.mono}>{r.o2Pct != null ? `${fmt(r.o2Pct, 1)} %` : "not recorded"}</b> <em>{basisLabel(r.o2Basis)}</em></span>
-          <span>P <b className={css.mono}>{r.pressureKPa != null ? `${fmt(r.pressureKPa, 1)} kPa · ${fmt(kPaToPsia(r.pressureKPa), 2)} psia` : "not recorded"}</b> <em>{basisLabel(r.pressureBasis)}</em></span>
-          <span>Flow <b className={css.mono}>{r.flowCmS != null ? `${fmt(r.flowCmS, 1)} cm/s` : "not recorded"}</b> <em>{r.flowRegime}</em></span>
-          {r.flags.length > 0 && <span className={css.flagRow}>{r.flags.map((f) => <span key={f} className={css.flag}>{f}</span>)}</span>}
-        </span>
-      ),
-      source: <RunSource run={r} openRun={openRun} />,
+    const v = verification(r);
+    out.push({
+      id: "nearest", kinds: uniq([...AXIS_KEYS.flatMap((a) => valueKinds(r, a)), v.kind]),
+      body: <>
+        <p className={css.claimLead}>Nearest comparable run <RunButton run={r} openRun={openRun} />: {r.material ?? "material not recorded"}{r.outcome ? ` · outcome ${r.outcome}` : ""}.</p>
+        <RunValues run={r} />
+        {v.kind === "DRAFT" && <p className={css.draftNote}>DRAFT: {v.label}.</p>}
+      </>,
+      source: <SourceRef run={r} />,
     });
-    claims.push({
-      id: "gaps", types: ["COMPUTED"],
-      title: <>Per-axis gaps, run − scenario{n.d.partialMatch ? " (partial match: not all axes comparable)" : ""}.</>,
-      body: <Gaps sc={n} />,
-      source: <>MARGIN engine · <code>distance()</code> · u = scale units</>,
+    out.push({
+      id: "gaps", kinds: ["COMPUTED"],
+      body: <>
+        <p className={css.claimLead}>Gaps to that run (run − scenario); one unit = {SCALES.o2Pts} pts O₂, ×{SCALES.pressureRatio} pressure, {SCALES.flowCmS} cm/s flow.{n.d.partialMatch && <> Partial match: compared on {n.d.axesUsed.map((a) => AX[a]).join(" + ")} only; {notCompared(n).map((a) => AX[a]).join(", ")} not compared.</>}</p>
+        <Gaps sc={n} />
+      </>,
+      source: <Engine fn="distance()" />,
     });
     if (n.d.partialMatch) {
       const c = ev.nearestComplete;
-      claims.push(c ? {
-        id: "complete", types: Array.from(new Set(["COMPUTED" as ClaimType, ...[basisType(c.run.o2Basis), basisType(c.run.pressureBasis)].filter((x): x is ClaimType => !!x)])),
-        title: <>Best fully-compared run (O₂, pressure and flow): <span className={css.mono}>{c.run.id}</span>, {c.run.material ?? "material not recorded"} — D = <span className={css.mono}>{fmt(c.d.D, 2)}</span> ({classify(c.d.D)}).</>,
-        body: <Gaps sc={c} />,
-        source: <RunSource run={c.run} openRun={openRun} />,
+      out.push(c ? {
+        id: "complete", kinds: uniq(["COMPUTED", ...AXIS_KEYS.flatMap((a) => valueKinds(c.run, a))]),
+        body: <p className={css.claimLead}>Best run compared on all three axes: <RunButton run={c.run} openRun={openRun} /> ({c.run.material ?? "material not recorded"}) — D = <b className="num">{fmt(c.d.D, 2)}</b>, <EvidenceWord v={classify(c.d.D)} />.</p>,
+        source: <SourceRef run={c.run} />,
       } : {
-        id: "complete", types: ["COMPUTED"],
-        title: <>Best fully-compared run: none. No comparable run records all three axes for this scenario.</>,
-        source: <>MARGIN engine · <code>evaluate().nearestComplete</code></>,
+        id: "complete", kinds: ["COMPUTED"],
+        body: <p className={css.claimLead}>No comparable run in this regime is compared on all three axes.</p>,
+        source: <Engine fn="evaluate().nearestComplete" />,
       });
     }
   } else {
-    claims.push({
-      id: "nonearest", types: ["COMPUTED"],
-      title: <>No run passes the gate for this question in {GRAVITY_LABEL[s.gravity].toLowerCase()}{s.includePublished ? "" : " (PSI only)"}.</>,
-      body: <>{ev.otherGravity.length} relevant runs exist in other gravity regimes; no cross-regime distance is computed.</>,
-      source: <>MARGIN engine · <code>gate()</code></>,
+    out.push({
+      id: "none", kinds: ["COMPUTED"],
+      body: <p className={css.claimLead}>No run passes the gate for this question in {GRAVITY_LABEL[s.gravity].toLowerCase()}{s.includePublished ? "" : " (PSI only)"}. {ev.otherGravity.length} relevant runs are in other gravity regimes; no distance is computed across regimes.</p>,
+      source: <Engine fn="gate()" />,
     });
   }
+
+  if (s.includePublished) {
+    out.push({
+      id: "psionly", kinds: ["COMPUTED"],
+      body: <p className={css.claimLead}>PSI run tables alone: <EvidenceWord v={psiOnly.verdict} />{psiOnly.nearest ? <> (D = <span className="num">{fmt(psiOnly.nearest.d.D, 2)}</span>, <span className="num">{psiOnly.nearest.run.id}</span>)</> : null}. Published values add the difference.</p>,
+      source: <Engine fn="evaluate(includePublished: false)" />,
+    });
+  }
+
+  const present = VERDICTS.filter((x) => robust.verdicts[x] > 0);
+  const fx = ROBUSTNESS_FACTORS.map(factorLabel);
+  out.push({
+    id: "robust", kinds: ["COMPUTED"],
+    body: <>
+      <p className={css.claimLead}>
+        {robust.robust
+          ? <>Across {robust.combos} combinations of {fx.join(", ")} axis scales the verdict stays {robust.range[0]}.</>
+          : <>Across {robust.combos} combinations of {fx.join(", ")} axis scales the verdict ranges {robust.range[0]}–{robust.range[1]} ({present.map((x) => `${x} ${robust.verdicts[x]}`).join(" · ")}).</>}
+        {robust.Drange && <> D spans <span className="num">{fmt(robust.Drange[0], 2)}–{fmt(robust.Drange[1], 2)}</span>.</>}
+        {robust.partialCells > 0 && <> In {robust.partialCells} of the {robust.combos} combinations the nearest run is a partial match (not compared on every axis).</>}
+      </p>
+      <p className={css.quiet}>“Changes under ½×/2× scales” describes the method&rsquo;s sensitivity to its own assumptions, not fire behaviour.</p>
+    </>,
+    source: <Engine fn="robustness()" />,
+  });
+
+  const changes = new Set(flowRows.map((r) => r.ev.verdict)).size > 1;
+  out.push({
+    id: "flow", kinds: ["COMPUTED"],
+    body: <>
+      <p className={css.claimLead}>Flow sensitivity: {changes ? <>the verdict <b>changes</b> with the assumed ventilation flow.</> : <>the verdict is the same at every flow below.</>} Flow is one of the three compared axes, so a different assumed flow moves D.</p>
+      {crossings.length > 0 && <p>Between quiescent air and {fmt(Math.max(...SENSITIVITY_FLOWS.map((u) => u ?? 0)), 0)} cm/s the verdict changes class at {crossings.map((c, i) => <span key={i}>{i > 0 ? ", " : ""}≈ <span className="num">{fmt(c.flowCmS, 1)}</span> cm/s ({c.from} → {c.to})</span>)}.</p>}
+      <FlowSensitivity rows={flowRows} s={s} />
+    </>,
+    source: <Engine fn="evaluate() at each flow" />,
+  });
+
   const lim = ev.limits[0];
   if (lim) {
-    claims.push({
-      id: "limit", types: ["REPORTED LIMIT"],
-      title: <>Nearest reported limit: <span className={css.mono}>{fmt(lim.run.o2Pct, 1)} % O₂</span>{lim.run.pressureKPa != null ? <> at <span className={css.mono}>{fmt(lim.run.pressureKPa, 1)} kPa</span></> : null} — {lim.run.material ?? lim.run.investigation}. A threshold inferred from a test series, not a tested condition; never used for the verdict.</>,
-      body: <>{ev.limits.length} reported limit point{ev.limits.length === 1 ? "" : "s"} in this regime. Distance to this one, for orientation only: D = <span className={css.mono}>{fmt(lim.d.D, 2)}</span> <em>computed</em>.</>,
-      source: <RunSource run={lim.run} openRun={openRun} />,
+    out.push({
+      id: "limit", kinds: uniq(["REPORTED LIMIT", verification(lim.run).kind]),
+      body: <p className={css.claimLead}>Nearest reported limit in this regime: <RunButton run={lim.run} openRun={openRun} />, <span className="num">{fmt(lim.run.o2Pct, 1)}% O₂</span>{lim.run.pressureKPa != null && <> at <span className="num">{fmt(lim.run.pressureKPa, 1)} kPa</span></>} ({lim.run.material ?? lim.run.investigation}). A threshold inferred by the authors from a test series — not a tested condition, never used for the verdict ({ev.limits.length} limit point{ev.limits.length === 1 ? "" : "s"} in this regime).</p>,
+      source: <SourceRef run={lim.run} />,
     });
   }
-  claims.push({
-    id: "robust", types: ["COMPUTED"],
-    title: <>{robust.robust ? "Robust" : "Sensitive"}: verdict across {robust.combos} scale combinations (each scale ½×, 1×, 2×).</>,
-    body: (
-      <span className={css.robustCounts}>
-        {VERDICTS.map((v) => <span key={v} data-zero={robust.verdicts[v] === 0}><b className={css.mono}>{robust.verdicts[v]}</b> {v}</span>)}
-        {robust.Drange && <span>D <b className={css.mono}>{fmt(robust.Drange[0], 2)}–{fmt(robust.Drange[1], 2)}</b></span>}
-      </span>
-    ),
-    source: <>MARGIN engine · <code>robustness()</code></>,
-  });
-  claims.push({
-    id: "coverage", types: ["MEASURED", "COMPUTED"],
-    title: <>Highest O₂ in any of PSI&rsquo;s {HEADLINE.solidRunsWithO2} solid-material tests with a recorded O₂ value: <b className={css.mono}>{fmt(HEADLINE.maxSolidO2, 1)} %</b>. {HEADLINE.atOrAboveArtemis} reach the Artemis habitat&rsquo;s {fmt(HEADLINE.artemisO2, 1)} %; {HEADLINE.atOrAboveEA} reach the Exploration Atmosphere&rsquo;s {fmt(HEADLINE.eaO2, 1)} %.</>,
-    body: <>{COUNTS.totalRuns} PSI run rows; {COUNTS.plottable} carry both O₂ and pressure.</>,
-    source: <>PSI snapshot fetched {fetchedDate(SNAP.fetchedAt)} · {SNAP.tableStats.length} experimental tables</>,
-  });
-  claims.push({
-    id: "context", types: ["COMPUTED"],
-    title: <>{ev.context.length} runs are context only; {ev.otherGravity.length} are in another gravity regime; {ev.excludedCount} are excluded by the gate.</>,
-    source: <>MARGIN engine · <code>gate()</code></>,
-  });
-  if (s.gravity !== "micro") {
-    const mylar = OLSON_FERKUL_2012.rows.find((r) => /mylar/i.test(r.material)) ?? OLSON_FERKUL_2012.rows[0];
-    claims.push({
-      id: "pg-psi", types: ["COMPUTED"],
-      title: <>PSI holds <b className={css.mono}>{COUNTS.partialGravityRuns}</b> partial-gravity combustion runs; all PSI runs are microgravity.</>,
-      source: <>PSI snapshot fetched {fetchedDate(SNAP.fetchedAt)}</>,
+
+  if (n && (n.run.pressureBasis === "nominal-stated" || n.run.o2Basis === "nominal-stated")) {
+    out.push({
+      id: "nominal", kinds: uniq(["NOMINAL", n.run.flags.includes("unverified-transcription") ? "DRAFT" : null]),
+      body: <p className={css.claimLead}>The nearest run&rsquo;s {n.run.pressureBasis === "nominal-stated" ? "pressure" : "O₂"} is nominal: stated in a document, not measured in the run.{n.run.note && <> {n.run.note}</>}</p>,
+      source: <SourceRef run={n.run} />,
     });
-    claims.push({
-      id: "pg-of", types: ["REPORTED LIMIT"],
-      title: <>For {mylar.material.replace(/\s+G$/, "")} at {mylar.pressurePsia} psia, NASA drop-tower tests found a lower flammability limit at lunar gravity than at either 0 g or 1 g. Microgravity and Earth results did not bound lunar behaviour for this material.</>,
-      body: <>ULOI* Moon <span className={css.mono}>{mylar.uloi.moon}</span> · 0 g <span className={css.mono}>{mylar.uloi.micro}</span> · 1 g <span className={css.mono}>{mylar.uloi.earth}</span> % O₂. {OLSON_FERKUL_2012.caveats.join("; ")}.</>,
-      source: <a href={OLSON_FERKUL_2012.source.url} target="_blank" rel="noreferrer">{OLSON_FERKUL_2012.source.ref}, {OLSON_FERKUL_2012.source.page} ↗</a>,
+  }
+
+  out.push({
+    id: "coverage", kinds: ["MEASURED", "COMPUTED"],
+    body: <p className={css.claimLead}>The highest O₂ in any of PSI&rsquo;s <span className="num">{HEADLINE.solidRunsWithO2}</span> solid-material tests with a recorded O₂ value is <b className="num">{fmt(HEADLINE.maxSolidO2, 1)}%</b>. <span className="num">{HEADLINE.atOrAboveArtemis}</span> reach the Artemis habitat&rsquo;s {fmt(HEADLINE.artemisO2, 1)}%; <span className="num">{HEADLINE.atOrAboveEA}</span> reach the Exploration Atmosphere&rsquo;s {fmt(HEADLINE.eaO2, 1)}%. ({COUNTS.totalRuns.toLocaleString("en-GB")} PSI run rows; {COUNTS.plottable.toLocaleString("en-GB")} record both O₂ and pressure.)</p>,
+    source: psiSrc,
+  });
+
+  out.push({
+    id: "gate", kinds: ["COMPUTED"],
+    body: <p className={css.claimLead}>Of {ALL_RUNS.length.toLocaleString("en-GB")} runs and records: {ev.comparable.length} comparable, {ev.limits.length} reported limits, {ev.context.length} context only, {ev.otherGravity.length} in another gravity regime, {ev.excludedCount.toLocaleString("en-GB")} excluded by the gate (other fuel class, no O₂, planned, or published while the toggle is off).</p>,
+    source: <Engine fn="gate()" />,
+  });
+
+  if (s.gravity !== "micro") {
+    const ofRuns = ALL_RUNS.filter((r) => r.investigation === "PUB-OLSON-FERKUL-2012");
+    const ofKinds = uniq(["REPORTED LIMIT", ofRuns.some((r) => r.flags.includes("unverified-transcription")) ? "DRAFT" : "PUBLISHED"]);
+    const mylar = OLSON_FERKUL_2012.rows.find((r) => /mylar/i.test(r.material)) ?? OLSON_FERKUL_2012.rows[0];
+    const lower = mylar.uloi.moon < mylar.uloi.micro && mylar.uloi.moon < mylar.uloi.earth;
+    out.push({
+      id: "pg-psi", kinds: ["COMPUTED"],
+      body: <p className={css.claimLead}>{COUNTS.partialGravityRuns === 0 ? "PSI contains no partial-gravity combustion tests." : <>PSI holds <span className="num">{COUNTS.partialGravityRuns}</span> partial-gravity combustion runs.</>}</p>,
+      source: psiSrc,
+    });
+    out.push({
+      id: "pg-of", kinds: ofKinds,
+      body: <p className={css.claimLead}>
+        {mylar.material} at {mylar.pressurePsia} psia, limiting O₂ (ULOI*): Moon <span className="num">{mylar.uloi.moon}</span> · 0 g <span className="num">{mylar.uloi.micro}</span> · 1 g <span className="num">{mylar.uloi.earth}</span> % O₂.
+        {lower && <> For this material the lunar value was lower than both; microgravity and Earth results did not bound lunar behaviour.</>}
+      </p>,
+      source: <><a href={OLSON_FERKUL_2012.source.url} target="_blank" rel="noreferrer">{OLSON_FERKUL_2012.source.ref}, {OLSON_FERKUL_2012.source.page} ↗</a> · doi {OLSON_FERKUL_2012.source.doi}</>,
     });
     const fm2 = invById.get("PLAN-FM2");
-    claims.push({
-      id: "pg-fm2", types: ["PLANNED"],
-      title: <>{fm2?.acronym ?? "FM2"}: planned — first lunar-surface test. {PLANNED.length} planned conditions, never counted as evidence.</>,
-      source: fm2 ? <a href={fm2.landingUrl} target="_blank" rel="noreferrer">{PLANNED[0]?.source.ref} ↗</a> : "—",
+    if (fm2) out.push({
+      id: "pg-fm2", kinds: ["PLANNED"],
+      body: <p className={css.claimLead}>{fm2.acronym}: planned — not evidence. {PLANNED.length} planned condition sets; never counted.</p>,
+      source: <a href={fm2.landingUrl} target="_blank" rel="noreferrer">{PLANNED[0]?.source.ref ?? fm2.title} ↗</a>,
     });
   }
-  const drafts = INSIGHTS.filter((i) => i.hazards.includes(s.hazard));
+
+  const insights = INSIGHTS.filter((i) => i.hazards.includes(s.hazard));
+  const verified = insights.filter((i) => i.verification.status === "primary-checked");
+  for (const i of verified) {
+    out.push({
+      id: `ins-${i.id}`, kinds: uniq([i.validity === "MEASURED" ? "MEASURED" : null, "PUBLISHED"]),
+      body: <>
+        <p className={css.claimLead}>{i.claim} <span className="num">{i.value}</span> · {i.conditions}.</p>
+        <p className={css.quiet}>Published finding ({i.validity.toLowerCase()}). Scope: {i.scope}. Not valid for: {i.notValidFor}.</p>
+        {i.verification.quote && <blockquote className={css.quote}>“{i.verification.quote}”</blockquote>}
+      </>,
+      source: <a href={i.source.url} target="_blank" rel="noreferrer">{i.source.ref}{i.verification.locator ? `, ${i.verification.locator}` : i.source.page ? `, ${i.source.page}` : ""} ↗</a>,
+    });
+  }
+  const pending = insights.length - verified.length;
 
   return (
-    <section className={css.ledger} aria-labelledby="cf-ledger-h">
-      <div className={css.sheetLabel} id="cf-ledger-h"><span>§4</span> Claim ledger <span className={css.sheetLabelNote}>{claims.length} statements · {drafts.length} drafts</span></div>
+    <section className={css.ledger} aria-labelledby="inv-ledger-h" data-testid="claim-ledger">
+      <h2 className={css.h2} id="inv-ledger-h">Claim ledger</h2>
+      <p className={css.secSub}>Every statement for this scenario, typed and sourced. {out.length} statements.</p>
+      <p className={css.kindKey}>
+        {(["MEASURED", "COMPUTED", "NOMINAL", "REPORTED LIMIT", "PUBLISHED", "DRAFT", "PLANNED"] as ClaimKind[]).map((k) => <Claim key={k} kind={k} />)}
+        <span className={css.quiet}>Hover a badge for its meaning.</span>
+      </p>
       <ol className={css.claims}>
-        {claims.map((c, i) => (
-          <li key={c.id} className={css.claim}>
-            <span className={css.claimNo}>C{i + 1}</span>
+        {out.map((c, i) => (
+          <li key={c.id} className={css.claimItem} data-claim={c.id}>
+            <span className={css.claimNo} aria-hidden="true">C{i + 1}</span>
             <div className={css.claimBody}>
-              <span className={css.badges}>{c.types.map((t) => <Badge key={t} t={t} />)}</span>
-              <p className={css.claimTitle}>{c.title}</p>
-              {c.body && <div className={css.claimText}>{c.body}</div>}
-              <p className={css.claimSrc}><span>Source</span> {c.source}</p>
-            </div>
-          </li>
-        ))}
-        {drafts.map((d, i) => (
-          <li key={d.id} className={`${css.claim} ${css.claimDraft}`}>
-            <span className={css.claimNo}>D{i + 1}</span>
-            <div className={css.claimBody}>
-              <span className={css.badges}><span className={css.draftStamp}>DRAFT — unverified</span><Badge t={d.validity} /></span>
-              <p className={css.claimTitle}>{d.claim}</p>
-              <div className={css.claimText}>
-                <span className={css.mono}>{d.value}</span> · {d.conditions}
-                <dl className={css.scopeDl}>
-                  <div><dt>Scope</dt><dd>{d.scope}</dd></div>
-                  <div><dt>Not valid for</dt><dd>{d.notValidFor}</dd></div>
-                </dl>
-              </div>
-              <p className={css.claimSrc}><span>Source</span> <a href={d.source.url} target="_blank" rel="noreferrer">{d.source.ref} ↗</a></p>
+              <span className={css.kinds}>{c.kinds.map((k) => <Claim key={k} kind={k} />)}</span>
+              <div className={css.claimText}>{c.body}</div>
+              <p className={css.claimSrc}><span className={css.srcLabel}>Source</span> {c.source}</p>
             </div>
           </li>
         ))}
       </ol>
+      {pending > 0 && <p className={css.quiet}>{pending} curated finding{pending === 1 ? "" : "s"} for this question {pending === 1 ? "is" : "are"} not shown: not yet checked against the primary source.</p>}
     </section>
   );
 }
