@@ -229,7 +229,7 @@ export default function FieldNotes(p: NotesProps) {
         {insights.length === 0 && <p className="atlas-micro">No source-checked findings for this question yet. Findings appear here only after they have been checked against their primary source.</p>}
         {insights.map((i) => (
           <article key={i.id} className="atlas-insight">
-            <p className="atlas-insight-stamps"><span className="claim" data-kind={i.validity === "MEASURED" ? "MEASURED" : "ASSUMED"}>{i.validity}</span> <span className="atlas-checked">checked against primary source · human sign-off pending</span></p>
+            <p className="atlas-insight-stamps"><span className="claim" data-kind={i.validity === "MEASURED" ? "MEASURED" : i.validity === "STATED" ? "PUBLISHED" : "ASSUMED"}>{i.validity}</span> <span className="atlas-checked">checked against primary source · human sign-off pending</span></p>
             <p className="atlas-insight-claim">{i.claim}</p>
             <p className="atlas-insight-meta"><span className="atlas-num">{i.value}</span> · {i.conditions}</p>
             <p className="atlas-insight-meta"><b>Scope</b> {i.scope}</p>

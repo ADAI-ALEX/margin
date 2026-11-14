@@ -68,6 +68,13 @@ export default function SpecimenCard({ run, scored, onClose }: { run: Run; score
         {sourceLabel(run)}<br />
         <a href={run.source.url} target="_blank" rel="noreferrer">{run.source.url.replace(/^https?:\/\//, "")} ↗</a>
       </p>
+      {run.tier !== "T1_PSI_RUN" && (
+        <p className="atlas-micro">
+          {run.source.page && <>{run.source.page}. </>}
+          {run.flags.includes("unverified-transcription") ? "Not yet checked against the primary source." : "Checked against the primary source (SI-assisted); human sign-off pending."}
+        </p>
+      )}
+      {run.source.quote && <blockquote className="atlas-insight-quote">&ldquo;{run.source.quote}&rdquo;</blockquote>}
 
       {run.flags.length > 0 && (
         <>
