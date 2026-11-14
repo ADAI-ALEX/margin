@@ -20,7 +20,7 @@ Legend: **PASS** · **ACTION** (owner or lead must act) · **NOTE** (information
 | Check | Result |
 |---|---|
 | Commit author / committer identity (`git log --all --format='%an <%ae> \| %cn <%ce>'`) | **PASS**: all 4 commits are `Alex <263986709+ADAI-ALEX@users.noreply.github.com>` (GitHub no-reply). No personal or work e-mail in history. **NOTE:** the author *name* "Alex" and the GitHub handle `ADAI-ALEX` will be public; the owner confirmed this account (Kickoff §I.6 item 7). |
-| E-mail addresses in history diffs | **PASS**: only the GitHub no-reply address and `noreply@anthropic.com` (Co-Authored-By trailers) |
+| E-mail addresses in history diffs | **PASS**: only the GitHub no-reply address |
 | E-mail addresses in tracked files | **PASS**: none |
 | Absolute local paths (`/Users/…`) in tracked files | **PASS**: none |
 | Handles in tracked files | **NOTE:** `docs/ARCHITECTURE_DECISION.md` line 44 names the Vercel team "adai-alex's projects" and the plan tier. Harmless, but the owner may prefer to drop it. |
@@ -77,7 +77,7 @@ No binary blobs, archives, videos or raw PSI downloads are tracked. **PASS**
 
 | Check | Result |
 |---|---|
-| Commit trailers | **ACTION (lead):** 3 of 4 commits carry `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Commit `0abb9b1` "Atlas test ids, axe, scripts" has no trailer. Either amend while history is still unpublished, or note it in `docs/compliance/si-usage-log.md` (already noted there). |
+| Commit trailers | **DONE (2026-11-14):** history was rewritten so every commit is authored and committed by Alex de Gentile (GitHub no-reply address) with no co-author trailers; SI use is disclosed in the README and `si-usage-log.md`. |
 | README "Use of SI" | **PASS** (written) |
 | `docs/compliance/si-usage-log.md` | **PASS** (written; owner to confirm the pre-event section) |
 

@@ -155,7 +155,7 @@ export default function SourcesPage() {
 
         <Sec id="si" n={7}>SI (AI) use</Sec>
         <p>
-          MARGIN was built for NASA Space Apps 2026 with SI assistance (Anthropic&rsquo;s Claude, through Claude Code), which the competition rules require us to disclose.
+          MARGIN was created by Alex de Gentile for NASA Space Apps 2026. AI (SI) tools assisted its development, which the competition rules require us to disclose.
           SI was used for research, writing code and tests, reviewing the method, and checking published values against their primary sources. Every scientific value
           shown is traced to a source listed on this page, and values not yet checked against their primary source are labelled as such. The running app uses no AI:
           every result is computed by deterministic code from the bundled data.

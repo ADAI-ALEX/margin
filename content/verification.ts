@@ -21,7 +21,7 @@ export interface Verification {
 }
 
 export const CHECKED_AT = "2026-11-14";
-export const CHECKED_BY = "SI-assisted source check (Claude) — human sign-off pending";
+export const CHECKED_BY = "SI-assisted source check — human sign-off pending";
 
 export const checked = (locator: string, quote: string | null, notes?: string): Verification => ({
   status: "primary-checked", checkedAt: CHECKED_AT, checkedBy: CHECKED_BY, locator, quote, ...(notes ? { notes } : {}),

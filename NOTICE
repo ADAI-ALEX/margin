@@ -1,5 +1,5 @@
 MARGIN — How close is the evidence?
-Copyright 2026 The MARGIN team
+Copyright 2026 Alex de Gentile
 
 This product's own source code is licensed under the Apache License, Version 2.0
 (see LICENSE). The licence of the code does NOT apply to the NASA data, the cited
@@ -124,9 +124,10 @@ The full licence text of each package is in node_modules/<package>/LICENSE after
 4. SUPER INTELLIGENCE (SI / AI) ACKNOWLEDGEMENT
 ===============================================================================
 
-Source code, data-pipeline code, tests and documentation in this repository
-were written with SI assistance (Anthropic Claude via Claude Code). Commits
-carry a "Co-Authored-By: Claude" trailer. Scientific values were checked
-against their cited sources by people. The deployed app makes no SI calls at
-run time, and the project contains no SI-generated images, video or audio.
+AI (SI) tools assisted the development of the source code, data-pipeline
+code, tests and documentation in this repository. Published scientific values
+were checked against their primary sources with AI assistance; human sign-off
+is pending and the app labels them accordingly. The deployed app makes no AI
+calls at run time, and the project contains no AI-generated images, video or
+audio.
 See README.md ("Use of SI") and docs/compliance/si-usage-log.md.

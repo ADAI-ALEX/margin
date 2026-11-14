@@ -34,9 +34,10 @@ Owner-confirmed items are marked **TODO (owner)** until confirmed.
 | Tests (`tests/`), CI, banned-claims lint | Wrote them | Reviewed |
 | Documentation (README, Method/Sources text, submission drafts) | Drafted | Edited and approved |
 
-**Metadata.** Commits made with Claude Code carry a `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
-trailer. Exception: commit `0abb9b1` ("Atlas test ids, axe, scripts") was made without the trailer;
-it was SI-assisted like the others.
+**Metadata.** Commits made during the build originally carried a `Co-Authored-By: Claude Opus 5.5`
+trailer. On 2026-11-14 the public repository
+history was rewritten to present Alex de Gentile as sole author and the trailers were removed. This log,
+not commit metadata, is the record of SI use; file contents and commit dates were unchanged by the rewrite.
 
 ## Phase 2 — Review and verification
 

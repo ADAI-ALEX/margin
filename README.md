@@ -2,6 +2,8 @@
 
 **How close is the evidence?**
 
+Created and led by **Alex de Gentile**.
+
 MARGIN maps every test run in NASA's Physical Sciences Informatics (PSI) combustion archive against the atmospheres that crewed vehicles and habitats will actually fly. Pick a cabin atmosphere (ISS, an Artemis surface habitat, the 34% O₂ / 8.2 psia Exploration Atmosphere, and others), a fire-safety question and a gravity regime. MARGIN finds the nearest comparable NASA test, reports how far away it is as a documented evidence distance **D**, and shows which investigations are closest and why. Every number links to the PSI table row or the NASA paper it came from.
 
 **Evidence proximity, not a safety rating.** MARGIN measures how close tested conditions come to a scenario. It does not predict fire behaviour, score how dangerous an environment is, certify anything, or claim that two conditions behave the same way.
@@ -127,18 +129,17 @@ docs/                   Build log, architecture decision, compliance and submiss
 
 ## Use of SI (AI)
 
-In line with the NASA Space Apps rules, we disclose our use of Super Intelligence (SI) tools:
+In line with the NASA Space Apps rules, we disclose that AI (SI) tools assisted the development of MARGIN:
 
-- **Tool:** Anthropic Claude through Claude Code (a lead agent and task-specific sub-agents).
 - **Ideation and research:** SI assisted with background research and concept analysis before the event.
-- **Build:** SI wrote most of the source code, the data-pipeline code, the tests and the documentation, and drafted the curated evidence entries. Commits carry a `Co-Authored-By: Claude` trailer.
+- **Build:** AI coding tools wrote much of the source code, the data-pipeline code, the tests and the documentation, and drafted the curated evidence entries, under the direction of the project lead, who set the requirements, chose the design and accepted the work.
 - **Review and verification:** SI agents reviewed the code and the method independently, and checked every published value and finding against its primary NASA source (page or table locator plus a short verbatim quote, recorded in `docs/verification/source-verification.md`). These checks are SI-assisted; human sign-off is pending and the app says so. Findings not checked against a primary source stay hidden (currently 1 of 19).
 - **No runtime SI.** The deployed app makes no SI calls. All numbers come from the deterministic engine and the cited data.
 - **No SI imagery.** No SI-generated images, video or audio are used.
 
-Details by phase: [`docs/compliance/si-usage-log.md`](docs/compliance/si-usage-log.md).
+The full tool disclosure for the competition, by phase, is in [`docs/compliance/si-usage-log.md`](docs/compliance/si-usage-log.md).
 
 ## Licence
 
-Code: [Apache License 2.0](LICENSE), Copyright 2026 The MARGIN team.
+Code: [Apache License 2.0](LICENSE), Copyright 2026 Alex de Gentile.
 NASA data, cited publications, fonts and third-party packages keep their own terms; see [`NOTICE`](NOTICE).

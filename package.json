@@ -45,5 +45,12 @@
   "license": "Apache-2.0",
   "engines": {
     "node": ">=20"
-  }
+  },
+  "author": "Alex de Gentile",
+  "description": "MARGIN: an evidence-coverage atlas of NASA PSI combustion tests for crewed atmospheres.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ADAI-ALEX/margin.git"
+  },
+  "homepage": "https://margin-two-rho.vercel.app"
 }

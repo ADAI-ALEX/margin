@@ -1,6 +1,6 @@
 # Source verification log
 
-Checked 2026-11-14 by an SI-assisted source check (Claude). **Human sign-off is still pending** for every item: `verifiedBy` stays null on all insight cards.
+Checked 2026-11-14 by an SI-assisted source check. **Human sign-off is still pending** for every item: `verifiedBy` stays null on all insight cards.
 
 Method. Each published (non-PSI) value, atmosphere preset and insight card in `content/` was compared with the primary document it cites, downloaded from NTRS (or nasa.gov / standards.nasa.gov for the Researcher's Guide and NASA-STD-6001B). Tables were read from rendered page images as well as the text layer. Quotes are verbatim and at most 25 words; PDF subscripts and superscripts are written with Unicode (O₂, s⁻¹), everything else follows the PDF text. "p." is the printed page number; "PDF p." is given where it differs.
 
