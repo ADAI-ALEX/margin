@@ -51,10 +51,8 @@ independent project. It is not produced, reviewed or endorsed by NASA.
 Served with next/font/google, which downloads the font files at build time and
 self-hosts them with the site (no request to Google from the visitor's browser).
 
-  Newsreader        Production Type             SIL Open Font License 1.1
-  Public Sans       USWDS / General Services Administration
-                                                SIL Open Font License 1.1
-  JetBrains Mono    JetBrains                   SIL Open Font License 1.1
+  Albert Sans       Andreas Rasmussen           SIL Open Font License 1.1
+  IBM Plex Mono     IBM Corp.                   SIL Open Font License 1.1
 
 SIL OFL 1.1: https://openfontlicense.org/
 

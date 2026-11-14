@@ -1,45 +1,213 @@
-/* Long-form pages (Method, Sources). Consumes the global tokens only. */
-.doc { max-width: 1180px; margin: 0 auto; padding: 28px var(--gutter) 24px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0 48px; }
-.doc-toc { position: sticky; top: 16px; align-self: start; font-family: var(--sans); font-size: 12.5px; line-height: 1.5; }
-.doc-toc ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 3px; }
-.doc-toc a { text-decoration: none; color: var(--text-2); }
-.doc-toc a:hover { color: var(--text); text-decoration: underline; }
-.doc-body { min-width: 0; }
-.doc-kicker { margin: 0; }
-.doc h1 { font-family: var(--sans); font-weight: 400; font-size: clamp(30px, 4vw, 44px); line-height: 1.08; margin: 6px 0 12px; letter-spacing: -0.01em; }
-.doc-lede { font-size: 19px; line-height: 1.45; max-width: 64ch; margin: 0 0 18px; color: var(--text); }
-.doc h2 { font-family: var(--sans); font-weight: 500; font-size: 25px; margin: 38px 0 8px; padding-top: 14px; border-top: 1px solid var(--text); scroll-margin-top: 16px; }
-.doc h2 .doc-secno { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: var(--text-3); margin-right: 10px; vertical-align: 3px; }
-.doc h3 { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin: 22px 0 6px; }
-.doc p, .doc li { max-width: 72ch; }
-.doc p { margin: 0 0 10px; }
-.doc ul, .doc ol.doc-list { margin: 0 0 12px; padding-left: 20px; }
-.doc li { margin: 0 0 4px; }
-.doc code, .doc .formula { font-family: var(--mono); font-size: 0.86em; }
-.doc .formula { display: block; background: var(--surface-1); border: 1px solid var(--line); padding: 12px 14px; margin: 10px 0 14px; overflow-x: auto; white-space: pre; line-height: 1.6; font-size: 13.5px; }
-.doc .callout { border-left: 3px solid var(--text); padding: 4px 0 4px 14px; margin: 14px 0; font-size: 17px; max-width: 70ch; }
-.doc .callout p:last-child { margin-bottom: 0; }
-.doc-tablewrap { overflow-x: auto; margin: 10px 0 16px; border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); }
-.doc table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 13px; line-height: 1.4; }
-.doc caption { text-align: left; font-family: var(--sans); font-size: 12px; color: var(--text-2); padding: 8px 0 6px; caption-side: top; }
-.doc th, .doc td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
-.doc thead th { font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); border-bottom: 1px solid var(--line); }
-.doc td.n, .doc th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.doc tr.is-current td, .doc tr.is-current th { background: color-mix(in srgb, var(--scenario) 9%, transparent); }
-.doc thead th.n { font-family: var(--sans); }
-.doc .refuse li::marker { content: "✕  "; }
-.doc .muted { color: var(--text-3); }
-.doc .src { font-family: var(--sans); font-size: 12px; color: var(--text-2); }
-.doc dl.defs { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; margin: 8px 0 14px; font-size: 15px; }
-.doc dl.defs dt { font-family: var(--sans); font-weight: 700; font-size: 12px; letter-spacing: 0.06em; padding-top: 3px; }
-.doc dl.defs dd { margin: 0; }
-.doc .ref-list { list-style: none; padding: 0; margin: 0; }
-.doc .ref-list li { padding: 10px 0; border-bottom: 1px solid var(--line-soft); max-width: none; }
-.doc .ref-meta { font-family: var(--sans); font-size: 12px; color: var(--text-2); margin-top: 3px; }
-@media (max-width: 860px) {
-  .doc { grid-template-columns: minmax(0, 1fr); }
-  .doc-toc { position: static; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 8px; }
-  .doc-toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .doc dl.defs { grid-template-columns: 1fr; gap: 2px; }
-  .doc dl.defs dd { margin-bottom: 8px; }
+/*
+ * Long-form pages (Method, Sources). Frame: .ui-page / .ui-page-head (components/ui/ui.css).
+ * Tokens only (app/globals.css); classes prefixed doc-. Spec: docs/design/DESIGN_SYSTEM.md
+ * Reading text sits at --measure; tables, formulas and figures may use the full article width.
+ */
+
+/* ------------------------------------------------------------------ page head */
+.doc-head { gap: var(--s3); }
+.doc-head .ui-crumbs { margin-bottom: var(--s3); }
+.doc-kicker { margin-top: var(--s1); }
+.doc-head-meta {
+  display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); margin-top: var(--s2);
+  font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps-wide); text-transform: uppercase; color: var(--text-3);
+}
+.doc-head-meta .mono { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: var(--fs-xs); color: var(--text-2); }
+
+/* ------------------------------------------------------------------ layout: sticky contents + article */
+.doc-layout { display: grid; grid-template-columns: 208px minmax(0, 1fr); gap: 0 var(--s9); }
+.doc-toc {
+  position: sticky; top: calc(var(--header-h) + var(--s6)); align-self: start;
+  max-height: calc(100vh - var(--header-h) - var(--s7)); overflow: auto; overscroll-behavior: contain;
+}
+.doc-toc-label { font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps); text-transform: uppercase; color: var(--text-2); }
+.doc-toc-list { list-style: none; margin: var(--s3) 0 0; padding: 0; border-left: 1px solid var(--line-faint); }
+.doc-toc-list li { break-inside: avoid; }
+.doc-toc-list a {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: var(--s2); margin-left: -1px; padding: 5px 0 5px var(--s3);
+  border-left: 1px solid transparent; color: var(--text-2); text-decoration: none; font-size: var(--fs-sm); line-height: 1.35;
+}
+.doc-toc-list a:hover { color: var(--text); border-left-color: var(--text-3); }
+.doc-toc-no { padding-top: 2px; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps); color: var(--text-3); }
+
+/* Albert Sans sets narrower than its "0": 0.76 × --measure (70ch) gives ≈ 70 characters per line at 16 px. */
+.doc-body { --doc-measure: calc(var(--measure) * 0.76); min-width: 0; font-size: var(--fs-lg); line-height: 1.6; color: var(--text-2); }
+.doc-body strong { color: var(--text); font-weight: 600; }
+.doc-body em { color: var(--text); }
+.doc-body code.mono { color: var(--text); white-space: nowrap; }
+
+/* ------------------------------------------------------------------ sections */
+.doc-sec { padding-top: var(--s8); margin-top: var(--s8); border-top: 1px solid var(--line-faint); }
+.doc-sec:first-child { padding-top: 0; margin-top: 0; border-top: 0; }
+.doc-sec > * + * { margin-top: var(--s4); }
+.doc-sec > :is(.doc-table, .doc-formula, .doc-figure, .doc-scale, .doc-example, .doc-attribution, .doc-disclosure) { margin-top: var(--s6); }
+.doc-sec > :is(.doc-table, .doc-formula, .doc-figure, .doc-scale) + * { margin-top: var(--s6); }
+.doc-sec > .doc-scale + .doc-table { margin-top: var(--s5); }
+.doc-sec > :is(p, ul, ol) { max-width: var(--doc-measure); }
+
+.doc-h2 { display: grid; gap: var(--s2); margin-bottom: var(--s6); scroll-margin-top: calc(var(--header-h) + var(--s6)); }
+.doc-h2 + * { margin-top: 0; }
+.doc-secno { font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps-wide); color: var(--text-3); }
+.doc-h2-text { font-size: var(--fs-2xl); font-weight: 300; letter-spacing: var(--track-tight); line-height: 1.1; color: var(--text); }
+
+/* statements, notes, examples */
+.doc-sec > .doc-statement { max-width: calc(var(--measure) * 0.62); }
+.doc-statement { font-size: var(--fs-xl); font-weight: 300; line-height: 1.45; color: var(--text); }
+.doc-statement strong { font-weight: 500; }
+.doc-note { padding-left: var(--s4); border-left: 1px solid var(--line-strong); font-size: var(--fs-md); line-height: 1.55; }
+.doc-small { font-size: var(--fs-sm); color: var(--text-2); }
+.doc-example {
+  display: grid; gap: var(--s2); padding: var(--s4) var(--s5); max-width: var(--measure);
+  background: var(--surface-1); border: 1px solid var(--line-faint); border-radius: var(--r-md); font-size: var(--fs-md); line-height: 1.55;
+}
+
+/* lists: dash rules, numbered steps, refusals */
+.doc-rules, .doc-steps, .doc-refuse { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.doc-rules li, .doc-steps li, .doc-refuse li { position: relative; padding-left: var(--s6); }
+.doc-rules li::before { content: ""; position: absolute; left: 2px; top: 0.8em; width: 8px; height: 1px; background: var(--text-3); }
+.doc-steps { counter-reset: doc-step; }
+.doc-steps li { counter-increment: doc-step; }
+.doc-steps li::before {
+  content: counter(doc-step, decimal-leading-zero); position: absolute; left: 0; top: 0.3em;
+  font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps); color: var(--text-3); font-variant-numeric: tabular-nums;
+}
+.doc-refuse li::before { content: "✕"; position: absolute; left: 1px; top: 0; font-size: var(--fs-sm); line-height: 1.95; color: var(--text-3); }
+
+/* ------------------------------------------------------------------ tables (.ui-table inside a focusable region) */
+.doc-table { min-width: 0; }
+.doc-table--narrow { max-width: calc(var(--s9) * 6); }
+.doc-caption { caption-side: top; text-align: left; padding: var(--s3) var(--s3) var(--s3); font-size: var(--fs-xs); line-height: 1.45; color: var(--text-2); border-bottom: 1px solid var(--line-faint); }
+.doc-table .ui-table { line-height: 1.45; }
+.doc-table .ui-table td { color: var(--text-2); }
+.doc-table .ui-table tbody th { font-weight: 500; }
+.doc-table .mono { font-size: var(--fs-xs); }
+.doc-nowrap { white-space: nowrap; }
+.doc-cell-wide { min-width: 20em; }
+.doc-cell-mid { min-width: 11em; }
+.doc-cell-narrow { min-width: 8em; }
+.doc-cell-id { min-width: 9em; }
+.doc-cell-src { min-width: 16em; }
+.doc-sub { font-size: var(--fs-xs); color: var(--text-3); }
+.doc-table .ui-table td.doc-sub, .doc-table .ui-table td .doc-sub { color: var(--text-3); }
+.doc-quote { font-size: var(--fs-xs); color: var(--text-2); }
+.doc-caution-text, .doc-table .ui-table td.doc-caution-text { color: var(--scenario); }
+.doc-class { font-size: var(--fs-2xs); letter-spacing: var(--track-caps-wide); text-transform: uppercase; }
+.doc-table .ui-table tbody th.doc-class { font-weight: 600; }
+.doc-row-current > * { background: var(--surface-2); }
+.doc-row-current > :first-child { box-shadow: inset 2px 0 0 var(--scenario); }
+
+/* ------------------------------------------------------------------ formulas */
+.doc-formula { margin: 0; display: grid; background: var(--surface-1); border: 1px solid var(--line-faint); border-radius: var(--r-md); min-width: 0; }
+.doc-formula-display { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s5) var(--s8); padding: var(--s6) var(--s6) var(--s5); overflow-x: auto; border-radius: var(--r-md) var(--r-md) 0 0; }
+.doc-formula-display:focus-visible { box-shadow: inset 0 0 0 2px var(--ev-strong); }
+.doc-eq { display: flex; align-items: center; flex: none; white-space: nowrap; font-size: var(--fs-xl); font-weight: 300; line-height: 1.25; color: var(--text); }
+.doc-eq--main { flex-basis: 100%; font-size: var(--fs-3xl); padding-bottom: var(--s5); border-bottom: 1px solid var(--line-faint); }
+.doc-eq--main:last-child { padding-bottom: 0; border-bottom: 0; }
+.doc-var { font-style: normal; color: var(--text); }
+.doc-var sub, .doc-eq sub { font-size: 0.6em; vertical-align: -0.35em; line-height: 0; color: var(--text-2); }
+.doc-eq sup { font-size: 0.55em; vertical-align: 0.75em; line-height: 0; }
+.doc-op { margin: 0 0.3em; color: var(--text-2); }
+.doc-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 0.92em; }
+.doc-frac-num { padding: 0 0.25em 0.14em; border-bottom: 1px solid var(--text-2); }
+.doc-frac-den { padding: 0.14em 0.25em 0; }
+.doc-sqrt { display: inline-flex; align-items: stretch; }
+.doc-sqrt-sign { flex: none; width: 0.5em; height: auto; overflow: visible; }
+.doc-sqrt-sign path { fill: none; stroke: var(--text-2); stroke-width: 1; stroke-linejoin: round; }
+.doc-sqrt-body { display: inline-flex; align-items: center; padding: 0.14em 0.2em 0.06em 0.16em; border-top: 1px solid var(--text-2); }
+.doc-formula-cap { display: grid; gap: var(--s3); padding: var(--s5) var(--s6) var(--s6); border-top: 1px solid var(--line-faint); }
+.doc-formula-where { font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps); text-transform: uppercase; color: var(--text-2); }
+.doc-symbols { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--s3) var(--s6); font-size: var(--fs-md); line-height: 1.5; }
+.doc-symbols > div { display: contents; }
+.doc-symbols dt { color: var(--text); white-space: nowrap; }
+.doc-symbols dd { margin: 0; color: var(--text-2); max-width: var(--measure); }
+.doc-formula-note { font-size: var(--fs-sm); color: var(--text-2); }
+
+/* ------------------------------------------------------------------ verdict class scale */
+.doc-scale { margin: 0; display: grid; gap: var(--s2); }
+.doc-scale-bar { display: grid; height: 44px; border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; }
+.doc-scale-seg { display: flex; align-items: center; min-width: 0; padding: 0 var(--s3); font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps-wide); color: var(--text); overflow: hidden; }
+.doc-scale-seg--direct { background: var(--ev-direct); border-right: 1px solid var(--ev-edge); }
+.doc-scale-seg--near { background: var(--ev-near); border-right: 1px solid var(--ev-edge-soft); }
+.doc-scale-seg--distant { background-color: var(--canvas); background-image: repeating-linear-gradient(135deg, var(--line) 0 1px, transparent 1px 7px); color: var(--text-2); }
+.doc-scale-ticks { position: relative; height: 18px; font-size: var(--fs-xs); color: var(--text-3); }
+.doc-scale-ticks > span { position: absolute; top: 0; transform: translateX(-50%); }
+.doc-scale-ticks > span:first-child { transform: none; }
+.doc-scale-ticks > .doc-scale-axis { transform: none; }
+.doc-scale-cap { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.5; }
+
+/* ------------------------------------------------------------------ the distance illustration (ChartFrame child) */
+.doc-figure .ui-chart-def { max-width: var(--measure); }
+.doc-figure .ui-chart-source { max-width: var(--measure); }
+.doc-ill { display: grid; gap: var(--s5); margin-top: var(--s2); }
+.doc-ill-controls { display: flex; flex-wrap: wrap; gap: var(--s4) var(--s6); }
+.doc-ill-body { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: var(--s6); align-items: start; }
+.doc-ill-svg { display: block; width: 100%; height: auto; }
+.doc-ill-plane { stroke: none; }
+.doc-ill-hatch-line { stroke: var(--line-faint); stroke-width: 1; }
+.doc-ill-grid { stroke: var(--line-faint); stroke-width: 1; }
+.doc-ill-frame { fill: none; stroke: var(--line); stroke-width: 1; }
+.doc-ill-tick { fill: var(--text-3); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.doc-ill-axis { fill: var(--text-2); font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps); text-transform: uppercase; }
+.doc-ill-label { fill: var(--text); font-size: var(--fs-sm); paint-order: stroke; stroke: var(--canvas); stroke-width: 4px; stroke-linejoin: round; }
+.doc-ill-region { fill: var(--ev-strong); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: var(--canvas); stroke-width: 4px; stroke-linejoin: round; }
+.doc-ill-label--probe { fill: var(--scenario); }
+.doc-ill-note { fill: var(--text-2); font-size: var(--fs-xs); }
+.doc-ill-gap { stroke: var(--scenario-line); stroke-width: 1; stroke-dasharray: 3 3; }
+.doc-ill-probe-ring { fill: none; stroke: var(--scenario); stroke-width: 1.4; }
+.doc-ill-readout { display: grid; gap: var(--s3); align-content: start; padding: var(--s4) var(--s5) var(--s5); background: var(--surface-1); border: 1px solid var(--line-faint); border-radius: var(--r-md); }
+.doc-ill-d { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2); font-size: var(--fs-3xl); font-weight: 300; line-height: 1; color: var(--text); }
+.doc-ill-d-sym { font-size: var(--fs-md); color: var(--text-2); }
+.doc-ill-class { font-size: var(--fs-xl); font-weight: 300; letter-spacing: 0.1em; }
+.doc-ill-gaps { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) max-content; gap: var(--s1) var(--s4); font-size: var(--fs-sm); padding-top: var(--s3); border-top: 1px solid var(--line-faint); }
+.doc-ill-gaps > div { display: contents; }
+.doc-ill-gaps dt { color: var(--text-2); }
+.doc-ill-gaps dd { margin: 0; color: var(--text); text-align: right; }
+.doc-ill-scales { font-size: var(--fs-xs); line-height: 1.5; color: var(--text-3); }
+.doc-ill-caution { padding-left: var(--s3); border-left: 2px solid var(--scenario); font-size: var(--fs-sm); line-height: 1.5; color: var(--text-2); }
+.doc-ill-key { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); column-gap: var(--s5); }
+
+/* ------------------------------------------------------------------ Sources: attribution, disclosure, references, definitions */
+.doc-attribution, .doc-disclosure {
+  max-width: var(--doc-measure); padding: var(--s5) var(--s6); background: var(--surface-1); border: 1px solid var(--line-faint);
+  border-left: 2px solid var(--line-strong); border-radius: var(--r-md); color: var(--text); font-size: var(--fs-lg); line-height: 1.6;
+}
+.doc-refs { list-style: none; margin: 0; padding: 0; counter-reset: doc-ref; border-top: 1px solid var(--line-faint); }
+.doc-ref { counter-increment: doc-ref; display: grid; grid-template-columns: 32px minmax(0, 1fr); column-gap: var(--s4); padding: var(--s5) 0; border-bottom: 1px solid var(--line-faint); }
+.doc-ref::before { content: counter(doc-ref, decimal-leading-zero); grid-row: 1 / span 3; padding-top: 6px; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.doc-ref > * { grid-column: 2; }
+.doc-ref-title { font-size: var(--fs-xl); font-weight: 300; line-height: 1.3; letter-spacing: -0.01em; }
+.doc-ref-cite { margin-top: var(--s2); max-width: var(--measure); font-size: var(--fs-md); line-height: 1.55; color: var(--text-2); }
+.doc-ref-meta, .doc-defs { margin: var(--s3) 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--s2) var(--s5); font-size: var(--fs-sm); line-height: 1.5; }
+.doc-ref-meta > div, .doc-defs > div { display: contents; }
+.doc-ref-meta dt, .doc-defs dt { padding-top: 2px; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--track-caps); text-transform: uppercase; color: var(--text-3); }
+.doc-ref-meta dd, .doc-defs dd { margin: 0; color: var(--text-2); max-width: var(--measure); }
+.doc-defs { margin-top: 0; font-size: var(--fs-md); gap: var(--s3) var(--s6); }
+
+/* ------------------------------------------------------------------ responsive */
+@media (max-width: 1023px) {
+  .doc-layout { grid-template-columns: minmax(0, 1fr); }
+  .doc-toc { position: static; max-height: none; overflow: visible; margin-bottom: var(--s7); padding-bottom: var(--s6); border-bottom: 1px solid var(--line-faint); }
+  .doc-toc-list { columns: 2; column-gap: var(--s6); border-left: 0; }
+  .doc-toc-list a { margin-left: 0; padding-left: 0; border-left: 0; }
+}
+@media (max-width: 767px) {
+  /* the mobile header is taller than --header-h (a second row of navigation) */
+  .doc-h2 { scroll-margin-top: calc(var(--header-h) + var(--s8)); }
+  .doc-sec { padding-top: var(--s7); margin-top: var(--s7); }
+  .doc-ill-tick, .doc-ill-label { font-size: var(--fs-md); }
+  .doc-ill-region, .doc-ill-note { font-size: var(--fs-sm); }
+  .doc-ill-axis { font-size: var(--fs-xs); }
+  .doc-statement { font-size: var(--fs-lg); }
+  .doc-formula-display { padding: var(--s5) var(--s4) var(--s4); gap: var(--s4) var(--s6); }
+  .doc-eq--main { font-size: var(--fs-2xl); }
+  .doc-eq { font-size: var(--fs-lg); }
+  .doc-formula-cap { padding: var(--s4); }
+  .doc-symbols, .doc-ref-meta, .doc-defs { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
+  .doc-symbols dd, .doc-ref-meta dd, .doc-defs dd { margin-bottom: var(--s3); }
+  .doc-symbols dt { white-space: normal; }
+  .doc-ill-body { grid-template-columns: minmax(0, 1fr); }
+  .doc-attribution, .doc-disclosure { padding: var(--s4); }
+  .doc-ref { grid-template-columns: minmax(0, 1fr); }
+  .doc-ref::before { grid-row: auto; padding-top: 0; }
+  .doc-ref > * { grid-column: 1; }
 }

@@ -114,7 +114,7 @@
   --ease-legacy: var(--ease); /* legacy-alias */
   --dur: var(--dur-1); /* legacy-alias */
 }
-@media (max-width: 767px) { :root { --gutter: 16px; --header-h: 56px; } }
+@media (max-width: 767px) { :root { --gutter: 16px; --header-h: 88px; } } /* two header rows on phones */
 
 html, body { margin: 0; padding: 0; }
 html { background: var(--canvas); }

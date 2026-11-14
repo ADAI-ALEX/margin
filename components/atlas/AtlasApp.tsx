@@ -56,7 +56,7 @@ function useEasedInsets(target: Insets, mode: string): Insets {
     const from = last.current.v, to = target;
     const jump = reducedMotion() || last.current.mode !== mode;
     last.current.mode = mode;
-    if (jump) { last.current.v = to; setCur(to); return; } // eslint-disable-line react-hooks/set-state-in-effect
+    if (jump) { last.current.v = to; setCur(to); return; }
     const t0 = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - t0) / 360), e = 1 - Math.pow(1 - t, 3);
