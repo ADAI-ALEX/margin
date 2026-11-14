@@ -42,6 +42,7 @@ Exactly three text levels. Contrast was computed (WCAG relative luminance) for e
 | Planned (never evidence) | `--tier-plan #8f98a3` | dashed ring |
 | PSI runs | `--tier-psi`, `--tier-psi-muted` | dot (other fuel class: smaller, dimmer) |
 | Snapshot status | `--text-3` | hollow square; never a green "live" dot |
+| Focus | `--text` | 2 px ring with a 2 px canvas gap |
 
 Rules: coverage uses only `--ev*` (single hue, lightness = closeness), never a red/amber/green ramp, never warm colours. Amber is never metadata. Verdict classes are always written as words. No gradients in chrome, no neon, no glow.
 
@@ -68,7 +69,7 @@ Numbers: `.num` (tabular, lining figures) everywhere a value is shown.
 
 ## 4. Space and shape
 
-4 px base (`--s1`…`--s9`: 4, 8, 12, 16, 20, 24, 32, 48, 64). Radii: `--r-sm 3px` controls, `--r-md 6px` panels and cards, `--r-round` only for the switch track. Hit targets: icon controls 32 × 32 px (≥ 28 px visible), primary controls 44 px on touch (regime detents on mobile). Header height 64 px (56 px on mobile). Reading measure 70 ch.
+4 px base (`--s1`…`--s9`: 4, 8, 12, 16, 20, 24, 32, 48, 64). Radii: `--r-sm 3px` controls, `--r-md 6px` panels and cards, `--r-round` only for the switch track. Hit targets: icon controls 32 × 32 px (≥ 28 px visible), primary controls 44 px on touch (regime detents on mobile). Header height 64 px (88 px on phones, where the primary nav takes a second row so it is always visible). Focus ring: 2 px canvas gap + 2 px `--text` ring (neutral: cyan means evidence). Modal scrim: `--scrim`. Reading measure 70 ch.
 
 ## 5. Motion
 
@@ -133,6 +134,10 @@ Frame: O₂ linear (10–45 %), pressure log (20–520 kPa, psia secondary axis)
 - **Minimum size**: mark 16 px (favicon); mark + wordmark 20 px mark height.
 - On dark only (canvas or `--surface-1`). No NASA insignia, no space imagery, no endorsement implied.
 
-## 9. Don'ts
+## 9. Shared links
+
+The pages are static, so a link's scenario (`?preset=…&o2=…`) is applied on the client. An inline script marks `html[data-pending]` before first paint when the URL carries scenario keys; every `[data-scenario-view]` stays hidden until `useMargin` has applied and rendered the URL scenario (8 s failsafe). A default verdict is therefore never shown or clickable.
+
+## 10. Don'ts
 
 Inter-everywhere, purple/blue gradients, neon glow, glass cards, pill buttons everywhere, emoji icons, marketing heroes, dashboards of identical cards, starfields, planets, spacecraft, a tilted data plane, a gravity slider, anything that interpolates between regimes, warm colours on coverage, a green "live" indicator.
