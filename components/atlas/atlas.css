@@ -43,10 +43,10 @@
 
 /* collapsed left column: a slim tab */
 .atlas-left-tab {
-  display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px 0 10px; cursor: pointer;
-  background: var(--surface-1); border: 1px solid var(--line-faint); border-radius: var(--r-md); color: var(--text-2); font-size: var(--fs-sm);
-  writing-mode: horizontal-tb;
+  display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0; cursor: pointer;
+  background: var(--surface-1); border: 1px solid var(--line-faint); border-radius: var(--r-md); color: var(--text-2);
 }
+.atlas-left-tab span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .atlas-left-tab:hover { color: var(--text); background: var(--surface-2); }
 .atlas-exp-panel { flex: 1 1 auto; min-height: 120px; }
 .atlas-con-panel { flex: none; }
@@ -192,6 +192,10 @@
 .ins-head { display: flex; align-items: center; gap: var(--s3); padding: 10px 10px 4px 16px; min-height: 44px; flex: none; }
 .ins-verdict { flex: none; display: grid; gap: 10px; padding: 6px 16px 16px; border-bottom: 1px solid var(--line-faint); }
 .ins[data-collapsed] .ins-verdict { border-bottom: 0; gap: 6px; padding-bottom: 12px; }
+.ins[data-collapsed] .ins-ctx { display: none; }
+.ins[data-collapsed] .ins-vword { display: flex; align-items: baseline; gap: 8px; }
+.ins[data-collapsed] .ins-vclass, .ins[data-collapsed] .ins-vdv { font-size: var(--fs-xl); }
+.ins[data-collapsed] .ins-head { min-height: 36px; padding-top: 6px; }
 .ins-ctx { color: var(--text-3); font-size: var(--fs-xs); line-height: 1.4; }
 .ins-vrow { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
 .ins-vd .claim { align-self: center; }

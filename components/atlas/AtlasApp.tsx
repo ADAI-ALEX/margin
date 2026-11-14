@@ -43,6 +43,35 @@ const GAP = { maxO2: HEADLINE.maxSolidO2, planned: [HEADLINE.artemisO2, HEADLINE
 const reducedMotion = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
+/**
+ * The field makes room instead of being covered: when a panel opens or collapses, the plot frame eases
+ * into the freed area (≤ 360 ms, decelerating). Layout-mode changes (resize across a breakpoint) jump.
+ */
+function useEasedInsets(target: Insets, mode: string): Insets {
+  const [cur, setCur] = useState(target);
+  const last = useRef({ v: target, mode });
+  const raf = useRef<number | null>(null);
+  const key = `${target.l},${target.t},${target.r},${target.b}`;
+  useEffect(() => {
+    const from = last.current.v, to = target;
+    const jump = reducedMotion() || last.current.mode !== mode;
+    last.current.mode = mode;
+    if (jump) { last.current.v = to; setCur(to); return; } // eslint-disable-line react-hooks/set-state-in-effect
+    const t0 = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - t0) / 360), e = 1 - Math.pow(1 - t, 3);
+      const v = { l: from.l + (to.l - from.l) * e, t: from.t + (to.t - from.t) * e, r: from.r + (to.r - from.r) * e, b: from.b + (to.b - from.b) * e };
+      last.current.v = v;
+      setCur(v);
+      if (t < 1) raf.current = requestAnimationFrame(step);
+    };
+    raf.current = requestAnimationFrame(step);
+    return () => { if (raf.current) cancelAnimationFrame(raf.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, mode]);
+  return cur;
+}
+
 export default function AtlasApp() {
   const m = useMargin("iss");
   const s = m.scenario;
@@ -91,6 +120,7 @@ export default function AtlasApp() {
   const free: Insets = !app ? { l: 0, t: 0, r: 0, b: 0 }
     : wide ? { l: leftOpen ? (roomy ? 332 : 300) : 76, t: 64, r: rightOpen ? (roomy ? 448 : 412) : 64, b: 122 }
     : { l: 76, t: 64, r: 64, b: 122 };
+  const shownFree = useEasedInsets(free, !app ? "stack" : wide ? (roomy ? "wide" : "mid") : "tablet");
 
   // ---- view domain (zoom) with an eased transition; the field is recomputed when it settles ----
   const [domain, setDomain] = useState<ViewDomain>(FULL_DOMAIN);
@@ -158,8 +188,24 @@ export default function AtlasApp() {
   const focusInv = hoverInv ?? pinnedInv ?? selected?.investigation ?? null;
   const [tab, setTab] = useState<"evidence" | "sensitivity" | "rank" | "findings" | "sources">("evidence");
 
+  /** Where focus returns when the run inspector closes (the control that opened it, else the active tab). */
+  const opener = useRef<{ el: HTMLElement | null; key: string | null }>({ el: null, key: null });
+  const closeRun = useCallback(() => {
+    setSelectedId(null);
+    const { el, key } = opener.current;
+    opener.current = { el: null, key: null };
+    requestAnimationFrame(() => {
+      const target = (el && document.contains(el) ? el : null)
+        ?? (key ? document.querySelector<HTMLElement>(`[data-runlink="${CSS.escape(key)}"]`) : null)
+        ?? document.querySelector<HTMLElement>(".ins-tablist [aria-selected='true']");
+      target?.focus();
+    });
+  }, []);
+
   /** Select a run. From a list or search (not the field) the view eases to it. */
   const selectRun = useCallback((r: Run, fromField = false) => {
+    const a = document.activeElement as HTMLElement | null;
+    opener.current = { el: fromField ? null : a, key: a?.dataset.runlink ?? null };
     setSelectedId(r.id);
     setOverview(false);
     if (!wide) setRightOpen(true);
@@ -214,7 +260,8 @@ export default function AtlasApp() {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (t && (t.closest("input, select, textarea, [role='dialog']") || t.isContentEditable)) return;
       if (e.key === "Escape") {
-        if (selectedId) { setSelectedId(null); e.preventDefault(); }
+        if (document.getElementById("atlas-rail-pop")) return; // the popover closes first
+        if (selectedId) { closeRun(); e.preventDefault(); }
         else if (overview) { setOverview(false); e.preventDefault(); }
         return;
       }
@@ -268,7 +315,7 @@ export default function AtlasApp() {
           </div>
         ) : (
           <EvidenceField
-            W={size.W} H={size.H} free={free} compact={!app}
+            W={size.W} H={size.H} free={shownFree} compact={!app}
             domain={domain} field={field} envHalf={envHalf} envDouble={envDouble} animating={animating}
             runs={runsByG[gi]} comparableIds={comparableSets[gi]}
             scenario={s} verdict={m.evaluation.verdict} nearestD={nearestD}
@@ -310,7 +357,7 @@ export default function AtlasApp() {
         <Inspector
           scenario={s} evaluation={m.evaluation} psiOnly={m.psiOnly} robust={m.robust} ranking={m.ranking}
           coveragePct={coveragePct} grid={MAIN_GRID} selected={selected} focusInv={focusInv} pinnedInv={pinnedInv}
-          onInspect={(r) => selectRun(r)} onCloseRun={() => setSelectedId(null)} onHoverInv={setHoverInv} onPinInv={(id) => setPinnedInv((c) => (c === id ? null : id))}
+          onInspect={(r) => selectRun(r)} onCloseRun={closeRun} onHoverInv={setHoverInv} onPinInv={(id) => setPinnedInv((c) => (c === id ? null : id))}
           collapsed={app && !rightOpen} tab={tab} setTab={setTab}
           runActions={selected && selected.gravity === s.gravity && selected.o2Pct != null && selected.pressureKPa != null
             ? <button type="button" className="ui-btn ui-btn--quiet" onClick={zoomToRun} disabled={zoom >= MAX_ZOOM - 0.01}><IconTarget /> Zoom to run</button> : null}

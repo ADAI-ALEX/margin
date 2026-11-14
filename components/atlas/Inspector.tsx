@@ -170,14 +170,14 @@ export default function Inspector(p: InspectorProps) {
               {n ? (
                 <p>
                   {loc}, the nearest comparable test is{" "}
-                  <button type="button" className="atlas-runlink ui-link-btn" onClick={() => p.onInspect(n.run)}>{runTitle(n.run)}</button>
+                  <button type="button" className="atlas-runlink ui-link-btn" data-runlink={n.run.id} onClick={() => p.onInspect(n.run)}>{runTitle(n.run)}</button>
                   {n.run.material ? ` (${n.run.material.replace(/\s+/g, " ").trim()})` : " (material not recorded)"}{fn.ref(runSrc(n.run))}, {fmt(n.d.D, 2)} units away
                   {n.d.partialMatch
                     ? <> <strong>on {n.d.axesUsed.map((ax) => AXIS_NAME[ax]).join(" and ")} only; {n.d.flags.includes("flow-regime-mismatch") ? "flow regime differs, so flow is not compared" : `${(["o2", "pressure", "flow"] as const).filter((ax) => !n.d.axesUsed.includes(ax)).map((ax) => AXIS_NAME[ax]).join(" and ")} not recorded`}</strong>{gapPhrase(n)}.</>
                     : <>{gapPhrase(n)}.</>}
                   {" "}Differences are test minus scenario; {unit}.
                   {n.d.partialMatch && (ev.nearestComplete
-                    ? <> Best fully-compared test:{" "}<button type="button" className="atlas-runlink ui-link-btn" onClick={() => p.onInspect(ev.nearestComplete!.run)}>{runTitle(ev.nearestComplete.run)}</button>{fn.ref(runSrc(ev.nearestComplete.run))}, D <span className="num">{fmt(ev.nearestComplete.d.D, 2)}</span> ({classify(ev.nearestComplete.d.D)}).</>
+                    ? <> Best fully-compared test:{" "}<button type="button" className="atlas-runlink ui-link-btn" data-runlink={ev.nearestComplete.run.id} onClick={() => p.onInspect(ev.nearestComplete!.run)}>{runTitle(ev.nearestComplete.run)}</button>{fn.ref(runSrc(ev.nearestComplete.run))}, D <span className="num">{fmt(ev.nearestComplete.d.D, 2)}</span> ({classify(ev.nearestComplete.d.D)}).</>
                     : <> No test in this regime is comparable on all three axes.</>)}
                   {n.run.pressureBasis === "nominal-stated" && <> Its pressure is nominal (stated), not measured.</>}
                   {n.run.tier === "T3_PUBLISHED" && (n.run.flags.includes("unverified-transcription")

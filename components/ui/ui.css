@@ -232,3 +232,14 @@
 .mk-ev-near { fill: var(--ev-near); stroke: var(--ev-edge-soft); stroke-width: 1; }
 .mk-envelope { fill: none; stroke: var(--ev-edge-soft); stroke-width: 1; stroke-dasharray: 4 3; }
 .mk-hatch { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+
+/* ------------------------------------------------------------------ not-found and loading states */
+.nf { display: grid; gap: var(--s4); justify-items: start; padding-top: var(--s8); }
+.nf-plane { position: relative; margin-bottom: var(--s4); }
+.nf-plane svg { display: block; max-width: 100%; height: auto; }
+.nf-grid { stroke: var(--text); stroke-opacity: 0.06; stroke-dasharray: 2 3; }
+.nf-frame { fill: none; stroke: var(--line-strong); }
+.nf-mark { position: absolute; right: 18px; top: 14px; }
+.nf-links { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s3); }
+.ui-loading { display: grid; gap: var(--s3); padding: var(--s7) var(--gutter); max-width: 1240px; margin: 0 auto; color: var(--text-2); }
+.ui-loading-bar { height: 1px; width: min(320px, 60vw); background: var(--line); position: relative; overflow: hidden; }
