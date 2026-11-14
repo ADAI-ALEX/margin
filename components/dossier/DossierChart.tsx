@@ -6,7 +6,8 @@ import { GRAVITY_LABEL, fmt } from "@/lib/format";
 import { GRAVS, isLimit, r2, type Fingerprint } from "@/components/casefile/derive";
 import css from "./dossier.module.css";
 
-const W = 640, H = 360, M = { l: 54, r: 16, t: 14, b: 42 };
+const W = 640, H = 360, M = { l: 66, r: 18, t: 16, b: 46 };
+const TRI = (x: number, y: number, r = 5) => `${x},${r2(y - r)} ${r2(x + r * 0.9)},${r2(y + r * 0.6)} ${r2(x - r * 0.9)},${r2(y + r * 0.6)}`;
 
 type MarkKind = "run" | "nominal" | "pub" | "limit" | "planned";
 const kindOf = (r: Run): MarkKind => (r.tier === "T4_PLANNED" ? "planned" : isLimit(r) ? "limit" : r.tier === "T3_PUBLISHED" ? "pub" : r.pressureBasis === "nominal-stated" ? "nominal" : "run");
@@ -43,34 +44,37 @@ function Panel({ runs, g, acronym }: { runs: Run[]; g: Gravity; acronym: string 
   const crosses = [...cm.values()].sort((a, b) => a.o2 - b.o2);
   const o2r = [Math.min(...runs.map((r) => r.o2Pct as number)), Math.max(...runs.map((r) => r.o2Pct as number))];
   const pr = [Math.min(...runs.map((r) => r.pressureKPa as number)), Math.max(...runs.map((r) => r.pressureKPa as number))];
-  const label = `${acronym}, ${GRAVITY_LABEL[g]}: ${runs.length} runs plotted, O₂ ${fmt(o2r[0], 1)}–${fmt(o2r[1], 1)} %, pressure ${fmt(pr[0], 1)}–${fmt(pr[1], 1)} kPa (log scale). Reference atmospheres drawn as crosshairs: ${PRESETS.map((p) => `${p.short} ${p.o2Pct}% / ${p.pressureKPa} kPa`).join("; ")}.`;
+  const label = `${acronym}, ${GRAVITY_LABEL[g]}: ${runs.length} runs plotted, O₂ ${fmt(o2r[0], 1)}–${fmt(o2r[1], 1)} %, pressure ${fmt(pr[0], 1)}–${fmt(pr[1], 1)} kPa (log scale). Reference atmospheres drawn as triangles: ${PRESETS.map((p) => `${p.short} ${p.o2Pct}% / ${p.pressureKPa} kPa`).join("; ")}.`;
   return (
     <figure className={css.panel}>
-      <figcaption className={css.panelCap}>{GRAVITY_LABEL[g]} <span className={css.quiet}>· {runs.length} runs</span></figcaption>
+      <figcaption className={css.panelCap}>{GRAVITY_LABEL[g]} <span className={css.capCount}><span className="num">{runs.length}</span> runs</span></figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className={css.chartSvg}>
+        <rect x={M.l} y={M.t} width={W - M.l - M.r} height={H - M.t - M.b} className={css.plotBg} />
         {xt.map((v) => (
           <g key={`x${v}`} className={css.axis}>
             <line x1={r2(x(v))} x2={r2(x(v))} y1={M.t} y2={H - M.b} className={css.gridLine} />
-            <text x={r2(x(v))} y={H - M.b + 14} textAnchor="middle">{v}</text>
+            <line x1={r2(x(v))} x2={r2(x(v))} y1={H - M.b} y2={H - M.b + 4} className={css.tickMark} />
+            <text x={r2(x(v))} y={H - M.b + 16} textAnchor="middle">{v}%</text>
           </g>
         ))}
         {yt.map((v) => (
           <g key={`y${v}`} className={css.axis}>
             <line x1={M.l} x2={W - M.r} y1={r2(y(v))} y2={r2(y(v))} className={css.gridLine} />
-            <text x={M.l - 6} y={r2(y(v)) + 3} textAnchor="end">{v}</text>
+            <line x1={M.l - 4} x2={M.l} y1={r2(y(v))} y2={r2(y(v))} className={css.tickMark} />
+            <text x={M.l - 8} y={r2(y(v)) + 3.5} textAnchor="end">{v} kPa</text>
           </g>
         ))}
-        <rect x={M.l} y={M.t} width={W - M.l - M.r} height={H - M.t - M.b} className={css.frame} />
-        <text x={(M.l + W - M.r) / 2} y={H - 6} textAnchor="middle" className={css.axisTitle}>O₂, % by volume (ambient)</text>
-        <text x={12} y={(M.t + H - M.b) / 2} transform={`rotate(-90 12 ${(M.t + H - M.b) / 2})`} textAnchor="middle" className={css.axisTitle}>Pressure, kPa (log scale)</text>
+        <line x1={M.l} x2={M.l} y1={M.t} y2={H - M.b} className={css.frame} />
+        <line x1={M.l} x2={W - M.r} y1={H - M.b} y2={H - M.b} className={css.frame} />
+        <text x={(M.l + W - M.r) / 2} y={H - 8} textAnchor="middle" className={css.axisTitle}>O₂, % by volume (ambient)</text>
+        <text x={13} y={(M.t + H - M.b) / 2} transform={`rotate(-90 13 ${(M.t + H - M.b) / 2})`} textAnchor="middle" className={css.axisTitle}>Pressure, kPa (log scale)</text>
         {crosses.map((c, i) => {
           const cx = r2(x(c.o2)), cy = r2(y(c.p));
-          const ty = i % 2 === 0 ? cy - 7 : cy + 17; // alternate above/below so neighbouring labels do not collide
+          const ty = i % 2 === 0 ? cy - 9 : cy + 17; // alternate above/below so neighbouring labels do not collide
           return (
             <g key={c.label} className={css.cross}>
-              <line x1={cx - 9} x2={cx + 9} y1={cy} y2={cy} />
-              <line x1={cx} x2={cx} y1={cy - 9} y2={cy + 9} />
-              {cx > W * 0.7 ? <text x={cx - 6} y={ty} textAnchor="end">{c.label}</text> : <text x={cx + 6} y={ty}>{c.label}</text>}
+              <polygon points={TRI(cx, cy)} />
+              {cx > W * 0.7 ? <text x={cx - 8} y={ty} textAnchor="end">{c.label}</text> : <text x={cx + 8} y={ty}>{c.label}</text>}
             </g>
           );
         })}
@@ -116,8 +120,9 @@ export function DossierChart({ runs, fp, acronym }: { runs: Run[]; fp: Fingerpri
             {kinds.has("pub") && <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" className={css.mPub} /></svg> published (not in PSI)</li>}
             {kinds.has("limit") && <li><svg width="12" height="12" aria-hidden="true"><g className={css.mLimit}><circle cx="6" cy="6" r="4.5" /><line x1="6" x2="6" y1="1.5" y2="10.5" /></g></svg> reported limit — not a tested condition</li>}
             {kinds.has("planned") && <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" className={css.mPlanned} /></svg> planned — not evidence</li>}
-            <li><svg width="14" height="14" aria-hidden="true" className={css.cross}><line x1="1" x2="13" y1="7" y2="7" /><line x1="7" x2="7" y1="1" y2="13" /></svg> reference atmosphere</li>
+            <li><svg width="14" height="14" aria-hidden="true" className={css.cross}><polygon points={TRI(7, 8, 5)} /></svg> reference atmosphere</li>
           </ul>
+          <p className={css.source}>Source: the normalized O₂ and pressure of each run in the run table below; the original cell and any conversion are in each run&rsquo;s provenance. Reference atmospheres are MARGIN&rsquo;s presets.</p>
         </>
       ) : (
         <p className={css.emptyNote}>

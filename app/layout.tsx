@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { fontVars } from "@/lib/fonts";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
+import { COUNTS, SNAP } from "@/lib/data";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,14 +15,14 @@ export const metadata: Metadata = {
     "An evidence-coverage atlas of NASA PSI combustion tests. For a crewed atmosphere, see how close real NASA test conditions come, by gravity regime, with every number traced to its source. Evidence proximity, not a safety rating.",
   openGraph: { type: "website", siteName: "MARGIN", title: "MARGIN · How close is the evidence?" },
 };
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#f3efe6" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0b0f14" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={fontVars}>
       <body>
         <a href="#main" className="skip-link">Skip to content</a>
-        <SiteHeader />
+        <SiteHeader status={`PSI snapshot ${SNAP.fetchedAt.slice(0, 10)} · ${COUNTS.totalRuns.toLocaleString("en-GB")} runs`} />
         {children}
         <SiteFooter />
       </body>

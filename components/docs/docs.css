@@ -2,43 +2,43 @@
 .doc { max-width: 1180px; margin: 0 auto; padding: 28px var(--gutter) 24px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0 48px; }
 .doc-toc { position: sticky; top: 16px; align-self: start; font-family: var(--sans); font-size: 12.5px; line-height: 1.5; }
 .doc-toc ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 3px; }
-.doc-toc a { text-decoration: none; color: var(--ink-2); }
-.doc-toc a:hover { color: var(--ink); text-decoration: underline; }
+.doc-toc a { text-decoration: none; color: var(--text-2); }
+.doc-toc a:hover { color: var(--text); text-decoration: underline; }
 .doc-body { min-width: 0; }
 .doc-kicker { margin: 0; }
-.doc h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 4vw, 44px); line-height: 1.08; margin: 6px 0 12px; letter-spacing: -0.01em; }
-.doc-lede { font-size: 19px; line-height: 1.45; max-width: 64ch; margin: 0 0 18px; color: var(--ink); }
-.doc h2 { font-family: var(--serif); font-weight: 500; font-size: 25px; margin: 38px 0 8px; padding-top: 14px; border-top: 1px solid var(--ink); scroll-margin-top: 16px; }
-.doc h2 .doc-secno { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: var(--ink-3); margin-right: 10px; vertical-align: 3px; }
+.doc h1 { font-family: var(--sans); font-weight: 400; font-size: clamp(30px, 4vw, 44px); line-height: 1.08; margin: 6px 0 12px; letter-spacing: -0.01em; }
+.doc-lede { font-size: 19px; line-height: 1.45; max-width: 64ch; margin: 0 0 18px; color: var(--text); }
+.doc h2 { font-family: var(--sans); font-weight: 500; font-size: 25px; margin: 38px 0 8px; padding-top: 14px; border-top: 1px solid var(--text); scroll-margin-top: 16px; }
+.doc h2 .doc-secno { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: var(--text-3); margin-right: 10px; vertical-align: 3px; }
 .doc h3 { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin: 22px 0 6px; }
 .doc p, .doc li { max-width: 72ch; }
 .doc p { margin: 0 0 10px; }
 .doc ul, .doc ol.doc-list { margin: 0 0 12px; padding-left: 20px; }
 .doc li { margin: 0 0 4px; }
 .doc code, .doc .formula { font-family: var(--mono); font-size: 0.86em; }
-.doc .formula { display: block; background: var(--paper-raised); border: 1px solid var(--rule); padding: 12px 14px; margin: 10px 0 14px; overflow-x: auto; white-space: pre; line-height: 1.6; font-size: 13.5px; }
-.doc .callout { border-left: 3px solid var(--ink); padding: 4px 0 4px 14px; margin: 14px 0; font-size: 17px; max-width: 70ch; }
+.doc .formula { display: block; background: var(--surface-1); border: 1px solid var(--line); padding: 12px 14px; margin: 10px 0 14px; overflow-x: auto; white-space: pre; line-height: 1.6; font-size: 13.5px; }
+.doc .callout { border-left: 3px solid var(--text); padding: 4px 0 4px 14px; margin: 14px 0; font-size: 17px; max-width: 70ch; }
 .doc .callout p:last-child { margin-bottom: 0; }
-.doc-tablewrap { overflow-x: auto; margin: 10px 0 16px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.doc-tablewrap { overflow-x: auto; margin: 10px 0 16px; border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); }
 .doc table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 13px; line-height: 1.4; }
-.doc caption { text-align: left; font-family: var(--sans); font-size: 12px; color: var(--ink-2); padding: 8px 0 6px; caption-side: top; }
-.doc th, .doc td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
-.doc thead th { font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); border-bottom: 1px solid var(--rule); }
+.doc caption { text-align: left; font-family: var(--sans); font-size: 12px; color: var(--text-2); padding: 8px 0 6px; caption-side: top; }
+.doc th, .doc td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+.doc thead th { font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); border-bottom: 1px solid var(--line); }
 .doc td.n, .doc th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.doc tr.is-current td, .doc tr.is-current th { background: color-mix(in srgb, var(--ochre) 9%, transparent); }
+.doc tr.is-current td, .doc tr.is-current th { background: color-mix(in srgb, var(--scenario) 9%, transparent); }
 .doc thead th.n { font-family: var(--sans); }
 .doc .refuse li::marker { content: "✕  "; }
-.doc .muted { color: var(--ink-3); }
-.doc .src { font-family: var(--sans); font-size: 12px; color: var(--ink-2); }
+.doc .muted { color: var(--text-3); }
+.doc .src { font-family: var(--sans); font-size: 12px; color: var(--text-2); }
 .doc dl.defs { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; margin: 8px 0 14px; font-size: 15px; }
 .doc dl.defs dt { font-family: var(--sans); font-weight: 700; font-size: 12px; letter-spacing: 0.06em; padding-top: 3px; }
 .doc dl.defs dd { margin: 0; }
 .doc .ref-list { list-style: none; padding: 0; margin: 0; }
-.doc .ref-list li { padding: 10px 0; border-bottom: 1px solid var(--rule-soft); max-width: none; }
-.doc .ref-meta { font-family: var(--sans); font-size: 12px; color: var(--ink-2); margin-top: 3px; }
+.doc .ref-list li { padding: 10px 0; border-bottom: 1px solid var(--line-soft); max-width: none; }
+.doc .ref-meta { font-family: var(--sans); font-size: 12px; color: var(--text-2); margin-top: 3px; }
 @media (max-width: 860px) {
   .doc { grid-template-columns: minmax(0, 1fr); }
-  .doc-toc { position: static; border-bottom: 1px solid var(--rule); padding-bottom: 12px; margin-bottom: 8px; }
+  .doc-toc { position: static; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 8px; }
   .doc-toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .doc dl.defs { grid-template-columns: 1fr; gap: 2px; }
   .doc dl.defs dd { margin-bottom: 8px; }

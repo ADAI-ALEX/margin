@@ -62,12 +62,14 @@ function NumField({ id, label, value, onCommit, min, max, step, unit, children }
   };
   return (
     <div className="atlas-field">
-      <label className="atlas-field-label" htmlFor={id}>{label}</label>
+      <span className="atlas-field-head">
+        <label className="atlas-field-label" htmlFor={id}>{label}</label>
+        {children}
+      </span>
       <span className="atlas-numgroup">
         <input id={id} className="atlas-numinput" type="number" inputMode="decimal" min={min} max={max} step={step} value={txt}
           onChange={(e) => setTxt(e.target.value)} onBlur={commit} onKeyDown={(e) => { if (e.key === "Enter") commit(); }} />
         <span className="atlas-unit">{unit}</span>
-        {children}
       </span>
     </div>
   );
@@ -96,11 +98,13 @@ export default function Toolbar({ scenario, preset, update, applyPreset }: {
           {HAZARDS.map((h) => <option key={h.id} value={h.id}>{h.label}</option>)}
         </select>
       </div>
+      <div className="atlas-rail-pair">
       <NumField id="atlas-o2" label="O₂" value={+scenario.o2Pct.toFixed(2)} min={0.1} max={100} step={0.1} unit="%" onCommit={(v) => update({ o2Pct: v })} />
       <NumField id="atlas-p" label="Pressure" value={pShown} min={psiaUnit ? 0.2 : 1} max={psiaUnit ? 145 : 1000} step={psiaUnit ? 0.1 : 0.5}
         unit={psiaUnit ? "psia" : "kPa"} onCommit={(v) => update({ pressureKPa: psiaUnit ? +psiaToKPa(v).toFixed(2) : v })}>
         <button type="button" className="atlas-unit-toggle" aria-pressed={psiaUnit} onClick={() => setPsiaUnit((u) => !u)} title="Show pressure in psia">psia</button>
       </NumField>
+      </div>
       <Segmented<MaterialClass>
         label="Material"
         options={["any", "thin", "thick"]}
@@ -138,6 +142,7 @@ export default function Toolbar({ scenario, preset, update, applyPreset }: {
           <span id="atlas-pub-t">Include published evidence</span>
         </button>
       </div>
+      <p className="atlas-rail-note">Presets are reference cabin atmospheres. Flow is an assumed ventilation speed; gravity selects a separate evidence regime — MARGIN never estimates between regimes.</p>
     </div>
   );
 }

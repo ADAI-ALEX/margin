@@ -7,6 +7,8 @@ import { fmt } from "@/lib/format";
 import { O2_DOMAIN, P_DOMAIN, bandsAtMost, gridToSvg, multiPolygonPath, r2 } from "./geo";
 import { PointsLayer, type PlotPoint } from "./marks";
 import { useWidth } from "./useWidth";
+import { runTitle } from "./SpecimenCard";
+import { TIER_LABEL, FUEL_LABEL } from "@/lib/format";
 
 const P_TICKS = [20, 30, 50, 70, 100, 150, 200, 300, 500];
 const PSIA_TICKS = [3, 5, 7, 10, 15, 20, 30, 50, 70];
@@ -69,13 +71,14 @@ const BandsLayer = memo(function BandsLayer({ field, envHalf, envDouble, x, y, w
 export default function CoverageMap(p: Props) {
   const [wrapRef, width] = useWidth<HTMLDivElement>(880);
   const svgRef = useRef<SVGSVGElement>(null);
+  const [hover, setHover] = useState<PlotPoint | null>(null);
   const [dragging, setDragging] = useState(false);
   const drag = useRef<number | null>(null);
   const tap = useRef<{ x: number; y: number; id: number } | null>(null);
 
   const narrow = width < 560;
   const m = narrow ? { l: 40, r: 34, t: 14, b: 36 } : { l: 56, r: 48, t: 18, b: 42 };
-  const height = Math.round(clamp(width * 0.6, [270, 600]));
+  const height = Math.round(clamp(width * (narrow ? 0.82 : 0.68), [300, 640]));
   const iw = width - m.l - m.r, ih = height - m.t - m.b;
 
   // x/y return coordinates rounded to 2 dp (hydration-stable); sx/sy are the raw scales for invert/ticks
@@ -130,7 +133,7 @@ export default function CoverageMap(p: Props) {
     })).sort((a, b) => a.x - b.x);
     let lastRight = -Infinity;
     for (const g of out) {
-      const wLab = g.label.length * 6.2;
+      const wLab = g.label.length * 6.9;
       if (g.x - wLab / 2 < lastRight + 6) g.below = true; else lastRight = g.x + wLab / 2;
     }
     return out;
@@ -176,7 +179,13 @@ export default function CoverageMap(p: Props) {
     svgRef.current!.setPointerCapture(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
-    if (drag.current !== e.pointerId) return;
+    if (drag.current !== e.pointerId) {
+      if (e.pointerType !== "mouse") return;
+      const { lx, ly } = local(e);
+      const h = inside(lx, ly) ? hit(lx, ly, 7) : null;
+      setHover((cur) => (h ? (cur?.run.id === h.run.id ? cur : h) : null));
+      return;
+    }
     const { lx, ly } = local(e);
     place(lx, ly);
   };
@@ -228,6 +237,7 @@ export default function CoverageMap(p: Props) {
         onPointerMove={onPointerMove}
         onPointerUp={end}
         onPointerCancel={end}
+        onPointerLeave={() => setHover(null)}
       >
         <defs>
           <clipPath id="atlas-plot-clip"><rect x={0} y={0} width={iw} height={ih} /></clipPath>
@@ -296,7 +306,7 @@ export default function CoverageMap(p: Props) {
                 const a = g.items[0];
                 const below = g.below || Math.hypot(g.x - px, g.y - py) < 26;
                 const active = g.items.some((it) => it.id === p.activePreset);
-                const wLab = g.label.length * 6.2;
+                const wLab = g.label.length * 6.9;
                 return (
                   <g
                     data-role="landmark"
@@ -336,13 +346,23 @@ export default function CoverageMap(p: Props) {
             <circle cy={-14} r={6} className="atlas-pin-head" />
             <circle cy={-14} r={1.8} className="atlas-pin-eye" />
             <circle r={2} className="atlas-pin-foot" />
-            <g transform={`translate(${labelRight ? 12 : -12},${py < 46 ? 20 : -26})`} textAnchor={labelRight ? "start" : "end"} className="atlas-pin-label">
+            {!p.activePreset && <g transform={`translate(${labelRight ? 12 : -12},${py < 46 ? 20 : -26})`} textAnchor={labelRight ? "start" : "end"} className="atlas-pin-label">
               <text className="atlas-pin-coords">{fmt(p.scenario.o2Pct)}% · {fmt(p.scenario.pressureKPa)} kPa{pinOff ? " (off chart)" : ""}</text>
-              <text y={13} className="atlas-pin-verdict">Evidence: {verdictWord}{p.nearestD != null && Number.isFinite(p.nearestD) ? ` · D ${fmt(p.nearestD, 2)}` : ""}</text>
-            </g>
+            </g>}
           </g>
         </g>
       </svg>
+      {hover && (
+        <div className="atlas-tip" role="status" style={{ left: Math.min(hover.x + m.l + 14, width - 270), top: Math.max(hover.y + m.t - 12, 0) }}>
+          <span className="atlas-tip-tier" style={{ color: hover.run.tier === "T3_PUBLISHED" ? "var(--tier-pub)" : hover.run.tier === "T4_PLANNED" ? "var(--tier-plan)" : "var(--text-3)" }}>
+            {hover.run.flags.includes("limit-value") ? "Reported limit" : TIER_LABEL[hover.run.tier]}{hover.comparable ? " · comparable" : ""}
+          </span>
+          <strong>{runTitle(hover.run)}</strong>
+          <span className="num">{fmt(hover.run.o2Pct)}% O₂ · {fmt(hover.run.pressureKPa)} kPa{hover.run.flowCmS != null ? ` · ${fmt(hover.run.flowCmS)} cm/s` : ""}</span>
+          <br />{hover.run.material ? hover.run.material.replace(/\s+/g, " ").trim() : FUEL_LABEL[hover.run.fuelClass]}
+          <br /><span className="atlas-tip-tier">Click to inspect source</span>
+        </div>
+      )}
       {off.outP > 0 && <p className="atlas-mapnote">{off.outP} placeable runs lie outside the {P_DOMAIN[0]}–{P_DOMAIN[1]} kPa window and are not drawn.</p>}
     </div>
   );

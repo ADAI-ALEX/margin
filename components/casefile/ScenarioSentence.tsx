@@ -87,7 +87,10 @@ export function ScenarioSentence({ m, pUnit, setPUnit }: { m: MarginState; pUnit
 
   return (
     <section className={css.scenario} aria-labelledby="inv-scenario-h">
-      <h2 className={css.eyebrowH} id="inv-scenario-h">Your scenario <span className={css.quiet}>· shared with the Atlas through the link</span></h2>
+      <div className={css.scenHead}>
+        <h2 className={css.panelTitle} id="inv-scenario-h"><i className={css.scenKey} aria-hidden="true" />Your scenario</h2>
+        <span className={css.headNote}>Shared with the Atlas through the link</span>
+      </div>
       <p className={css.sentence}>
         <span className={css.field}>
           <select aria-label="Question asked of the evidence" className={css.select} value={s.hazard} onChange={(e) => update({ hazard: e.target.value as Hazard }, true)}>
@@ -157,7 +160,7 @@ export function ScenarioSentence({ m, pUnit, setPUnit }: { m: MarginState; pUnit
           ))}
         </div>
         <label className={css.pubToggle}>
-          <input type="checkbox" role="switch" checked={s.includePublished} onChange={(e) => update({ includePublished: e.target.checked }, true)} />
+          <input type="checkbox" role="switch" className={css.switch} checked={s.includePublished} onChange={(e) => update({ includePublished: e.target.checked }, true)} />
           <span>Include published evidence <span className={css.quiet}>(not in PSI)</span></span>
         </label>
       </div>

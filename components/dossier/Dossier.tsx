@@ -7,7 +7,7 @@ import {
 } from "@/components/casefile/derive";
 import { Claim } from "@/components/casefile/ui";
 import { DossierChart } from "./DossierChart";
-import { DossierLinks } from "./DossierLinks";
+import { DossierCrumb, DossierLinks } from "./DossierLinks";
 import { RunTable } from "./RunTable";
 import css from "./dossier.module.css";
 
@@ -35,10 +35,19 @@ export function Dossier({ id }: { id: string }) {
   return (
     <main id="main" className={css.root} data-testid="dossier" data-inv={inv.id}>
       <header className={css.head}>
-        <p className={css.eyebrow}>Investigation dossier · <span className={css.tier} data-tier={inv.tier}>{tierShort(inv)}</span> · <span className="num">{inv.id}</span></p>
-        <h1 className={css.h1}>{inv.acronym}</h1>
-        {inv.title !== inv.acronym && <p className={css.title}>{inv.title}</p>}
-        <DossierLinks id={inv.id} />
+        <DossierCrumb id={inv.id} />
+        <div className={css.headMain}>
+          <div className={css.headText}>
+            <h1 className={css.h1}>{inv.acronym}</h1>
+            {inv.title !== inv.acronym && <p className={css.title}>{inv.title}</p>}
+            <p className={css.headMeta}>
+              <span className={css.tier} data-tier={inv.tier}>{tierShort(inv)}</span>
+              <span className="num">{inv.id}</span>
+              <span>Investigation dossier</span>
+            </p>
+          </div>
+          <DossierLinks id={inv.id} />
+        </div>
         <p className={css.disclaimer}>{DISCLAIMER} This page describes what was tested and where each value comes from.</p>
       </header>
 
@@ -76,10 +85,10 @@ export function Dossier({ id }: { id: string }) {
         ) : (
           <>
             <p className={css.sub}>Computed from the {runs.length} {isPsi ? "run rows" : "records"} below: what varied, what was held constant, and what was never recorded.</p>
-            <div className={css.tableScroll}>
+            <div className={css.tableScroll} tabIndex={0} role="region" aria-label="Condition axes (scrolls sideways on small screens)">
               <table className={css.fpTable}>
                 <caption className="sr-only">Condition axes: what varied and what was held constant</caption>
-                <thead><tr><th scope="col">Axis</th><th scope="col">State</th><th scope="col">Range</th><th scope="col">Basis</th><th scope="col">Recorded</th></tr></thead>
+                <thead><tr><th scope="col">Axis</th><th scope="col">State</th><th scope="col">Range</th><th scope="col">Basis</th><th scope="col" className={css.right}>Recorded</th></tr></thead>
                 <tbody>
                   {fp.axes.map((a) => (
                     <tr key={a.axis}>
@@ -87,7 +96,7 @@ export function Dossier({ id }: { id: string }) {
                       <td><b>{a.state === "held" ? "held constant" : a.state}</b></td>
                       <td>{a.min == null ? <span className={css.nr}>{a.reason ?? "—"}</span> : <span className="num">{a.min === a.max ? `${fmt(a.min, 1)}` : `${fmt(a.min, 1)}–${fmt(a.max, 1)}`} {AXIS_UNIT[a.axis]}{a.levels > 1 ? ` · ${a.levels} levels` : ""}</span>}</td>
                       <td>{a.basis || <span className={css.nr}>{BASIS_TEXT.unknown}</span>}</td>
-                      <td className="num">{a.n}/{a.total}</td>
+                      <td className={`num ${css.right}`}>{a.n}/{a.total}</td>
                     </tr>
                   ))}
                 </tbody>

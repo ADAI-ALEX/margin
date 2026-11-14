@@ -1,6 +1,7 @@
 "use client";
 import type { Run, Scenario } from "@/lib/schema";
 import Link from "next/link";
+import { useState } from "react";
 import { SCALES, VERDICT_THRESHOLDS, ROBUSTNESS_FACTORS, classify, boundaryMargin, type Evaluation, type Robustness, type RankRow, type Scored, type Verdict } from "@/lib/engine";
 import { COUNTS, SNAP, PSI_INVESTIGATIONS } from "@/lib/data";
 import { HAZARDS, INSIGHTS, OLSON_FERKUL_2012, PUBLISHED_GROUPS } from "@/content/curated";
@@ -9,20 +10,30 @@ import PartialGPlot from "./PartialGPlot";
 import SpecimenCard, { runTitle, sourceLabel } from "./SpecimenCard";
 import AxisGaps from "./AxisGaps";
 import FlowSensitivity from "./FlowSensitivity";
+import VerdictScale from "./VerdictScale";
 import { useScenarioQuery } from "@/lib/state/useMargin";
+
+type TabId = "evidence" | "sensitivity" | "rank" | "findings" | "sources";
+const TABS: { id: TabId; label: string }[] = [
+  { id: "evidence", label: "Evidence" },
+  { id: "sensitivity", label: "Sensitivity" },
+  { id: "rank", label: "Ranking" },
+  { id: "findings", label: "Findings" },
+  { id: "sources", label: "Sources" },
+];
 
 /** An insight renders as a finding only once it has been checked against its primary source. */
 type Checked = { verification?: { status?: string; locator?: string | null; quote?: string | null; checkedBy?: string } };
 const isPrimaryChecked = (i: object) => (i as Checked).verification?.status === "primary-checked";
 
 type Src = { key: string; label: string; url?: string };
-function footnotes() {
+function footnotes(onJump?: () => void) {
   const list: Src[] = [];
   const ref = (s: Src) => {
     let i = list.findIndex((x) => x.key === s.key);
     if (i < 0) { list.push(s); i = list.length - 1; }
     const n = i + 1;
-    return <sup className="atlas-fn"><a href={`#atlas-fn-${n}`} aria-label={`Source ${n}`}>[{n}]</a></sup>;
+    return <sup className="atlas-fn"><a href={`#atlas-fn-${n}`} aria-label={`Source ${n}`} onClick={onJump}>[{n}]</a></sup>;
   };
   return { list, ref };
 }
@@ -68,7 +79,8 @@ export interface NotesProps {
 
 export default function FieldNotes(p: NotesProps) {
   const { scenario: s, evaluation: ev, psiOnly, robust } = p;
-  const fn = footnotes();
+  const [tab, setTab] = useState<TabId>("evidence");
+  const fn = footnotes(() => setTab("sources"));
   const q = useScenarioQuery();
   const n = ev.nearest;
   const verdict: Verdict = ev.verdict;
@@ -96,11 +108,21 @@ export default function FieldNotes(p: NotesProps) {
       <p className="atlas-notes-loc">{GRAVITY_LABEL[s.gravity]} · {hazard.label} · {s.materialClass === "any" ? "any material" : `${s.materialClass} materials`} · {s.includePublished ? "PSI + published" : "PSI only"}</p>
 
       <div className="atlas-verdict" aria-live="polite" data-testid="verdict" data-verdict={verdict} data-d={n ? n.d.D.toFixed(3) : ""}>
-        <p className="atlas-verdict-line">
-          <span className="atlas-verdict-word">Evidence: {verdict}</span>
-          <span className="atlas-disclaimer">{DISCLAIMER}</span>
-        </p>
-        <p className="atlas-verdict-copy">{VERDICT_COPY[verdict]}{n && <> · <span className="atlas-computed">computed</span> D <span className="atlas-num">{fmt(n.d.D, 2)}</span></>}{fn.ref(ENGINE_SRC)}</p>
+        <div className="atlas-verdict-top">
+          <p className="atlas-verdict-line">
+            <span className="atlas-verdict-label">Evidence</span>
+            <span className="atlas-verdict-word">{verdict}</span>
+          </p>
+          {n && (
+            <p className="atlas-verdict-d" aria-label={`Evidence distance D ${fmt(n.d.D, 2)}`}>
+              <span className="atlas-verdict-dlabel">D</span>
+              <span className="atlas-verdict-dval">{fmt(n.d.D, 2)}</span>
+              <span className="claim" data-kind="COMPUTED">computed</span>
+            </p>
+          )}
+        </div>
+        <VerdictScale D={n ? n.d.D : null} />
+        <p className="atlas-verdict-copy">{VERDICT_COPY[verdict]}{fn.ref(ENGINE_SRC)}</p>
         {ev.qualifier && n && (
           <p className="atlas-verdict-qual" data-testid="verdict-qualifier" data-qualifier={ev.qualifier}>
             <span className="claim" data-kind="ASSUMED">partial match</span>{" "}
@@ -111,7 +133,8 @@ export default function FieldNotes(p: NotesProps) {
           </p>
         )}
         {bm && Math.abs(bm.delta) < 0.25 && <p className="atlas-verdict-edge">D is <span className="atlas-num">{fmt(Math.abs(bm.delta), 2)}</span> {bm.delta > 0 ? "above" : "below"} the {bm.boundary === VERDICT_THRESHOLDS.near ? "NEAR/DISTANT" : "DIRECT/NEAR"} boundary ({bm.boundary}): a small change in an input or assumption changes the class.</p>}
-        <p className="atlas-verdict-method">DIRECT (D ≤ {VERDICT_THRESHOLDS.direct}), NEAR (≤ {VERDICT_THRESHOLDS.near}) and DISTANT are classes defined by MARGIN&rsquo;s method, not established scientific categories. <Link href="/method#verdicts">How D is computed</Link>.</p>
+        <p className="atlas-disclaimer">{DISCLAIMER}</p>
+        <p className="atlas-verdict-method">DIRECT (D ≤ {VERDICT_THRESHOLDS.direct}), NEAR (≤ {VERDICT_THRESHOLDS.near}) and DISTANT are classes defined by MARGIN&rsquo;s method, not established scientific categories. <Link href="/method#verdicts">How D is computed</Link></p>
       </div>
 
       {p.selected && (
@@ -120,6 +143,30 @@ export default function FieldNotes(p: NotesProps) {
         </div>
       )}
 
+      <div className="tabs atlas-tabs" role="tablist" aria-label="Field notes">
+        {TABS.map((t) => (
+          <button key={t.id} type="button" role="tab" id={`atlas-tab-${t.id}`} aria-controls={`atlas-panel-${t.id}`} aria-selected={tab === t.id} tabIndex={tab === t.id ? 0 : -1}
+            onClick={() => setTab(t.id)}
+            onKeyDown={(e) => {
+              const i = TABS.findIndex((x) => x.id === tab);
+              const k = e.key === "ArrowRight" ? (i + 1) % TABS.length : e.key === "ArrowLeft" ? (i - 1 + TABS.length) % TABS.length : -1;
+              if (k >= 0) { e.preventDefault(); setTab(TABS[k].id); document.getElementById(`atlas-tab-${TABS[k].id}`)?.focus(); }
+            }}>{t.label}</button>
+        ))}
+      </div>
+
+      <div className="atlas-panel" role="tabpanel" id="atlas-panel-evidence" aria-labelledby="atlas-tab-evidence" hidden={tab !== "evidence"}>
+      {partialG && (
+        <section className="atlas-notes-sec" aria-labelledby="atlas-pg-title">
+          <h3 id="atlas-pg-title" className="atlas-h3">Partial gravity: a separate regime</h3>
+          <p className="atlas-prose-sm">PSI contains no partial-gravity combustion tests{fn.ref(PSI_SRC)}. The only reduced-gravity limits on record here are drop-tower values{fn.ref(OF_SRC)}, shown as points per gravity level.</p>
+          <PartialGPlot selected={s.gravity} />
+          {lunarClaim && mylar && <p className="atlas-pullquote">For {mylar.material.split(" ")[0]} at {mylar.pressurePsia} psia, NASA drop-tower tests found a lower flammability limit at lunar gravity than at either 0 g or 1 g. Microgravity and Earth results did not bound lunar behaviour for this material.{fn.ref(OF_SRC)}</p>}
+          <ul className="atlas-caveats">{OLSON_FERKUL_2012.caveats.map((c) => <li key={c}>{c}</li>)}</ul>
+          {fm2 && s.gravity === "moon" && <p className="atlas-prose-sm"><span className="atlas-planned-tag">planned — not evidence</span> {fm2.acronym}: planned — first lunar-surface test. Its condition sets are drawn as dashed rings and never counted{fn.ref({ key: "fm2", label: fm2.title, url: fm2.landingUrl })}.</p>}
+          <p className="atlas-micro">Each gravity level is a separate regime: no line, curve or estimate is drawn between them.</p>
+        </section>
+      )}
       <div className="atlas-prose">
         {n ? (
           <p>
@@ -155,6 +202,15 @@ export default function FieldNotes(p: NotesProps) {
           ) : <p>Published evidence is included but does not change the nearest test here.</p>
         ) : <p className="atlas-quiet">Published evidence is off: only PSI run-table rows are counted.</p>}
 
+
+
+        {ev.limits.length > 0 && <p className="atlas-quiet">{ev.limits.length} reported limit {ev.limits.length === 1 ? "point" : "points"} in this regime (ticked rings) are thresholds inferred from test series, not tested conditions; they never set the verdict or the bands.</p>}
+        <p className="atlas-quiet">{pct(p.coveragePct)} of this charted window lies within D {VERDICT_THRESHOLDS.near} of comparable evidence (computed on a {p.grid.nx} × {p.grid.ny} grid; uniform in log pressure). {ev.otherGravity.length > 0 && <>{ev.otherGravity.length.toLocaleString("en-US")} placeable runs from other gravity regimes stay on their own sheets.</>}</p>
+      </div>
+      </div>
+
+      <div className="atlas-panel" role="tabpanel" id="atlas-panel-sensitivity" aria-labelledby="atlas-tab-sensitivity" hidden={tab !== "sensitivity"}>
+        <div className="atlas-prose">
         <p>
           <span className={`atlas-robust ${robust.robust ? "is-robust" : "is-sensitive"}`}>{robust.robust ? "Robust" : "Sensitive"}</span>{" "}
           {robust.robust
@@ -166,24 +222,13 @@ export default function FieldNotes(p: NotesProps) {
         </p>
 
         <FlowSensitivity scenario={s} />
-
-        {ev.limits.length > 0 && <p className="atlas-quiet">{ev.limits.length} reported limit {ev.limits.length === 1 ? "point" : "points"} in this regime (ticked rings) are thresholds inferred from test series, not tested conditions; they never set the verdict or the bands.</p>}
-        <p className="atlas-quiet">{pct(p.coveragePct)} of this charted window lies within D {VERDICT_THRESHOLDS.near} of comparable evidence (computed on a {p.grid.nx} × {p.grid.ny} grid; uniform in log pressure). {ev.otherGravity.length > 0 && <>{ev.otherGravity.length.toLocaleString("en-US")} placeable runs from other gravity regimes stay on their own sheets.</>}</p>
+        </div>
       </div>
 
-      {partialG && (
-        <section className="atlas-notes-sec" aria-labelledby="atlas-pg-title">
-          <h3 id="atlas-pg-title" className="atlas-h3">Partial gravity: a separate regime</h3>
-          <p className="atlas-prose-sm">PSI contains no partial-gravity combustion tests{fn.ref(PSI_SRC)}. The only reduced-gravity limits on record here are drop-tower values{fn.ref(OF_SRC)}, shown as points per gravity level.</p>
-          <PartialGPlot selected={s.gravity} />
-          {lunarClaim && mylar && <p className="atlas-pullquote">For {mylar.material.split(" ")[0]} at {mylar.pressurePsia} psia, NASA drop-tower tests found a lower flammability limit at lunar gravity than at either 0 g or 1 g. Microgravity and Earth results did not bound lunar behaviour for this material.{fn.ref(OF_SRC)}</p>}
-          <ul className="atlas-caveats">{OLSON_FERKUL_2012.caveats.map((c) => <li key={c}>{c}</li>)}</ul>
-          {fm2 && s.gravity === "moon" && <p className="atlas-prose-sm"><span className="atlas-planned-tag">planned — not evidence</span> {fm2.acronym}: planned — first lunar-surface test. Its condition sets are drawn as dashed rings and never counted{fn.ref({ key: "fm2", label: fm2.title, url: fm2.landingUrl })}.</p>}
-          <p className="atlas-micro">Each gravity level is a separate regime: no line, curve or estimate is drawn between them.</p>
-        </section>
-      )}
 
-      <section className="atlas-notes-sec" aria-labelledby="atlas-rank-title">
+
+
+      <section className="atlas-panel atlas-notes-sec" role="tabpanel" id="atlas-panel-rank" aria-labelledby="atlas-tab-rank" hidden={tab !== "rank"}>
         <h3 id="atlas-rank-title" className="atlas-h3">Investigations, ranked for this question</h3>
         <p className="atlas-micro">R is computed (proximity, hazard match, scale, coverage, measures). Hover or select a row to find its runs on the map.</p>
         <ol className="atlas-rank">
@@ -224,8 +269,8 @@ export default function FieldNotes(p: NotesProps) {
         </p>
       </section>
 
-      <section className="atlas-notes-sec" aria-labelledby="atlas-ins-title">
-        <h3 id="atlas-ins-title" className="atlas-h3">Marginalia</h3>
+      <section className="atlas-panel atlas-notes-sec" role="tabpanel" id="atlas-panel-findings" aria-labelledby="atlas-tab-findings" hidden={tab !== "findings"}>
+        <h3 id="atlas-ins-title" className="atlas-h3">Findings checked against primary sources</h3>
         {insights.length === 0 && <p className="atlas-micro">No source-checked findings for this question yet. Findings appear here only after they have been checked against their primary source.</p>}
         {insights.map((i) => (
           <article key={i.id} className="atlas-insight">
@@ -240,6 +285,7 @@ export default function FieldNotes(p: NotesProps) {
         ))}
       </section>
 
+      <div className="atlas-panel" role="tabpanel" id="atlas-panel-sources" aria-labelledby="atlas-tab-sources" hidden={tab !== "sources"}>
       <section className="atlas-notes-sec" aria-labelledby="atlas-arch-title">
         <h3 id="atlas-arch-title" className="atlas-h3">The archive</h3>
         <p className="atlas-prose-sm">
@@ -259,6 +305,7 @@ export default function FieldNotes(p: NotesProps) {
           ))}
         </ol>
       </footer>
+      </div>
     </aside>
   );
 }

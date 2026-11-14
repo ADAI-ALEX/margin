@@ -19,7 +19,6 @@ import Toolbar from "./Toolbar";
 import { KeySwatch } from "./marks";
 import "./atlas.css";
 
-const PLATE = ["I", "II", "III", "IV"];
 
 export default function AtlasApp() {
   const m = useMargin("iss");
@@ -73,23 +72,45 @@ export default function AtlasApp() {
         </defs>
       </svg>
 
-      <header className="atlas-masthead">
-        <p className="atlas-hero">
-          The highest O₂ in any of PSI&rsquo;s <span className="atlas-num">{HEADLINE.solidRunsWithO2}</span> solid-material tests with a recorded O₂ value is{" "}
-          <span className="atlas-num">{HEADLINE.maxSolidO2}%</span>. Artemis surface habitats plan <span className="atlas-num">{HEADLINE.artemisO2}%</span> and the
-          Exploration Atmosphere <span className="atlas-num">{HEADLINE.eaO2}%</span>: <em>{HEADLINE.atOrAboveArtemis === 0 ? "none" : <span className="atlas-num">{HEADLINE.atOrAboveArtemis}</span>}</em> of those tests reach either level.
-          {HEADLINE.solidRunsNoO2 > 0 && <span className="atlas-hero-note"> A further <span className="atlas-num">{HEADLINE.solidRunsNoO2}</span> solid-material runs have no O₂ recorded.</span>}
-        </p>
+      <header className="atlas-intro">
+        <div className="atlas-intro-text">
+          <h1 className="atlas-title">How close is the evidence?</h1>
+          <p className="atlas-lede">
+            MARGIN places every NASA PSI combustion test and published result in one condition space with a crewed-cabin atmosphere, and measures how far
+            that scenario is from the nearest comparable test, gravity regime by gravity regime, with every number traced to its source.
+          </p>
+        </div>
+        <dl className="atlas-stats" aria-label="Coverage headline, computed from the PSI run tables">
+          <div className="atlas-stat">
+            <dt>Highest O₂ in any PSI solid-material test</dt>
+            <dd><span className="atlas-stat-val">{HEADLINE.maxSolidO2}</span><span className="atlas-stat-unit">% O₂</span></dd>
+            <p>of {HEADLINE.solidRunsWithO2} tests with O₂ recorded{HEADLINE.solidRunsNoO2 > 0 ? `; ${HEADLINE.solidRunsNoO2} more record none` : ""}</p>
+          </div>
+          <div className="atlas-stat is-target">
+            <dt>Planned habitat atmospheres</dt>
+            <dd><span className="atlas-stat-val">{HEADLINE.artemisO2}–{HEADLINE.eaO2}</span><span className="atlas-stat-unit">% O₂</span></dd>
+            <p>Artemis surface habitat to the Exploration Atmosphere</p>
+          </div>
+          <div className="atlas-stat">
+            <dt>PSI solid tests at those levels</dt>
+            <dd><span className="atlas-stat-val">{HEADLINE.atOrAboveArtemis}</span></dd>
+            <p>reach {HEADLINE.artemisO2}% O₂ or more</p>
+          </div>
+        </dl>
       </header>
 
-      <Toolbar scenario={s} preset={m.preset} update={m.update} applyPreset={(id) => { m.applyPreset(id); setSelectedId(null); }} />
-
-      <div className="atlas-body">
-        <main className="atlas-main">
+      <div className="atlas-workspace">
+        <aside className="atlas-rail" aria-label="Scenario controls">
+          <Toolbar scenario={s} preset={m.preset} update={m.update} applyPreset={(id) => { m.applyPreset(id); setSelectedId(null); }} />
+        </aside>
+        <section className="atlas-stage" aria-labelledby="atlas-plate-title">
+          <div className="atlas-plate">
           <div className="atlas-plate-head">
-            <p className="atlas-plate-no">Plate {PLATE[gi]}</p>
-            <h1 className="atlas-plate-title">Nearest comparable evidence · {GRAVITY_LABEL[s.gravity]}</h1>
-            <p className="atlas-plate-sub">{hazardLabel} · {s.materialClass === "any" ? "any material" : `${s.materialClass} materials`} · {s.flowCmS == null ? "quiescent" : `${s.flowCmS} cm/s`} · {includePublished ? "PSI + published" : "PSI only"}. Drag the pin, or tap the map to place it; select a landmark to jump.</p>
+            <div>
+              <h2 id="atlas-plate-title" className="atlas-plate-title">Evidence coverage <span className="atlas-plate-regime">· {GRAVITY_LABEL[s.gravity]}</span></h2>
+              <p className="atlas-plate-sub">{hazardLabel} · {s.materialClass === "any" ? "any material" : `${s.materialClass} materials`} · {s.flowCmS == null ? "quiescent" : `${s.flowCmS} cm/s`} · {includePublished ? "PSI + published" : "PSI only"}</p>
+            </div>
+            <p className="atlas-plate-hint">Drag the pin or tap the map · select a landmark to jump</p>
           </div>
 
           <CoverageMap
@@ -114,13 +135,12 @@ export default function AtlasApp() {
           />
 
           <p className="atlas-map-caption">
-            <strong>Evidence proximity, not a safety rating.</strong>
-            <span>Shading shows distance to the nearest comparable test under MARGIN&rsquo;s method. It is not a hazard map.</span>
+            <span className="atlas-map-source"><strong>Evidence proximity, not a safety rating.</strong> Shading is the distance D to the nearest comparable test under MARGIN&rsquo;s method — a map of where tests exist, not a hazard map. Source: NASA PSI run tables{includePublished ? " and the published papers listed under Sources" : ""}.</span>
             {field.omitted > 0 && <span>{field.omitted} comparable {field.omitted === 1 ? "run lacks" : "runs lack"} a recorded pressure, so {field.omitted === 1 ? "it is" : "they are"} not drawn on this plane; {field.omitted === 1 ? "it still counts" : "they still count"} for the verdict as partial matches.</span>}
           </p>
 
           <section className="atlas-key" aria-labelledby="atlas-key-title">
-            <h2 id="atlas-key-title" className="atlas-key-title">Key · Evidence coverage — not a hazard map</h2>
+            <h3 id="atlas-key-title" className="atlas-key-title">Key</h3>
             <ul className="atlas-key-list">
               <li><KeySwatch kind="direct" /> DIRECT · D ≤ {VERDICT_THRESHOLDS.direct}</li>
               <li><KeySwatch kind="near" /> NEAR · D ≤ {VERDICT_THRESHOLDS.near}</li>
@@ -134,12 +154,12 @@ export default function AtlasApp() {
               <li><KeySwatch kind="landmark" /> habitat atmosphere</li>
               <li><KeySwatch kind="pin" /> your scenario</li>
             </ul>
-            <p className="atlas-micro atlas-key-flow">Bands are computed at the scenario&rsquo;s flow; runs at another flow sit further away than the plane suggests.</p>
-            <p className="atlas-micro">D is computed from O₂, log pressure and flow gaps to the nearest comparable test, with flow, gravity, question and material held at the scenario&rsquo;s values. Dot shapes: ● solid · ◆ liquid droplet · + gas burner · ■ smoke source. Click any mark for its specimen card.</p>
+            <p className="atlas-micro atlas-key-flow">Bands are computed at the scenario&rsquo;s flow, gravity, question and material; runs at another flow sit further away than the plane suggests. Marks: ● solid · ◆ liquid droplet · + gas burner · ■ smoke source. Click a mark to inspect its source.</p>
           </section>
+          </div>
 
           <GravitySheets sheets={sheets} scenario={s} onSelect={selectGravity} />
-        </main>
+        </section>
 
         <FieldNotes
           scenario={s}

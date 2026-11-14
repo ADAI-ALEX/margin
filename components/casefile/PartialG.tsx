@@ -60,6 +60,7 @@ export function PartialG({ gravity, includePublished, openRun }: { gravity: Grav
               return (
                 <g key={g}>
                   {sel && <rect x={x0 + 2} y={T} width={colW - 4} height={H - T - B} className={css.pgSel} />}
+                  {sel && <rect x={x0 + 2} y={T} width={colW - 4} height={2} className={css.pgSelTop} />}
                   <text x={x0 + colW / 2} y={H - B + 16} textAnchor="middle" className={sel ? css.pgColSel : css.pgColLabel}>{GRAVITY_SHORT[g]}{sel ? " (selected)" : ""}</text>
                   {rows.map((r, ri) => {
                     const cx = r2(x0 + colW / 2 + (ri - 1) * 38);

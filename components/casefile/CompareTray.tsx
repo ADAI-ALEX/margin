@@ -126,7 +126,7 @@ export function CompareTray({ rows, pinned, unpin, openRun }: { rows: LadderRow[
         <p className={css.empty}>Nothing pinned yet. Use the <b>+</b> button beside an investigation in the ladder to add up to three.</p>
       ) : (
         <div className={css.tableScroll} tabIndex={0} role="region" aria-label="Compare table (scrolls sideways on small screens)">
-          <table className={css.cmpTable}>
+          <table className={css.cmpTable} data-multi={cols.length > 1 || undefined}>
             <caption className="sr-only">Aligned fingerprints of the pinned investigations. Rows marked “differs” vary between them.</caption>
             <thead>
               <tr>

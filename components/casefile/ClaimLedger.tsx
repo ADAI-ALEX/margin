@@ -59,7 +59,7 @@ function RunValues({ run }: { run: Run }) {
 
 export function FlowSensitivity({ rows, s }: { rows: FlowRow[]; s: Scenario }) {
   return (
-    <div className={css.tableScroll} data-testid="flow-sensitivity">
+    <div className={css.tableScroll} data-testid="flow-sensitivity" tabIndex={0} role="region" aria-label="Verdict at other ventilation flows">
       <table className={css.dataTable}>
         <caption className={css.capLeft}>
           Verdict at other ventilation flows, everything else as in your scenario ({fmt(s.o2Pct, 1)}% O₂, {fmt(s.pressureKPa, 1)} kPa, {GRAVITY_LABEL[s.gravity].toLowerCase()}, {s.includePublished ? "PSI + published" : "PSI only"}). <Claim kind="COMPUTED" />
@@ -245,8 +245,12 @@ export function ClaimLedger({ s, ev, psiOnly, robust, flowRows, crossings, openR
 
   return (
     <section className={css.ledger} aria-labelledby="inv-ledger-h" data-testid="claim-ledger">
-      <h2 className={css.h2} id="inv-ledger-h">Claim ledger</h2>
-      <p className={css.secSub}>Every statement for this scenario, typed and sourced. {out.length} statements.</p>
+      <div className={css.secHead}>
+        <div>
+          <h2 className={css.h2} id="inv-ledger-h">Claim ledger</h2>
+          <p className={css.secSub}>Every statement for this scenario, typed and sourced. <span className="num">{out.length}</span> statements.</p>
+        </div>
+      </div>
       <p className={css.kindKey}>
         {(["MEASURED", "COMPUTED", "NOMINAL", "REPORTED LIMIT", "PUBLISHED", "DRAFT", "PLANNED"] as ClaimKind[]).map((k) => <Claim key={k} kind={k} />)}
         <span className={css.quiet}>Hover a badge for its meaning.</span>
@@ -255,15 +259,15 @@ export function ClaimLedger({ s, ev, psiOnly, robust, flowRows, crossings, openR
         {out.map((c, i) => (
           <li key={c.id} className={css.claimItem} data-claim={c.id}>
             <span className={css.claimNo} aria-hidden="true">C{i + 1}</span>
+            <span className={css.kinds}>{c.kinds.map((k) => <Claim key={k} kind={k} />)}</span>
             <div className={css.claimBody}>
-              <span className={css.kinds}>{c.kinds.map((k) => <Claim key={k} kind={k} />)}</span>
               <div className={css.claimText}>{c.body}</div>
               <p className={css.claimSrc}><span className={css.srcLabel}>Source</span> {c.source}</p>
             </div>
           </li>
         ))}
       </ol>
-      {pending > 0 && <p className={css.quiet}>{pending} curated finding{pending === 1 ? "" : "s"} for this question {pending === 1 ? "is" : "are"} not shown: not yet checked against the primary source.</p>}
+      {pending > 0 && <p className={css.ledgerFoot}>{pending} curated finding{pending === 1 ? "" : "s"} for this question {pending === 1 ? "is" : "are"} not shown: not yet checked against the primary source.</p>}
     </section>
   );
 }

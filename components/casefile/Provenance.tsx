@@ -59,7 +59,7 @@ export function Provenance({ run, s, onClose }: { run: Run | null; s: Scenario; 
       <aside ref={panelRef} className={css.prov} role="dialog" aria-modal="true" aria-labelledby="inv-prov-h" data-testid="provenance" onKeyDown={trap}>
         <header className={css.provHead}>
           <div>
-            <p className={css.eyebrowH}>Provenance</p>
+            <p className={css.provKicker}>Provenance</p>
             <h2 id="inv-prov-h" className={css.provTitle}><span className="num">{run.id}</span></h2>
             <p className={css.provSub}>
               {TIER_LABEL[run.tier]} · {inv ? <Link href={`/investigations/${inv.id}`}>{inv.acronym}</Link> : run.investigation} · {FUEL_LABEL[run.fuelClass]} · {GRAVITY_LABEL[run.gravity]}
@@ -79,7 +79,7 @@ export function Provenance({ run, s, onClose }: { run: Run | null; s: Scenario; 
 
           <section>
             <h3 className={css.h3}>Values: normalized and original</h3>
-            <div className={css.tableScroll}>
+            <div className={css.tableScroll} tabIndex={0} role="region" aria-label="Values: normalized and original">
               <table className={css.dataTable}>
                 <caption className="sr-only">Normalized value, basis, original source cell and conversion for each axis of run {run.id}</caption>
                 <thead><tr><th scope="col">Axis</th><th scope="col">Normalized</th><th scope="col">Basis</th><th scope="col">Original cell(s)</th><th scope="col">Conversion</th></tr></thead>
@@ -145,7 +145,7 @@ export function Provenance({ run, s, onClose }: { run: Run | null; s: Scenario; 
                   D <b className="num">{fmt(d.D, 2)}</b> · <EvidenceWord v={classify(d.D)} /> · axes compared: {d.axesUsed.map((a) => AXIS_LABEL[a === "pressure" ? "p" : a]).join(", ")}
                   {d.partialMatch && <> (partial match)</>}
                 </p>
-                <div className={css.tableScroll}>
+                <div className={css.tableScroll} tabIndex={0} role="region" aria-label="Gaps to your scenario">
                   <table className={css.dataTable}>
                     <caption className="sr-only">Signed per-axis gaps, run minus scenario</caption>
                     <thead><tr><th scope="col">Axis</th><th scope="col">Gap (run − scenario)</th><th scope="col">In scale units</th><th scope="col">One unit</th></tr></thead>
@@ -174,10 +174,10 @@ export function Provenance({ run, s, onClose }: { run: Run | null; s: Scenario; 
           </section>
 
           <section>
-            <h3 className={css.h3}>Original row <span className={css.quiet}>{origEntries.length} columns</span></h3>
+            <h3 className={css.h3}>Original row <span className={css.h3Note}><span className="num">{origEntries.length}</span> columns</span></h3>
             {origEntries.length ? (
-              <div className={css.tableScroll}>
-                <table className={css.dataTable}>
+              <div className={css.tableScroll} tabIndex={0} role="region" aria-label="Original row">
+                <table className={`${css.dataTable} ${css.origTable}`}>
                   <caption className="sr-only">All original cells of {run.id} as they appear in the source table</caption>
                   <tbody>
                     {origEntries.map(([k, v]) => (

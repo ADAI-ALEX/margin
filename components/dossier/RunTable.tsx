@@ -35,7 +35,7 @@ export function RunTable({ invId, acronym, files }: { invId: string; acronym: st
               <th scope="col">Material</th>
               <th scope="col">Fuel class</th>
               <th scope="col">g</th>
-              {AXIS_KEYS.map((a) => <th key={a} scope="col">{AXIS_LABEL[a]} <span className={css.quiet}>{AXIS_UNIT[a]}</span></th>)}
+              {AXIS_KEYS.map((a) => <th key={a} scope="col" className={css.right}>{AXIS_LABEL[a]} <span className={css.quiet}>{AXIS_UNIT[a]}</span></th>)}
               <th scope="col">Outcome</th>
               <th scope="col">Flags</th>
               {published && <th scope="col">Source locator</th>}
@@ -57,7 +57,7 @@ export function RunTable({ invId, acronym, files }: { invId: string; acronym: st
                     const orig = originalCell(r, a);
                     const b = BASIS_SHORT[r[BASIS[a]]];
                     return (
-                      <td key={a}>
+                      <td key={a} className={css.valCell}>
                         {val == null ? <span className={css.nr}>not recorded</span> : <span className="num">{fmt(val, a === "p" ? 1 : 1)}</span>}
                         {b && val != null && <span className={css.basisTag}> {b}</span>}
                         {a === "flow" && r.flowRegime !== "unknown" && <span className={css.quiet}> {REGIME_TEXT[r.flowRegime]}</span>}
@@ -70,7 +70,7 @@ export function RunTable({ invId, acronym, files }: { invId: string; acronym: st
                   <td className={css.flags}>{r.flags.length ? r.flags.join(", ") : <span className={css.quiet}>none</span>}</td>
                   {published && <td className={css.loc}>{r.source.ref}{r.source.page ? ` · ${r.source.page}` : ""}{r.source.quote && <span className={css.quote}>“{r.source.quote}”</span>}</td>}
                   {published && <td>{v.kind ? <><Claim kind={v.kind} /><span className={css.orig}>{v.label}</span></> : null}</td>}
-                  <td><button type="button" className={css.detailBtn} onClick={() => setOpen(r)} aria-label={`Provenance of ${r.id}`}>Provenance</button></td>
+                  <td className={css.actCell}><button type="button" className={css.detailBtn} onClick={() => setOpen(r)} aria-label={`Provenance of ${r.id}`}>Provenance</button></td>
                 </tr>
               );
             })}

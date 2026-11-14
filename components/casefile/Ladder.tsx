@@ -255,8 +255,10 @@ export function Ladder(props: {
             <tbody key={sec.id}>
               <tr className={css.secRow}>
                 <th scope="colgroup" colSpan={7}>
-                  {sec.label} <span className="num">({sec.rows.length})</span>
-                  {sec.note && <span className={css.secNote}> — {sec.note}</span>}
+                  <span className={css.secLabel}>
+                    {sec.label} <span className={`num ${css.secCount}`}>{sec.rows.length}</span>
+                    {sec.note && <span className={css.secNote}> — {sec.note}</span>}
+                  </span>
                 </th>
               </tr>
               {sec.rows.map((row) => {

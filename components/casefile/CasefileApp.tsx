@@ -89,6 +89,7 @@ export default function CasefileApp() {
   return (
     <main id="main" className={css.root}>
       <header className={css.pageHead}>
+        <p className={css.kicker}>Evidence workspace</p>
         <h1 className={css.h1}>Investigations</h1>
         <p className={css.purpose}>Which NASA investigations come closest to your scenario, how they differ, and where each number comes from.</p>
       </header>
@@ -96,27 +97,47 @@ export default function CasefileApp() {
       <ScenarioSentence m={m} pUnit={pUnit} setPUnit={setPUnit} />
 
       <section className={css.finding} aria-live="polite" aria-label="Finding for this scenario" data-testid="finding" data-verdict={ev.verdict}>
-        <p className={css.findingLine}>
-          <span className={css.verdictWord}><EvidenceWord v={ev.verdict} /></span>
-          {n && <span className={css.findingD}>D <b className="num">{fmt(n.d.D, 2)}</b> to <button type="button" className={css.runLink} onClick={() => setProvRun(n.run)}>{n.run.id}</button>{nearestInv && <> ({nearestInv.acronym})</>}{n.d.partialMatch && <span className={css.partial}>{partialLabel(n)}</span>}</span>}
-          <span className={css.disclaimer}>{DISCLAIMER}</span>
-        </p>
-        {ev.qualifier && (
-          <p className={css.findingNote}>
-            {ev.qualifier === "flow-regime-mismatch" ? "The nearest run's flow regime differs from the scenario's, so flow is not compared" : "The nearest run does not record every axis"}.{" "}
-            {ev.nearestComplete
-              ? <>On all three axes the nearest comparable run is <button type="button" className={css.runLink} onClick={() => setProvRun(ev.nearestComplete!.run)}>{ev.nearestComplete.run.id}</button> at D <b className="num">{fmt(ev.nearestComplete.d.D, 2)}</b> — <EvidenceWord v={ev.verdictComplete} />.</>
-              : <>No comparable run in this regime is compared on all three axes — on all three axes, <EvidenceWord v={ev.verdictComplete} />.</>}
-          </p>
-        )}
-        {others.length > 0 ? (
-          <p className={css.findingNote}>
-            The verdict depends on the assumed ventilation flow: {[...byVerdict.entries()].map(([v, us], i) => <span key={v}>{i > 0 ? "; " : ""}<b>{v}</b> at {us.join(", ")} cm/s</span>)} (see the flow table in the claim ledger).
-          </p>
-        ) : (
-          <p className={css.findingNote}>Same verdict at every flow from {TABLE_FLOWS[0]} to {TABLE_FLOWS[TABLE_FLOWS.length - 1]} cm/s.</p>
-        )}
-        <p className={css.findingNote}><MethodNote /></p>
+        <div className={css.readout}>
+          <div className={css.roCell}>
+            <span className={css.roLabel}>Evidence</span>
+            <span className={css.verdictWord}>
+              <i className={css.vGlyph} data-v={ev.verdict} aria-hidden="true" />
+              <EvidenceWord v={ev.verdict} prefix={false} />
+            </span>
+          </div>
+          <div className={css.roCell}>
+            <span className={css.roLabel}>D to nearest comparable run</span>
+            {n ? (
+              <span className={css.findingD}>
+                <b className={`num ${css.roNum}`}>{fmt(n.d.D, 2)}</b>
+                <span className={css.roRun}>
+                  <button type="button" className={css.runLink} onClick={() => setProvRun(n.run)}>{n.run.id}</button>
+                  {nearestInv && <span className={css.roInv}>{nearestInv.acronym}</span>}
+                  {n.d.partialMatch && <span className={css.partial}>{partialLabel(n)}</span>}
+                </span>
+              </span>
+            ) : <span className={css.roNone}>no comparable run</span>}
+          </div>
+          <p className={css.disclaimer}>{DISCLAIMER}</p>
+        </div>
+        <div className={css.findingNotes}>
+          {ev.qualifier && (
+            <p className={css.findingNote}>
+              {ev.qualifier === "flow-regime-mismatch" ? "The nearest run's flow regime differs from the scenario's, so flow is not compared" : "The nearest run does not record every axis"}.{" "}
+              {ev.nearestComplete
+                ? <>On all three axes the nearest comparable run is <button type="button" className={css.runLink} onClick={() => setProvRun(ev.nearestComplete!.run)}>{ev.nearestComplete.run.id}</button> at D <b className="num">{fmt(ev.nearestComplete.d.D, 2)}</b> — <EvidenceWord v={ev.verdictComplete} />.</>
+                : <>No comparable run in this regime is compared on all three axes — on all three axes, <EvidenceWord v={ev.verdictComplete} />.</>}
+            </p>
+          )}
+          {others.length > 0 ? (
+            <p className={css.findingNote}>
+              The verdict depends on the assumed ventilation flow: {[...byVerdict.entries()].map(([v, us], i) => <span key={v}>{i > 0 ? "; " : ""}<b>{v}</b> at {us.join(", ")} cm/s</span>)} (see the flow table in the claim ledger).
+            </p>
+          ) : (
+            <p className={css.findingNote}>Same verdict at every flow from {TABLE_FLOWS[0]} to {TABLE_FLOWS[TABLE_FLOWS.length - 1]} cm/s.</p>
+          )}
+          <p className={css.findingNote}><MethodNote /></p>
+        </div>
       </section>
 
       {s.gravity !== "micro" && <PartialG gravity={s.gravity} includePublished={s.includePublished} openRun={setProvRun} />}

@@ -1,0 +1,750 @@
+{
+ "linear-home": {
+  "title": "Linear – The system for product development",
+  "body": {
+   "font": "Inter Variable",
+   "size": "16px",
+   "weight": "400",
+   "lh": "24px",
+   "ls": "normal",
+   "color": "rgb(247, 248, 248)",
+   "bg": "rgb(8, 9, 10)"
+  },
+  "html_bg": "rgb(8, 9, 10)",
+  "h1": {
+   "font": "Inter Variable",
+   "size": "64px",
+   "weight": "510",
+   "lh": "64px",
+   "ls": "-1.408px",
+   "color": "rgb(247, 248, 248)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "h2": {
+   "font": "Inter Variable",
+   "size": "48px",
+   "weight": "510",
+   "lh": "48px",
+   "ls": "-1.056px",
+   "color": "rgb(138, 143, 152)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "p": {
+   "font": "Inter Variable",
+   "size": "15px",
+   "weight": "400",
+   "lh": "24px",
+   "ls": "-0.165px",
+   "color": "rgb(138, 143, 152)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "a": {
+   "font": "Inter Variable",
+   "size": "14px",
+   "weight": "510",
+   "lh": "21px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgb(94, 106, 210)"
+  },
+  "button": {
+   "font": "Inter Variable",
+   "size": "13px",
+   "weight": "400",
+   "lh": "19.5px",
+   "ls": "normal",
+   "color": "rgb(138, 143, 152)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "navHeight": 73,
+  "fonts": [
+   [
+    "Inter Variable",
+    2046
+   ],
+   [
+    "Berkeley Mono",
+    279
+   ]
+  ],
+  "textColors": [
+   [
+    "rgb(247, 248, 248)",
+    2621
+   ],
+   [
+    "rgb(138, 143, 152)",
+    441
+   ],
+   [
+    "rgb(98, 102, 109)",
+    293
+   ],
+   [
+    "rgb(208, 214, 224)",
+    198
+   ],
+   [
+    "rgb(255, 255, 255)",
+    165
+   ],
+   [
+    "rgb(226, 228, 231)",
+    141
+   ]
+  ],
+  "svgCount": 228,
+  "canvasCount": 0,
+  "radius": [
+   "6px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px"
+  ]
+ },
+ "linear-refresh": {
+  "title": "A calmer interface for a product in motion",
+  "body": {
+   "font": "Inter Variable",
+   "size": "16px",
+   "weight": "400",
+   "lh": "24px",
+   "ls": "normal",
+   "color": "rgb(247, 248, 248)",
+   "bg": "rgb(8, 9, 10)"
+  },
+  "html_bg": "rgb(8, 9, 10)",
+  "h1": {
+   "font": "Inter Variable",
+   "size": "48px",
+   "weight": "590",
+   "lh": "48px",
+   "ls": "-1.056px",
+   "color": "rgb(247, 248, 248)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "h2": null,
+  "p": {
+   "font": "Inter Variable",
+   "size": "17px",
+   "weight": "400",
+   "lh": "27.2px",
+   "ls": "normal",
+   "color": "rgb(208, 214, 224)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "a": {
+   "font": "Inter Variable",
+   "size": "14px",
+   "weight": "510",
+   "lh": "21px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgb(94, 106, 210)"
+  },
+  "button": {
+   "font": "Inter Variable",
+   "size": "13px",
+   "weight": "400",
+   "lh": "19.5px",
+   "ls": "normal",
+   "color": "rgb(138, 143, 152)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "navHeight": 73,
+  "fonts": [
+   [
+    "Inter Variable",
+    683
+   ]
+  ],
+  "textColors": [
+   [
+    "rgb(247, 248, 248)",
+    1131
+   ],
+   [
+    "rgb(138, 143, 152)",
+    89
+   ],
+   [
+    "rgb(208, 214, 224)",
+    51
+   ],
+   [
+    "rgba(255, 255, 255, 0.48)",
+    3
+   ],
+   [
+    "rgb(62, 62, 68)",
+    3
+   ],
+   [
+    "rgb(98, 102, 109)",
+    3
+   ]
+  ],
+  "svgCount": 19,
+  "canvasCount": 0,
+  "radius": [
+   "6px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px",
+   "9999px"
+  ]
+ },
+ "owid-home": {
+  "title": "Our World in Data",
+  "body": {
+   "font": "Lato",
+   "size": "16px",
+   "weight": "400",
+   "lh": "25.6px",
+   "ls": "normal",
+   "color": "rgb(29, 61, 99)",
+   "bg": "rgb(255, 255, 255)"
+  },
+  "html_bg": "rgba(0, 0, 0, 0)",
+  "h1": {
+   "font": "Playfair Display",
+   "size": "20px",
+   "weight": "600",
+   "lh": "24px",
+   "ls": "normal",
+   "color": "rgb(45, 46, 45)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "h2": {
+   "font": "Playfair Display",
+   "size": "32px",
+   "weight": "600",
+   "lh": "40px",
+   "ls": "normal",
+   "color": "rgb(247, 192, 32)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "p": {
+   "font": "Lato",
+   "size": "12px",
+   "weight": "900",
+   "lh": "32px",
+   "ls": "1.2px",
+   "color": "rgb(53, 81, 116)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "a": {
+   "font": "Lato",
+   "size": "20px",
+   "weight": "400",
+   "lh": "24px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "button": {
+   "font": "Lato",
+   "size": "18px",
+   "weight": "400",
+   "lh": "20.7px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "navHeight": 76,
+  "fonts": [
+   [
+    "Lato",
+    1457
+   ],
+   [
+    "Playfair Display",
+    40
+   ]
+  ],
+  "textColors": [
+   [
+    "rgb(29, 61, 99)",
+    1078
+   ],
+   [
+    "rgb(91, 91, 91)",
+    177
+   ],
+   [
+    "rgb(255, 255, 255)",
+    130
+   ],
+   [
+    "rgb(66, 101, 145)",
+    101
+   ],
+   [
+    "rgb(87, 114, 145)",
+    60
+   ],
+   [
+    "rgb(152, 169, 189)",
+    57
+   ]
+  ],
+  "svgCount": 133,
+  "canvasCount": 0,
+  "radius": [
+   "32px",
+   "32px",
+   "32px",
+   "32px",
+   "32px",
+   "32px",
+   "32px",
+   "32px"
+  ]
+ },
+ "owid-entry-redesign": {
+  "title": "Introducing our updated work on Poverty: a new design for our content | Our World in Data",
+  "body": {
+   "font": "Lato",
+   "size": "16px",
+   "weight": "400",
+   "lh": "25.6px",
+   "ls": "normal",
+   "color": "rgb(29, 61, 99)",
+   "bg": "rgb(255, 255, 255)"
+  },
+  "html_bg": "rgba(0, 0, 0, 0)",
+  "h1": {
+   "font": "Playfair Display",
+   "size": "40px",
+   "weight": "600",
+   "lh": "48px",
+   "ls": "-0.16px",
+   "color": "rgb(29, 61, 99)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "h2": {
+   "font": "Lato",
+   "size": "24px",
+   "weight": "400",
+   "lh": "31.9999px",
+   "ls": "normal",
+   "color": "rgb(87, 114, 145)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "p": {
+   "font": "Lato",
+   "size": "14px",
+   "weight": "400",
+   "lh": "21px",
+   "ls": "normal",
+   "color": "rgb(66, 101, 145)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "a": {
+   "font": "Lato",
+   "size": "20px",
+   "weight": "400",
+   "lh": "24px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "button": {
+   "font": "Lato",
+   "size": "18px",
+   "weight": "400",
+   "lh": "20.7px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "navHeight": 76,
+  "fonts": [
+   [
+    "Lato",
+    333
+   ],
+   [
+    "Playfair Display",
+    14
+   ],
+   [
+    "monospace",
+    2
+   ],
+   [
+    "Menlo",
+    2
+   ]
+  ],
+  "textColors": [
+   [
+    "rgb(29, 61, 99)",
+    154
+   ],
+   [
+    "rgb(255, 255, 255)",
+    68
+   ],
+   [
+    "rgb(152, 169, 189)",
+    53
+   ],
+   [
+    "rgb(66, 101, 145)",
+    50
+   ],
+   [
+    "rgb(219, 229, 240)",
+    37
+   ],
+   [
+    "rgb(17, 46, 79)",
+    18
+   ]
+  ],
+  "svgCount": 30,
+  "canvasCount": 0,
+  "radius": [
+   "3px",
+   "1px",
+   "1px",
+   "3px",
+   "3px"
+  ]
+ },
+ "owid-grapher": {
+  "title": "CO₂ emissions per capita",
+  "body": {
+   "font": "Lato",
+   "size": "16px",
+   "weight": "400",
+   "lh": "25.6px",
+   "ls": "normal",
+   "color": "rgb(29, 61, 99)",
+   "bg": "rgb(255, 255, 255)"
+  },
+  "html_bg": "rgba(0, 0, 0, 0)",
+  "h1": {
+   "font": "Playfair Display",
+   "size": "25px",
+   "weight": "600",
+   "lh": "30px",
+   "ls": "normal",
+   "color": "rgb(45, 46, 45)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "h2": {
+   "font": "Lato",
+   "size": "12px",
+   "weight": "900",
+   "lh": "15.9996px",
+   "ls": "1.2px",
+   "color": "rgb(118, 118, 118)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "p": {
+   "font": "Lato",
+   "size": "15px",
+   "weight": "400",
+   "lh": "19.2857px",
+   "ls": "normal",
+   "color": "rgb(91, 91, 91)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "a": {
+   "font": "Lato",
+   "size": "20px",
+   "weight": "400",
+   "lh": "24px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "button": {
+   "font": "Lato",
+   "size": "18px",
+   "weight": "400",
+   "lh": "20.7px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "navHeight": 76,
+  "fonts": [
+   [
+    "Lato",
+    2629
+   ],
+   [
+    "Playfair Display",
+    26
+   ],
+   [
+    "Menlo",
+    17
+   ],
+   [
+    "monospace",
+    11
+   ]
+  ],
+  "textColors": [
+   [
+    "rgb(91, 91, 91)",
+    1946
+   ],
+   [
+    "rgb(29, 61, 99)",
+    379
+   ],
+   [
+    "rgb(255, 255, 255)",
+    347
+   ],
+   [
+    "rgb(118, 118, 118)",
+    284
+   ],
+   [
+    "rgb(0, 0, 0)",
+    259
+   ],
+   [
+    "rgb(66, 101, 145)",
+    155
+   ]
+  ],
+  "svgCount": 105,
+  "canvasCount": 0,
+  "radius": [
+   "2px",
+   "4px",
+   "4px",
+   "4px",
+   "4px",
+   "4px",
+   "50%",
+   "4px"
+  ]
+ },
+ "nasa-eyes": {
+  "title": "Eyes - NASA Science",
+  "body": {
+   "font": "Public Sans Web",
+   "size": "16px",
+   "weight": "400",
+   "lh": "18.4px",
+   "ls": "normal",
+   "color": "rgb(27, 27, 27)",
+   "bg": "rgb(255, 255, 255)"
+  },
+  "html_bg": "rgb(0, 0, 0)",
+  "h1": {
+   "font": "inter",
+   "size": "80px",
+   "weight": "700",
+   "lh": "80px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "h2": {
+   "font": "inter",
+   "size": "18px",
+   "weight": "700",
+   "lh": "18.9px",
+   "ls": "normal",
+   "color": "rgb(27, 27, 27)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "p": {
+   "font": "Public Sans Web",
+   "size": "17.6px",
+   "weight": "400",
+   "lh": "29.04px",
+   "ls": "normal",
+   "color": "rgb(185, 185, 187)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "a": {
+   "font": "inter",
+   "size": "22.08px",
+   "weight": "700",
+   "lh": "26.496px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "button": {
+   "font": "Public Sans Web",
+   "size": "22.08px",
+   "weight": "400",
+   "lh": "25.392px",
+   "ls": "normal",
+   "color": "rgb(0, 0, 0)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "navHeight": 0,
+  "fonts": [
+   [
+    "inter",
+    1528
+   ],
+   [
+    "Public Sans Web",
+    867
+   ],
+   [
+    "dm-mono",
+    47
+   ]
+  ],
+  "textColors": [
+   [
+    "rgb(255, 255, 255)",
+    1309
+   ],
+   [
+    "rgb(27, 27, 27)",
+    691
+   ],
+   [
+    "rgb(149, 149, 153)",
+    381
+   ],
+   [
+    "rgb(0, 0, 238)",
+    373
+   ],
+   [
+    "rgb(0, 0, 0)",
+    220
+   ],
+   [
+    "rgb(88, 88, 91)",
+    50
+   ]
+  ],
+  "svgCount": 247,
+  "canvasCount": 0,
+  "radius": [
+   "0px 4px 4px 0px",
+   "0px 4px 4px 0px"
+  ]
+ },
+ "jpl-d2d-desktop-error": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at https://datavis.caltech.edu/\nCall log:\n  - navigating to \"https://datavis.caltech.edu/\", waiting until \"domcontentloaded\"\n",
+ "jpl-d2d-mobile-error": "Error: page.goto: net::ERR_NAME_NOT_RESOLVED at https://datavis.caltech.edu/\nCall log:\n  - navigating to \"https://datavis.caltech.edu/\", waiting until \"domcontentloaded\"\n",
+ "nasa-svs": {
+  "title": "Scientific Visualization Studio - NASA Science",
+  "body": {
+   "font": "Public Sans Web",
+   "size": "16px",
+   "weight": "400",
+   "lh": "18.4px",
+   "ls": "normal",
+   "color": "rgb(27, 27, 27)",
+   "bg": "rgb(255, 255, 255)"
+  },
+  "html_bg": "rgb(0, 0, 0)",
+  "h1": {
+   "font": "inter",
+   "size": "48px",
+   "weight": "700",
+   "lh": "50.4px",
+   "ls": "normal",
+   "color": "rgb(27, 27, 27)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "h2": {
+   "font": "inter",
+   "size": "18px",
+   "weight": "700",
+   "lh": "18.9px",
+   "ls": "normal",
+   "color": "rgb(27, 27, 27)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "p": {
+   "font": "Public Sans Web",
+   "size": "16px",
+   "weight": "400",
+   "lh": "26.4px",
+   "ls": "normal",
+   "color": "rgb(27, 27, 27)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "a": {
+   "font": "inter",
+   "size": "22.08px",
+   "weight": "700",
+   "lh": "26.496px",
+   "ls": "normal",
+   "color": "rgb(255, 255, 255)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "button": {
+   "font": "Public Sans Web",
+   "size": "22.08px",
+   "weight": "400",
+   "lh": "25.392px",
+   "ls": "normal",
+   "color": "rgb(0, 0, 0)",
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "navHeight": 0,
+  "fonts": [
+   [
+    "inter",
+    1099
+   ],
+   [
+    "Public Sans Web",
+    371
+   ],
+   [
+    "dm-mono",
+    37
+   ]
+  ],
+  "textColors": [
+   [
+    "rgb(255, 255, 255)",
+    1192
+   ],
+   [
+    "rgb(149, 149, 153)",
+    347
+   ],
+   [
+    "rgb(27, 27, 27)",
+    298
+   ],
+   [
+    "rgb(88, 88, 91)",
+    51
+   ],
+   [
+    "rgb(185, 185, 187)",
+    32
+   ],
+   [
+    "rgb(0, 0, 0)",
+    31
+   ]
+  ],
+  "svgCount": 207,
+  "canvasCount": 0,
+  "radius": [
+   "0px 4px 4px 0px",
+   "0px 4px 4px 0px"
+  ]
+ }
+}
