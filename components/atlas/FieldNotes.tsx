@@ -81,11 +81,11 @@ export default function FieldNotes(p: NotesProps) {
   const maxR = Math.max(1, ...top.map((r) => r.R));
 
   return (
-    <aside className="atlas-notes" aria-labelledby="atlas-notes-title">
+    <aside className="atlas-notes" aria-labelledby="atlas-notes-title" data-testid="field-notes">
       <h2 id="atlas-notes-title" className="atlas-notes-title">Field notes</h2>
       <p className="atlas-notes-loc">{GRAVITY_LABEL[s.gravity]} · {hazard.label} · {s.materialClass === "any" ? "any material" : `${s.materialClass} materials`} · {s.includePublished ? "PSI + published" : "PSI only"}</p>
 
-      <div className="atlas-verdict" aria-live="polite">
+      <div className="atlas-verdict" aria-live="polite" data-testid="verdict" data-verdict={verdict} data-d={n ? n.d.D.toFixed(3) : ""}>
         <p className="atlas-verdict-line">
           <span className="atlas-verdict-word">Evidence: {verdict}</span>
           <span className="atlas-disclaimer">{DISCLAIMER}</span>

@@ -55,7 +55,7 @@ export default function Toolbar({ scenario, preset, update, applyPreset }: {
 }) {
   const flowOpts = FLOW_STOPS.includes(scenario.flowCmS) ? FLOW_STOPS : [...FLOW_STOPS, scenario.flowCmS];
   return (
-    <div className="atlas-toolbar" role="toolbar" aria-label="Scenario">
+    <div className="atlas-toolbar" role="toolbar" aria-label="Scenario" data-testid="scenario-toolbar">
       <div className="atlas-field">
         <label className="atlas-field-label" htmlFor="atlas-q">Question</label>
         <select id="atlas-q" className="atlas-select" value={scenario.hazard} onChange={(e) => update({ hazard: e.target.value as Hazard }, true)}>

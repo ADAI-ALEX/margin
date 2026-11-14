@@ -26,7 +26,7 @@ export default function SpecimenCard({ run, scored, onClose }: { run: Run; score
   const measures = Object.entries(run.measures);
   const original = Object.entries(run.original);
   return (
-    <article className="atlas-specimen" aria-labelledby="atlas-specimen-title" onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
+    <article data-testid="specimen-card" data-run={run.id} className="atlas-specimen" aria-labelledby="atlas-specimen-title" onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
       <header className="atlas-specimen-head">
         <span className={`atlas-tier ${tierCls}`}>
           <svg viewBox="0 0 14 14" width={14} height={14} aria-hidden="true">

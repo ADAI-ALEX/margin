@@ -75,7 +75,7 @@ export default function GravitySheets({ sheets, scenario, onSelect }: { sheets: 
     refs.current[k]?.focus();
   };
   return (
-    <section className="atlas-sheets" aria-labelledby="atlas-sheets-title">
+    <section data-testid="gravity-sheets" className="atlas-sheets" aria-labelledby="atlas-sheets-title">
       <header className="atlas-sheets-head">
         <h2 id="atlas-sheets-title" className="atlas-h3">Gravity regimes · four separate sheets</h2>
         <p className="atlas-micro">Each regime has its own evidence. No distance is computed across sheets.</p>
