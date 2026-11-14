@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Research capture scripts (one-off browser automation recorded with the design research, not app code)
+    "docs/**",
   ]),
 ]);
 

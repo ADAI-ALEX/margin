@@ -1,5 +1,5 @@
 "use client";
-import type { ReactNode } from "react";
+import { isValidElement, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { Run, Scenario } from "@/lib/schema";
 import { SCALES, VERDICT_THRESHOLDS, ROBUSTNESS_FACTORS, classify, kPaToPsia, SENSITIVITY_FLOWS, type Evaluation, type FlowSensitivity, type Robustness, type Scored, type Verdict } from "@/lib/engine";
@@ -8,6 +8,7 @@ import { ALL_RUNS, COUNTS, HEADLINE, SNAP, invById } from "@/lib/data";
 import { DISCLAIMER, GRAVITY_LABEL, fmt, fmtSigned } from "@/lib/format";
 import { AXIS_KEYS, AXIS_LABEL, AXIS_UNIT, BASIS, BASIS_TEXT, FIELD, factorLabel, fetchedDate, notCompared, partialLabel, valueKinds, verification, type ClaimKind } from "./derive";
 import { Claim, EvidenceWord, MethodNote, SourceRef } from "./ui";
+import { ClaimBadge } from "@/components/ui/misc";
 import css from "./casefile.module.css";
 
 export interface FlowRow { u: number; current: boolean; ev: Evaluation }
@@ -18,7 +19,7 @@ const AX = { o2: "O₂", pressure: "pressure", flow: "flow" } as const;
 const uniq = (k: (ClaimKind | null | undefined)[]) => Array.from(new Set(k.filter((x): x is ClaimKind => !!x)));
 
 function RunButton({ run, openRun }: { run: Run; openRun: (r: Run) => void }) {
-  return <button type="button" className={css.runLink} onClick={() => openRun(run)}>{run.id}</button>;
+  return <button type="button" className="ui-link-btn mono" onClick={() => openRun(run)}>{run.id}</button>;
 }
 function Engine({ fn }: { fn: string }) {
   return <>MARGIN engine · <code>{fn}</code> · <Link href="/method">method</Link></>;
@@ -59,23 +60,25 @@ function RunValues({ run }: { run: Run }) {
 
 export function FlowSensitivity({ rows, s }: { rows: FlowRow[]; s: Scenario }) {
   return (
-    <div className={css.tableScroll} data-testid="flow-sensitivity" tabIndex={0} role="region" aria-label="Verdict at other ventilation flows">
-      <table className={css.dataTable}>
-        <caption className={css.capLeft}>
-          Verdict at other ventilation flows, everything else as in your scenario ({fmt(s.o2Pct, 1)}% O₂, {fmt(s.pressureKPa, 1)} kPa, {GRAVITY_LABEL[s.gravity].toLowerCase()}, {s.includePublished ? "PSI + published" : "PSI only"}). <Claim kind="COMPUTED" />
-        </caption>
-        <thead><tr><th scope="col">Flow</th><th scope="col">D</th><th scope="col">Evidence</th><th scope="col">Nearest comparable run</th></tr></thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.u} data-current={r.current || undefined} className={r.current ? css.currentRow : undefined}>
-              <th scope="row"><span className="num">{fmt(r.u, r.u % 1 ? 1 : 0)} cm/s</span>{r.u === 0 && <span className={css.quiet}> (quiescent)</span>}{r.current && <b className={css.youMark}> ← your scenario</b>}</th>
-              <td className="num">{r.ev.nearest ? fmt(r.ev.nearest.d.D, 2) : "—"}</td>
-              <td><EvidenceWord v={r.ev.verdict} prefix={false} /></td>
-              <td>{r.ev.nearest ? <><span className="num">{r.ev.nearest.run.id}</span>{r.ev.nearest.d.partialMatch && <span className={css.quiet}> (partial)</span>}</> : <span className={css.nr}>none</span>}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className={css.flowMod}>
+      <h3 className={css.h3} id="inv-flow-h">Flow sensitivity <ClaimBadge kind="COMPUTED" /></h3>
+      <p className={css.secSub}>Verdict at other ventilation flows, everything else as in your scenario ({fmt(s.o2Pct, 1)}% O₂, {fmt(s.pressureKPa, 1)} kPa, {GRAVITY_LABEL[s.gravity].toLowerCase()}, {s.includePublished ? "PSI + published" : "PSI only"}).</p>
+      <div className="ui-table-scroll" data-testid="flow-sensitivity" tabIndex={0} role="region" aria-labelledby="inv-flow-h">
+        <table className="ui-table">
+          <caption className="sr-only">Verdict at other ventilation flows, everything else as in your scenario</caption>
+          <thead><tr><th scope="col">Flow</th><th scope="col" className="is-num">D</th><th scope="col">Evidence</th><th scope="col">Nearest comparable run</th></tr></thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.u} data-current={r.current || undefined} className={r.current ? css.currentRow : undefined}>
+                <th scope="row"><span className="num">{fmt(r.u, r.u % 1 ? 1 : 0)} cm/s</span>{r.u === 0 && <span className={css.quiet}> (quiescent)</span>}{r.current && <span className={css.youMark}> · your scenario</span>}</th>
+                <td className="num is-num">{r.ev.nearest ? fmt(r.ev.nearest.d.D, 2) : "—"}</td>
+                <td><span className={css.vWord}>{r.ev.verdict}</span></td>
+                <td>{r.ev.nearest ? <><span className="mono">{r.ev.nearest.run.id}</span>{r.ev.nearest.d.partialMatch && <span className={css.quiet}> (partial)</span>}</> : <span className={css.nr}>none</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -168,7 +171,7 @@ export function ClaimLedger({ s, ev, psiOnly, robust, flowRows, crossings, openR
     body: <>
       <p className={css.claimLead}>Flow sensitivity: {changes ? <>the verdict <b>changes</b> with the assumed ventilation flow.</> : <>the verdict is the same at every flow below.</>} Flow is one of the three compared axes, so a different assumed flow moves D.</p>
       {crossings.length > 0 && <p>Between quiescent air and {fmt(Math.max(...SENSITIVITY_FLOWS.map((u) => u ?? 0)), 0)} cm/s the verdict changes class at {crossings.map((c, i) => <span key={i}>{i > 0 ? ", " : ""}≈ <span className="num">{fmt(c.flowCmS, 1)}</span> cm/s ({c.from} → {c.to})</span>)}.</p>}
-      <FlowSensitivity rows={flowRows} s={s} />
+      <p className={css.quiet}>The verdict at each flow is in the Flow sensitivity table below.</p>
     </>,
     source: <Engine fn="evaluate() at each flow" />,
   });
@@ -243,31 +246,67 @@ export function ClaimLedger({ s, ev, psiOnly, robust, flowRows, crossings, openR
   }
   const pending = insights.length - verified.length;
 
+  const rows = out.map((c, i) => ({ ...c, n: i + 1, engine: isValidElement(c.source) && c.source.type === Engine }));
+  return <LedgerTable rows={rows} pending={pending} flow={<FlowSensitivity rows={flowRows} s={s} />} />;
+}
+
+type LedgerRow = Entry & { n: number; engine: boolean };
+type SortKey = "n" | "kind" | "source";
+const KIND_ORDER: ClaimKind[] = ["MEASURED", "COMPUTED", "NOMINAL", "REPORTED LIMIT", "PUBLISHED", "DRAFT", "PLANNED"];
+
+function LedgerTable({ rows, pending, flow }: { rows: LedgerRow[]; pending: number; flow: ReactNode }) {
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "n", dir: 1 });
+  const sorted = useMemo(() => {
+    const kindRank = (r: LedgerRow) => Math.min(...r.kinds.map((k) => KIND_ORDER.indexOf(k)));
+    const val = (r: LedgerRow) => (sort.key === "n" ? r.n : sort.key === "kind" ? kindRank(r) * 100 + r.n : (r.engine ? 0 : 1) * 100 + r.n);
+    return [...rows].sort((a, b) => (val(a) - val(b)) * sort.dir);
+  }, [rows, sort]);
+  const th = (key: SortKey, label: string, cls?: string) => {
+    const on = sort.key === key;
+    return (
+      <th scope="col" className={cls} aria-sort={on ? (sort.dir === 1 ? "ascending" : "descending") : "none"}>
+        <button type="button" className={css.sortBtn} onClick={() => setSort((p) => ({ key, dir: p.key === key ? (p.dir === 1 ? -1 : 1) : 1 }))}>
+          {label}<span className={css.sortGlyph} aria-hidden="true">{on ? (sort.dir === 1 ? "▲" : "▼") : "↕"}</span>
+        </button>
+      </th>
+    );
+  };
   return (
     <section className={css.ledger} aria-labelledby="inv-ledger-h" data-testid="claim-ledger">
       <div className={css.secHead}>
-        <div>
+        <div className={css.secHeadText}>
           <h2 className={css.h2} id="inv-ledger-h">Claim ledger</h2>
-          <p className={css.secSub}>Every statement for this scenario, typed and sourced. <span className="num">{out.length}</span> statements.</p>
+          <p className={css.secSub}>Every statement made for this scenario, typed and sourced: <span className="num">{rows.length}</span> statements. Sort by number, claim type or source; run ids open their provenance.</p>
         </div>
+        <p className={css.kindKey} aria-label="Claim types">
+          {KIND_ORDER.map((k) => <Claim key={k} kind={k} />)}
+        </p>
       </div>
-      <p className={css.kindKey}>
-        {(["MEASURED", "COMPUTED", "NOMINAL", "REPORTED LIMIT", "PUBLISHED", "DRAFT", "PLANNED"] as ClaimKind[]).map((k) => <Claim key={k} kind={k} />)}
-        <span className={css.quiet}>Hover a badge for its meaning.</span>
-      </p>
-      <ol className={css.claims}>
-        {out.map((c, i) => (
-          <li key={c.id} className={css.claimItem} data-claim={c.id}>
-            <span className={css.claimNo} aria-hidden="true">C{i + 1}</span>
-            <span className={css.kinds}>{c.kinds.map((k) => <Claim key={k} kind={k} />)}</span>
-            <div className={css.claimBody}>
-              <div className={css.claimText}>{c.body}</div>
-              <p className={css.claimSrc}><span className={css.srcLabel}>Source</span> {c.source}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+      <div className={`ui-table-scroll ${css.ledgerScroll}`} tabIndex={0} role="region" aria-label="Claim ledger table">
+        <table className={`ui-table ${css.ledgerTable}`}>
+          <caption className="sr-only">Claim ledger: each statement for the current scenario with its claim type and source</caption>
+          <thead>
+            <tr>
+              {th("n", "#", css.lN)}
+              {th("kind", "Type", css.lKind)}
+              <th scope="col" className={css.lBody}>Statement</th>
+              {th("source", "Source", css.lSrc)}
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((c) => (
+              <tr key={c.id} data-claim={c.id}>
+                <td className={`num ${css.lN}`}>C{c.n}</td>
+                <td className={css.lKind}><span className={css.kinds}>{c.kinds.map((k) => <Claim key={k} kind={k} />)}</span></td>
+                <td className={css.lBody}><div className={css.claimText}>{c.body}</div></td>
+                <td className={css.lSrc}><span className={css.srcLabelSm}>Source</span>{c.source}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {pending > 0 && <p className={css.ledgerFoot}>{pending} curated finding{pending === 1 ? "" : "s"} for this question {pending === 1 ? "is" : "are"} not shown: not yet checked against the primary source.</p>}
+      {flow}
     </section>
   );
 }

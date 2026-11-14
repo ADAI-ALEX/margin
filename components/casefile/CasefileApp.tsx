@@ -1,22 +1,24 @@
 "use client";
 /**
- * /investigations — the investigation layer of MARGIN (the "Casefile" workspace in the Atlas identity).
- * The scenario is shared with the Atlas through the URL (useMargin); the compare selection is kept in `cmp`.
+ * /investigations: which NASA investigations come closest to the scenario, how they differ, and where each
+ * number comes from. The scenario is shared with the Atlas through the URL (useMargin); the compare
+ * selection is kept in `cmp`.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Run } from "@/lib/schema";
 import { evaluate, flowSensitivity } from "@/lib/engine";
 import { useMargin } from "@/lib/state/useMargin";
 import { ALL_RUNS, invById } from "@/lib/data";
-import { DISCLAIMER, fmt } from "@/lib/format";
-import { buildRows, partialLabel } from "./derive";
+import { Breadcrumb } from "@/components/ui/misc";
+import { buildRows } from "./derive";
 import { ScenarioSentence, type PUnit } from "./ScenarioSentence";
-import { Ladder, type SortMode } from "./Ladder";
+import { Finding } from "./Finding";
+import { Ladder, sections, type SortMode } from "./Ladder";
+import { Footprint } from "./Footprint";
 import { PartialG } from "./PartialG";
 import { ClaimLedger, type FlowRow } from "./ClaimLedger";
 import { CompareTray } from "./CompareTray";
 import { Provenance } from "./Provenance";
-import { EvidenceWord, MethodNote } from "./ui";
 import { publishPins } from "./pinStore";
 import css from "./casefile.module.css";
 
@@ -44,12 +46,14 @@ function writeCmp(ids: string[]) {
 
 export default function CasefileApp() {
   const m = useMargin("iss");
-  const { scenario: s, evaluation: ev, psiOnly, ranking, robust, weights } = m;
+  const { scenario: s, evaluation: ev, psiOnly, ranking, robust, weights, setWeights } = m;
   const [pUnit, setPUnit] = useState<PUnit>("kPa");
   const [sort, setSort] = useState<SortMode>("rank");
   const [pinned, setPinned] = useState<string[]>([]);
   const [cmpReady, setCmpReady] = useState(false);
   const [provRun, setProvRun] = useState<Run | null>(null);
+  const [hoverInv, setHoverInv] = useState<string | null>(null);
+  const [selInv, setSelInv] = useState<string | null>(null);
 
   // Read `cmp` from the URL on mount (in an effect so server and first client render match). With Cache
   // Components the route can be re-shown from a hidden <Activity>; then a URL without `cmp` keeps the pins.
@@ -71,7 +75,6 @@ export default function CasefileApp() {
     const us = Array.from(new Set([...TABLE_FLOWS, cur])).sort((a, b) => a - b);
     return us.map((u) => ({ u, current: u === cur, ev: u === cur ? ev : evaluate(ALL_RUNS, { ...s, flowCmS: u }) }));
   }, [s, ev]);
-
   const crossings = useMemo(() => flowSensitivity(ALL_RUNS, s).crossings, [s]);
 
   const togglePin = useCallback((id: string) => {
@@ -80,78 +83,39 @@ export default function CasefileApp() {
   const unpin = useCallback((id: string) => setPinned((p) => p.filter((x) => x !== id)), []);
   const closeProv = useCallback(() => setProvRun(null), []);
 
-  const n = ev.nearest;
-  const others = flowRows.filter((r) => r.ev.verdict !== ev.verdict);
-  const byVerdict = new Map<string, string[]>();
-  for (const r of others) byVerdict.set(r.ev.verdict, [...(byVerdict.get(r.ev.verdict) ?? []), `${fmt(r.u, r.u % 1 ? 1 : 0)}${r.ev.qualifier ? " (partial match)" : ""}`]);
-  const nearestInv = n ? invById.get(n.run.investigation) : null;
+  // The footprint follows the hovered row, else the selected one, else the top of the list.
+  const firstId = useMemo(() => sections(rows, sort, s)[0]?.rows[0]?.inv.id ?? null, [rows, sort, s]);
+  const focusId = hoverInv ?? (selInv && rows.some((r) => r.inv.id === selInv) ? selInv : firstId);
+  const focusRow = rows.find((r) => r.inv.id === focusId) ?? null;
 
   return (
-    <main id="main" className={css.root}>
-      <header className={css.pageHead}>
-        <p className={css.kicker}>Evidence workspace</p>
-        <h1 className={css.h1}>Investigations</h1>
-        <p className={css.purpose}>Which NASA investigations come closest to your scenario, how they differ, and where each number comes from.</p>
+    <main id="main" className={`ui-page ${css.root}`} data-dock={pinned.length > 0 || undefined}>
+      <header className="ui-page-head">
+        <Breadcrumb items={[{ label: "Atlas", href: "/" }, { label: "Investigations" }]} />
+        <h1 className="ui-page-title">Investigations</h1>
+        <p className="ui-page-lede">Which NASA investigations come closest to your scenario, how they differ, and where each number comes from.</p>
       </header>
 
-      <ScenarioSentence m={m} pUnit={pUnit} setPUnit={setPUnit} />
-
-      <section className={css.finding} aria-live="polite" aria-label="Finding for this scenario" data-testid="finding" data-verdict={ev.verdict}>
-        <div className={css.readout}>
-          <div className={css.roCell}>
-            <span className={css.roLabel}>Evidence</span>
-            <span className={css.verdictWord}>
-              <i className={css.vGlyph} data-v={ev.verdict} aria-hidden="true" />
-              <EvidenceWord v={ev.verdict} prefix={false} />
-            </span>
-          </div>
-          <div className={css.roCell}>
-            <span className={css.roLabel}>D to nearest comparable run</span>
-            {n ? (
-              <span className={css.findingD}>
-                <b className={`num ${css.roNum}`}>{fmt(n.d.D, 2)}</b>
-                <span className={css.roRun}>
-                  <button type="button" className={css.runLink} onClick={() => setProvRun(n.run)}>{n.run.id}</button>
-                  {nearestInv && <span className={css.roInv}>{nearestInv.acronym}</span>}
-                  {n.d.partialMatch && <span className={css.partial}>{partialLabel(n)}</span>}
-                </span>
-              </span>
-            ) : <span className={css.roNone}>no comparable run</span>}
-          </div>
-          <p className={css.disclaimer}>{DISCLAIMER}</p>
-        </div>
-        <div className={css.findingNotes}>
-          {ev.qualifier && (
-            <p className={css.findingNote}>
-              {ev.qualifier === "flow-regime-mismatch" ? "The nearest run's flow regime differs from the scenario's, so flow is not compared" : "The nearest run does not record every axis"}.{" "}
-              {ev.nearestComplete
-                ? <>On all three axes the nearest comparable run is <button type="button" className={css.runLink} onClick={() => setProvRun(ev.nearestComplete!.run)}>{ev.nearestComplete.run.id}</button> at D <b className="num">{fmt(ev.nearestComplete.d.D, 2)}</b> — <EvidenceWord v={ev.verdictComplete} />.</>
-                : <>No comparable run in this regime is compared on all three axes — on all three axes, <EvidenceWord v={ev.verdictComplete} />.</>}
-            </p>
-          )}
-          {others.length > 0 ? (
-            <p className={css.findingNote}>
-              The verdict depends on the assumed ventilation flow: {[...byVerdict.entries()].map(([v, us], i) => <span key={v}>{i > 0 ? "; " : ""}<b>{v}</b> at {us.join(", ")} cm/s</span>)} (see the flow table in the claim ledger).
-            </p>
-          ) : (
-            <p className={css.findingNote}>Same verdict at every flow from {TABLE_FLOWS[0]} to {TABLE_FLOWS[TABLE_FLOWS.length - 1]} cm/s.</p>
-          )}
-          <p className={css.findingNote}><MethodNote /></p>
-        </div>
-      </section>
+      <div className={css.top}>
+        <ScenarioSentence m={m} pUnit={pUnit} setPUnit={setPUnit} />
+        <Finding s={s} ev={ev} flowRows={flowRows} flowSpan={[TABLE_FLOWS[0], TABLE_FLOWS[TABLE_FLOWS.length - 1]]} openRun={setProvRun} />
+      </div>
 
       {s.gravity !== "micro" && <PartialG gravity={s.gravity} includePublished={s.includePublished} openRun={setProvRun} />}
 
       <div className={css.workspace}>
-        <div className={css.mainCol}>
-          <Ladder rows={rows} s={s} pUnit={pUnit} sort={sort} setSort={setSort} pinned={pinned} togglePin={togglePin} openRun={setProvRun} weights={weights} />
-          <CompareTray rows={rows} pinned={pinned} unpin={unpin} openRun={setProvRun} />
-        </div>
-        <aside className={css.sideCol} aria-label="Claim ledger">
-          <ClaimLedger s={s} ev={ev} psiOnly={psiOnly} robust={robust} flowRows={flowRows} crossings={crossings} openRun={setProvRun} />
+        <Ladder
+          rows={rows} s={s} pUnit={pUnit} sort={sort} setSort={setSort} pinned={pinned} togglePin={togglePin} openRun={setProvRun}
+          weights={weights} setWeights={setWeights} focusId={focusId} selectedId={selInv ?? firstId} onHover={setHoverInv} onSelect={setSelInv}
+        />
+        <aside className={css.fieldCol} aria-label="Footprint field">
+          <Footprint row={focusRow} s={s} ev={ev} />
         </aside>
       </div>
 
+      <ClaimLedger s={s} ev={ev} psiOnly={psiOnly} robust={robust} flowRows={flowRows} crossings={crossings} openRun={setProvRun} />
+
+      <CompareTray rows={rows} pinned={pinned} unpin={unpin} openRun={setProvRun} />
       <Provenance run={provRun} s={s} onClose={closeProv} />
     </main>
   );

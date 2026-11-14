@@ -4,6 +4,9 @@ import type { Gravity, Run } from "@/lib/schema";
 import { PRESETS } from "@/content/curated";
 import { GRAVITY_LABEL, fmt } from "@/lib/format";
 import { GRAVS, isLimit, r2, type Fingerprint } from "@/components/casefile/derive";
+import { ChartFrame } from "@/components/ui/misc";
+import { LimitMark } from "@/components/atlas/marks";
+import { Landmarks } from "@/components/casefile/field";
 import css from "./dossier.module.css";
 
 const W = 640, H = 360, M = { l: 66, r: 18, t: 16, b: 46 };
@@ -12,12 +15,13 @@ const TRI = (x: number, y: number, r = 5) => `${x},${r2(y - r)} ${r2(x + r * 0.9
 type MarkKind = "run" | "nominal" | "pub" | "limit" | "planned";
 const kindOf = (r: Run): MarkKind => (r.tier === "T4_PLANNED" ? "planned" : isLimit(r) ? "limit" : r.tier === "T3_PUBLISHED" ? "pub" : r.pressureBasis === "nominal-stated" ? "nominal" : "run");
 
+/** The field encoding (.mk-* in ui.css): dot = PSI run, hollow dot = nominal pressure, ring = published, ring + tick = limit, dashed ring = planned. */
 function Mark({ kind, x, y, n }: { kind: MarkKind; x: number; y: number; n: number }) {
   const big = r2(4.5 + Math.sqrt(n - 1) * 0.8), small = r2(2.6 + Math.sqrt(n - 1) * 0.8);
-  if (kind === "planned") return <circle cx={x} cy={y} r={big} className={css.mPlanned} />;
-  if (kind === "limit") return <g className={css.mLimit}><circle cx={x} cy={y} r={big} /><line x1={x} x2={x} y1={r2(y - big)} y2={r2(y + big)} /></g>;
-  if (kind === "pub") return <circle cx={x} cy={y} r={big} className={css.mPub} />;
-  return <circle cx={x} cy={y} r={small} className={kind === "nominal" ? css.mNominal : css.mRun} />;
+  if (kind === "planned") return <circle cx={x} cy={y} r={big} className="mk-planned" />;
+  if (kind === "limit") return <LimitMark x={x} y={y} scale={big / 4} />;
+  if (kind === "pub") return <circle cx={x} cy={y} r={big} className="mk-ring" />;
+  return <circle cx={x} cy={y} r={small} className={kind === "nominal" ? css.mNominal : "mk-dot"} />;
 }
 
 function Panel({ runs, g, acronym }: { runs: Run[]; g: Gravity; acronym: string }) {
@@ -35,19 +39,14 @@ function Panel({ runs, g, acronym }: { runs: Run[]; g: Gravity; acronym: string 
     if (g) g.n++; else gm.set(key, { key, kind, o2, p, n: 1, first: r });
   }
   const groups = [...gm.values()].sort((a, b) => Number(a.kind === "run" || a.kind === "nominal" ? 0 : 1) - Number(b.kind === "run" || b.kind === "nominal" ? 0 : 1));
-  const cm = new Map<string, { label: string; o2: number; p: number }>();
-  for (const pr of PRESETS) {
-    const k = `${pr.o2Pct}|${pr.pressureKPa}`;
-    const c = cm.get(k);
-    if (c) c.label = `${c.label} / ${pr.short}`; else cm.set(k, { label: pr.short, o2: pr.o2Pct, p: pr.pressureKPa });
-  }
-  const crosses = [...cm.values()].sort((a, b) => a.o2 - b.o2);
+  const [xd0, xd1] = x.domain(), [yd0, yd1] = y.domain();
+  const geom = { W, H, M, x: (v: number) => r2(x(v)), y: (v: number) => r2(y(v)), inWindow: (o: number, p: number) => o >= xd0 && o <= xd1 && p >= yd0 && p <= yd1 };
   const o2r = [Math.min(...runs.map((r) => r.o2Pct as number)), Math.max(...runs.map((r) => r.o2Pct as number))];
   const pr = [Math.min(...runs.map((r) => r.pressureKPa as number)), Math.max(...runs.map((r) => r.pressureKPa as number))];
   const label = `${acronym}, ${GRAVITY_LABEL[g]}: ${runs.length} runs plotted, O₂ ${fmt(o2r[0], 1)}–${fmt(o2r[1], 1)} %, pressure ${fmt(pr[0], 1)}–${fmt(pr[1], 1)} kPa (log scale). Reference atmospheres drawn as triangles: ${PRESETS.map((p) => `${p.short} ${p.o2Pct}% / ${p.pressureKPa} kPa`).join("; ")}.`;
   return (
-    <figure className={css.panel}>
-      <figcaption className={css.panelCap}>{GRAVITY_LABEL[g]} <span className={css.capCount}><span className="num">{runs.length}</span> runs</span></figcaption>
+    <div className={css.panel}>
+      <p className={css.panelCap}>{GRAVITY_LABEL[g]} <span className={css.capCount}><span className="num">{runs.length}</span> runs</span></p>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className={css.chartSvg}>
         <rect x={M.l} y={M.t} width={W - M.l - M.r} height={H - M.t - M.b} className={css.plotBg} />
         {xt.map((v) => (
@@ -68,16 +67,7 @@ function Panel({ runs, g, acronym }: { runs: Run[]; g: Gravity; acronym: string 
         <line x1={M.l} x2={W - M.r} y1={H - M.b} y2={H - M.b} className={css.frame} />
         <text x={(M.l + W - M.r) / 2} y={H - 8} textAnchor="middle" className={css.axisTitle}>O₂, % by volume (ambient)</text>
         <text x={13} y={(M.t + H - M.b) / 2} transform={`rotate(-90 13 ${(M.t + H - M.b) / 2})`} textAnchor="middle" className={css.axisTitle}>Pressure, kPa (log scale)</text>
-        {crosses.map((c, i) => {
-          const cx = r2(x(c.o2)), cy = r2(y(c.p));
-          const ty = i % 2 === 0 ? cy - 9 : cy + 17; // alternate above/below so neighbouring labels do not collide
-          return (
-            <g key={c.label} className={css.cross}>
-              <polygon points={TRI(cx, cy)} />
-              {cx > W * 0.7 ? <text x={cx - 8} y={ty} textAnchor="end">{c.label}</text> : <text x={cx + 8} y={ty}>{c.label}</text>}
-            </g>
-          );
-        })}
+        <Landmarks g={geom} items={PRESETS.map((p) => ({ label: p.short, o2: p.o2Pct, p: p.pressureKPa }))} />
         {groups.map((g) => (
           <g key={g.key}>
             <title>{`${g.n > 1 ? `${g.n} runs` : g.first.id} · ${fmt(g.o2, 1)}% O₂ · ${fmt(g.p, 1)} kPa${g.n === 1 ? ` · ${g.first.material ?? "material not recorded"}` : ""}`}</title>
@@ -85,7 +75,7 @@ function Panel({ runs, g, acronym }: { runs: Run[]; g: Gravity; acronym: string 
           </g>
         ))}
       </svg>
-    </figure>
+    </div>
   );
 }
 
@@ -102,33 +92,36 @@ export function DossierChart({ runs, fp, acronym }: { runs: Run[]; fp: Fingerpri
     if (noP) reasons.push(`${noP} run${noP === 1 ? "" : "s"}: O₂ recorded but pressure not recorded`);
     void noO2;
   }
+  const source = <>Source: the normalized O₂ and pressure of each run in the run table below (NASA PSI run tables or the cited paper); the original cell and any conversion are in each run&rsquo;s provenance. Reference atmospheres are MARGIN&rsquo;s presets. Not a hazard map.</>;
   return (
-    <section className={css.section} aria-labelledby="dos-chart-h" data-testid="dossier-chart" data-empty={placed.length === 0 || undefined}>
-      <h2 className={css.h2} id="dos-chart-h">Where the runs sit: O₂ × pressure</h2>
-      {placed.length > 0 ? (
-        <>
-          <p className={css.sub}>
-            {placed.length} of {runs.length} runs record both ambient O₂ and pressure and are plotted.{missing > 0 && <> {missing} are not: {reasons.join("; ")}.</>}
-            {byG.length > 1 && <> Each gravity regime has its own panel; regimes are never compared with one another.</>}
-          </p>
-          <div className={css.panels} data-n={byG.length}>
-            {byG.map((p) => <Panel key={p.g} g={p.g} runs={p.runs} acronym={acronym} />)}
-          </div>
-          <ul className={css.key}>
-            {kinds.has("run") && <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="2.6" className={css.mRun} /></svg> PSI run (larger = several runs at the same condition)</li>}
-            {kinds.has("nominal") && <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="2.6" className={css.mNominal} /></svg> PSI run, pressure nominal (stated)</li>}
-            {kinds.has("pub") && <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" className={css.mPub} /></svg> published (not in PSI)</li>}
-            {kinds.has("limit") && <li><svg width="12" height="12" aria-hidden="true"><g className={css.mLimit}><circle cx="6" cy="6" r="4.5" /><line x1="6" x2="6" y1="1.5" y2="10.5" /></g></svg> reported limit — not a tested condition</li>}
-            {kinds.has("planned") && <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" className={css.mPlanned} /></svg> planned — not evidence</li>}
-            <li><svg width="14" height="14" aria-hidden="true" className={css.cross}><polygon points={TRI(7, 8, 5)} /></svg> reference atmosphere</li>
-          </ul>
-          <p className={css.source}>Source: the normalized O₂ and pressure of each run in the run table below; the original cell and any conversion are in each run&rsquo;s provenance. Reference atmospheres are MARGIN&rsquo;s presets.</p>
-        </>
-      ) : (
-        <p className={css.emptyNote}>
-          Nothing from this investigation can be placed on an O₂ × pressure chart: {reasons.length ? reasons.join("; ") : "no run records both values"}.
-        </p>
-      )}
+    <section className={css.section} aria-labelledby="dos-chart-h" data-empty={placed.length === 0 || undefined}>
+      <ChartFrame
+        testId="dossier-chart"
+        id="dos-chart"
+        headingLevel={2}
+        className={css.chartMod}
+        title={<span id="dos-chart-h">Where the runs sit: O₂ × pressure, zoomed to the data</span>}
+        definition={placed.length > 0
+          ? <>{placed.length} of {runs.length} runs record both ambient O₂ and pressure and are plotted.{missing > 0 && <> {missing} are not: {reasons.join("; ")}.</>}{byG.length > 1 && <> Each gravity regime has its own panel; regimes are never compared with one another.</>}</>
+          : <>Nothing from this investigation can be placed on an O₂ × pressure chart: {reasons.length ? reasons.join("; ") : "no run records both values"}.</>}
+        source={source}
+      >
+        {placed.length > 0 ? (
+          <>
+            <div className={css.panels} data-n={byG.length}>
+              {byG.map((p) => <Panel key={p.g} g={p.g} runs={p.runs} acronym={acronym} />)}
+            </div>
+            <ul className={css.key} aria-label="Key">
+              {kinds.has("run") && <li><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="2.6" className="mk-dot" /></svg> PSI run (larger = several runs at the same condition)</li>}
+              {kinds.has("nominal") && <li><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="2.6" className={css.mNominal} /></svg> PSI run, pressure nominal (stated)</li>}
+              {kinds.has("pub") && <li><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" className="mk-ring" /></svg> published (not in PSI)</li>}
+              {kinds.has("limit") && <li><svg width="16" height="14" aria-hidden="true"><LimitMark x={8} y={7} scale={0.9} /></svg> reported limit: not a tested condition</li>}
+              {kinds.has("planned") && <li><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" className="mk-planned" /></svg> planned: not evidence</li>}
+              <li><svg width="14" height="14" aria-hidden="true"><polygon points={TRI(7, 8, 5)} className="mk-landmark" /></svg> reference atmosphere</li>
+            </ul>
+          </>
+        ) : <div className={css.emptyPlot} aria-hidden="true" />}
+      </ChartFrame>
     </section>
   );
 }

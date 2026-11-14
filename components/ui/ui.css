@@ -136,7 +136,7 @@
 /* ------------------------------------------------------------------ drawer (inspector sheet) */
 .ui-drawer-wrap { position: fixed; inset: 0; z-index: 70; display: flex; justify-content: flex-end; pointer-events: none; }
 .ui-drawer-wrap[data-modal] { pointer-events: auto; }
-.ui-drawer-scrim { position: absolute; inset: 0; background: rgba(5, 7, 10, 0.62); animation: ui-fade var(--dur-2) var(--ease); }
+.ui-drawer-scrim { position: absolute; inset: 0; background: var(--scrim); animation: ui-fade var(--dur-2) var(--ease); }
 .ui-drawer {
   position: relative; pointer-events: auto; height: 100%; width: min(560px, 100vw); display: flex; flex-direction: column;
   background: var(--surface-1); border-left: 1px solid var(--line); animation: ui-slide-in var(--dur-2) var(--ease);

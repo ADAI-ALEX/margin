@@ -97,22 +97,8 @@
   --ease-in-out: cubic-bezier(0.45, 0, 0.2, 1);
 
   --focus-ring: 0 0 0 2px var(--canvas), 0 0 0 4px var(--ev-strong);
+  --scrim: rgba(5, 7, 10, 0.62);   /* behind modal drawers and search */
 
-  /* TRANSITIONAL aliases for not-yet-rebuilt feature CSS (removed before merge; grep "legacy-alias") */
-  --bg: var(--canvas); /* legacy-alias */
-  --surface-hover: var(--surface-3); /* legacy-alias */
-  --line-soft: var(--line-faint); /* legacy-alias */
-  --signal: var(--ev); /* legacy-alias */
-  --signal-strong: var(--ev-strong); /* legacy-alias */
-  --ev-none-hatch: var(--surface-2); /* legacy-alias */
-  --display: var(--font-ui); /* legacy-alias */
-  --sans: var(--font-ui); /* legacy-alias */
-  --serif: var(--font-ui); /* legacy-alias */
-  --mono: var(--font-code); /* legacy-alias */
-  --claim-draft-legacy: var(--text-3); /* legacy-alias */
-  --focus: var(--focus-ring); /* legacy-alias */
-  --ease-legacy: var(--ease); /* legacy-alias */
-  --dur: var(--dur-1); /* legacy-alias */
 }
 @media (max-width: 767px) { :root { --gutter: 16px; --header-h: 88px; } } /* two header rows on phones */
 

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { Run } from "@/lib/schema";
 import { classify } from "@/lib/engine";
@@ -9,6 +9,7 @@ import {
   type Fingerprint, type LadderRow,
 } from "./derive";
 import { Claim, EvidenceWord, VerifyBadge } from "./ui";
+import { IconChevronDown, IconChevronUp, IconClose } from "@/components/ui/icons";
 import css from "./casefile.module.css";
 
 interface Cell { key: string; node: ReactNode }
@@ -59,7 +60,7 @@ export function CompareTray({ rows, pinned, unpin, openRun }: { rows: LadderRow[
           <span className={css.stack}>
             <span>D<sub>min</sub> <b className="num">{fmt(r.Dmin, 2)}</b> · <EvidenceWord v={classify(r.Dmin)} /></span>
             {r.nearest.d.partialMatch && <span className={css.partial}>{partialLabel(r.nearest)}</span>}
-            <button type="button" className={css.runLink} onClick={() => openRun(r.nearest!.run)}>nearest: {r.nearest.run.id}</button>
+            <span>nearest <button type="button" className="ui-link-btn mono" onClick={() => openRun(r.nearest!.run)}>{r.nearest.run.id}</button></span>
           </span>
         ) : <span className={css.nr}>{r.chip}</span>,
       })),
@@ -105,8 +106,8 @@ export function CompareTray({ rows, pinned, unpin, openRun }: { rows: LadderRow[
         node: (
           <span className={css.stack}>
             <Link href={`/investigations/${r.inv.id}`}>Dossier</Link>
-            <a href={r.inv.landingUrl} target="_blank" rel="noreferrer">{r.inv.tier === "T2_PSI_RECORD" ? "PSI record" : "Source document"} ↗</a>
-            {r.inv.doi && <a href={`https://doi.org/${r.inv.doi}`} target="_blank" rel="noreferrer">doi {r.inv.doi} ↗</a>}
+            <a href={r.inv.landingUrl} target="_blank" rel="noreferrer">{r.inv.tier === "T2_PSI_RECORD" ? "PSI record" : "Source document"}<span className="sr-only"> (opens in a new tab)</span></a>
+            {r.inv.doi && <a href={`https://doi.org/${r.inv.doi}`} target="_blank" rel="noreferrer">doi {r.inv.doi}<span className="sr-only"> (opens in a new tab)</span></a>}
             {r.runs[0] && <span className={css.quiet}>{sourceLabel(r.runs[0]).replace(/ · row \d+$/, "")}</span>}
           </span>
         ),
@@ -114,29 +115,38 @@ export function CompareTray({ rows, pinned, unpin, openRun }: { rows: LadderRow[
     },
   ];
 
+  const [open, setOpen] = useState(false);
+  if (cols.length === 0) return null;
   return (
-    <section className={css.compare} aria-labelledby="inv-compare-h" data-testid="compare-tray" id="compare">
-      <div className={css.secHead}>
-        <div>
-          <h2 className={css.h2} id="inv-compare-h">Compare <span className="num">{cols.length}/3</span></h2>
-          <p className={css.secSub}>How did the tests differ? Fingerprints aligned side by side — what varied, what was held constant, and where each value comes from. Pinned investigations are kept in the link.</p>
-        </div>
+    <section className={css.dock} aria-labelledby="inv-compare-h" data-testid="compare-tray" id="compare" data-open={open || undefined}>
+      <div className={css.dockBar}>
+        <h2 className={css.dockTitle} id="inv-compare-h">Compare <span className={`num ${css.dockCount}`}>{cols.length}/3</span></h2>
+        <ul className={css.dockChips} aria-label="Pinned investigations">
+          {cols.map((r) => (
+            <li key={r.inv.id} className={css.dockChip}>
+              <span>{r.inv.acronym}</span>
+              <button type="button" className={css.dockX} onClick={() => unpin(r.inv.id)} aria-label={`Remove ${r.inv.acronym} from compare`}><IconClose size={12} /></button>
+            </li>
+          ))}
+        </ul>
+        <span className={css.dockHint}>Kept in the link</span>
+        <button type="button" className="ui-btn" aria-expanded={open} aria-controls="inv-compare-body" onClick={() => setOpen((x) => !x)}>
+          {open ? <>Collapse <IconChevronDown size={14} /></> : <>Show comparison <IconChevronUp size={14} /></>}
+        </button>
       </div>
-      {cols.length === 0 ? (
-        <p className={css.empty}>Nothing pinned yet. Use the <b>+</b> button beside an investigation in the ladder to add up to three.</p>
-      ) : (
-        <div className={css.tableScroll} tabIndex={0} role="region" aria-label="Compare table (scrolls sideways on small screens)">
-          <table className={css.cmpTable} data-multi={cols.length > 1 || undefined}>
+      <div id="inv-compare-body" className={css.dockBody} hidden={!open}>
+        <p className={css.dockSub}>How did the tests differ? Fingerprints aligned on shared axes: what varied, what was held constant, and where each value comes from.{cols.length > 1 && " Rows marked “differs” vary between them."}</p>
+        <div className={`ui-table-scroll ${css.cmpScroll}`} tabIndex={0} role="region" aria-label="Compare table">
+          <table className={`ui-table ${css.cmpTable}`} data-multi={cols.length > 1 || undefined}>
             <caption className="sr-only">Aligned fingerprints of the pinned investigations. Rows marked “differs” vary between them.</caption>
             <thead>
               <tr>
-                <td />
+                <td className={css.cmpCorner} />
                 {cols.map((r) => (
                   <th key={r.inv.id} scope="col" className={css.cmpHead}>
-                    <span className={css.cmpName}><Link href={`/investigations/${r.inv.id}`}>{r.inv.acronym}</Link></span>
-                    <span className={css.invMeta}><span className={css.tier} data-tier={r.inv.tier}>{tierShort(r.inv)}</span> <span className="num">{r.inv.id}</span></span>
+                    <Link href={`/investigations/${r.inv.id}`} className={css.cmpName}>{r.inv.acronym}</Link>
+                    <span className={css.cmpMeta}><span className={css.tier} data-tier={r.inv.tier}>{tierShort(r.inv)}</span> <span className="num">{r.inv.id}</span></span>
                     <span className={css.cmpTitle}>{r.inv.title}</span>
-                    <button type="button" className={css.unpinBtn} onClick={() => unpin(r.inv.id)} aria-label={`Remove ${r.inv.acronym} from compare`}>Remove ✕</button>
                   </th>
                 ))}
               </tr>
@@ -147,7 +157,7 @@ export function CompareTray({ rows, pinned, unpin, openRun }: { rows: LadderRow[
                 return (
                   <tr key={l.label} data-differs={differs || undefined}>
                     <th scope="row" className={css.cmpLabel}>
-                      {l.label}
+                      <span>{l.label}</span>
                       {l.computed && <> <Claim kind="COMPUTED" /></>}
                       {cols.length > 1 && <span className={css.diffTag}>{differs ? "differs" : "same"}</span>}
                     </th>
@@ -158,7 +168,7 @@ export function CompareTray({ rows, pinned, unpin, openRun }: { rows: LadderRow[
             </tbody>
           </table>
         </div>
-      )}
+      </div>
     </section>
   );
 }

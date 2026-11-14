@@ -19,6 +19,19 @@ export async function generateMetadata({ params }: PageProps<"/investigations/[i
   };
 }
 
+/** Designed loading state: the page frame and a quiet status line (shown only for ids outside the prerendered list). */
+function DossierLoading() {
+  return (
+    <main id="main" className="ui-page" aria-busy="true">
+      <header className="ui-page-head">
+        <p className="caps">Investigation dossier</p>
+        <h1 className="ui-page-title">Loading dossier…</h1>
+        <p className="ui-page-lede" role="status">Reading the record, its runs and their sources.</p>
+      </header>
+    </main>
+  );
+}
+
 async function DossierFor({ params }: { params: PageProps<"/investigations/[id]">["params"] }) {
   const { id } = await params;
   const inv = invById.get(decodeURIComponent(id));
@@ -30,7 +43,7 @@ async function DossierFor({ params }: { params: PageProps<"/investigations/[id]"
 // prerendered by generateStaticParams, so the fallback only shows for ids outside the list (which 404).
 export default function Page({ params }: PageProps<"/investigations/[id]">) {
   return (
-    <Suspense fallback={<main id="main" style={{ padding: "24px var(--gutter)" }}><p>Loading dossier…</p></main>}>
+    <Suspense fallback={<DossierLoading />}>
       <DossierFor params={params} />
     </Suspense>
   );
