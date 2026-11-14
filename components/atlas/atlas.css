@@ -279,3 +279,55 @@
 @media (prefers-reduced-motion: reduce) {
   .atlas-root *, .atlas-root *::before, .atlas-root *::after { transition: none !important; animation: none !important; }
 }
+
+/* ---------------------------------------------------------------- verdict extras */
+.atlas-root .atlas-verdict-edge { margin: 6px 0 0; font-family: var(--sans); font-size: 12.5px; color: var(--ink); border-left: 2px solid var(--ink); padding-left: 8px; }
+.atlas-root .atlas-verdict-method { margin: 6px 0 0; font-family: var(--sans); font-size: 11.5px; color: var(--ink-3); line-height: 1.45; }
+
+/* ---------------------------------------------------------------- per-axis gaps (signed bars) */
+.atlas-root .atlas-gaps { margin: 14px 0 6px; }
+.atlas-root .atlas-gaps-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 12px; }
+.atlas-root .atlas-gaps-table td, .atlas-root .atlas-gaps-table th { padding: 3px 0; vertical-align: middle; }
+.atlas-root .atlas-gaps-axis { text-align: left; font-weight: 600; width: 74px; line-height: 1.15; }
+.atlas-root .atlas-gaps-scale { display: block; font-weight: 400; font-size: 10px; color: var(--ink-3); }
+.atlas-root .atlas-gaps-barcell { padding: 0 8px !important; }
+.atlas-root .atlas-gaps-track { position: relative; display: block; height: 10px; background: var(--rule-soft); }
+.atlas-root .atlas-gaps-zero { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--ink); }
+.atlas-root .atlas-gaps-bar { position: absolute; top: 2px; height: 6px; background: var(--ink-2); }
+.atlas-root .atlas-gaps-bar.is-clipped { background: repeating-linear-gradient(90deg, var(--ink-2) 0 6px, transparent 6px 8px); }
+.atlas-root .atlas-gaps-na { font-size: 11px; font-style: italic; color: var(--ink-3); }
+.atlas-root .atlas-gaps-val { text-align: right; white-space: nowrap; font-size: 11.5px; }
+.atlas-root .atlas-gaps-phys { color: var(--ink-3); }
+.atlas-root tr.is-off .atlas-gaps-axis { color: var(--ink-3); }
+
+/* ---------------------------------------------------------------- flow sensitivity */
+.atlas-root .atlas-sens { margin: 16px 0 8px; }
+.atlas-root .atlas-sens-svg { display: block; max-width: 360px; overflow: visible; }
+.atlas-root .atlas-sens-direct { fill: var(--direct); opacity: 0.22; }
+.atlas-root .atlas-sens-near { fill: var(--near); opacity: 0.45; }
+.atlas-root .atlas-sens-rule { stroke: var(--edge); stroke-width: 0.75; stroke-dasharray: 2 2; }
+.atlas-root .atlas-sens-tick { font-family: var(--sans); font-size: 9px; fill: var(--ink-3); }
+.atlas-root .atlas-sens-zone { font-family: var(--sans); font-size: 8.5px; font-weight: 700; letter-spacing: 0.1em; fill: var(--ink-2); }
+.atlas-root .atlas-sens-line { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+.atlas-root .atlas-sens-pt { fill: var(--ink); }
+.atlas-root .atlas-sens-pt.is-partial { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.atlas-root .atlas-sens-cur { stroke: var(--ochre); stroke-width: 1; }
+.atlas-root .atlas-sens-curpt { fill: var(--ochre); stroke: var(--paper); stroke-width: 1.5; }
+
+/* ---------------------------------------------------------------- insights (checked) */
+.atlas-root .atlas-checked { font-family: var(--sans); font-size: 10.5px; color: var(--ink-3); }
+.atlas-root .atlas-insight-quote { margin: 6px 0; padding-left: 10px; border-left: 2px solid var(--rule); font-style: italic; font-size: 13px; color: var(--ink-2); }
+
+/* ---------------------------------------------------------------- numeric entry */
+.atlas-root .atlas-numgroup { display: flex; align-items: center; gap: 6px; }
+.atlas-root .atlas-numinput { width: 66px; font-family: var(--mono); font-size: 13px; color: var(--ink); background: transparent; border: none; border-bottom: 1px solid var(--ink); padding: 3px 2px; font-variant-numeric: tabular-nums; }
+.atlas-root .atlas-numinput:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+.atlas-root .atlas-unit { font-family: var(--sans); font-size: 12px; color: var(--ink-2); }
+.atlas-root .atlas-unit-toggle { font-family: var(--sans); font-size: 11px; border: 1px solid var(--rule); background: transparent; padding: 1px 5px; cursor: pointer; }
+.atlas-root .atlas-unit-toggle[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.atlas-root .atlas-map-caption { margin: 6px 0 0; font-family: var(--sans); font-size: 12px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.atlas-root .atlas-map-caption strong { color: var(--ink); }
+.atlas-root .atlas-hero-note { color: var(--ink-2); font-size: 0.8em; }
+.atlas-root .atlas-gaps-table { table-layout: fixed; }
+.atlas-root .atlas-gaps-table col.c-axis { width: 78px; }
+.atlas-root .atlas-gaps-table col.c-val { width: 132px; }

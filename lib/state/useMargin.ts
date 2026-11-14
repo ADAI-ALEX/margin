@@ -35,20 +35,20 @@ export function useMargin(initialPreset = "iss") {
 
   // Hydrate from the URL once on the client — in an effect (not a lazy initializer) so the
   // server and first client render match and there is no hydration mismatch.
+  const initialPresetRef = initialPreset;
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     const { scenario: rest, preset: pr } = parseScenarioQuery(new URLSearchParams(window.location.search));
     const hasScenario = Object.keys(rest).length > 0;
-    if (pr && !hasScenario) {
-      const ps = presetScenario(pr);
-      if (ps) { setScenario((s) => ({ ...ps, hazard: s.hazard, materialClass: s.materialClass, includePublished: s.includePublished })); setPreset(pr); }
-    } else {
-      if (hasScenario) setScenario((s) => clampScenario({ ...s, ...rest }));
-      if (pr !== undefined) setPreset(pr); else if (hasScenario) setPreset(null);
-    }
+    const ps = pr ? presetScenario(pr) : null;
+    // A preset sets the landmark position first; explicit parameters then override it.
+    if (ps) setScenario(clampScenario({ ...ps, ...rest }));
+    else if (hasScenario) setScenario((s) => clampScenario({ ...s, ...rest }));
+    const moved = ps && (["o2Pct", "pressureKPa"] as const).some((k) => k in rest && rest[k] !== ps[k]);
+    setPreset(ps && !moved ? pr! : hasScenario || pr ? null : initialPresetRef);
     setHydrated(true);
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+  }, [initialPresetRef]);
 
   // Never write the URL before hydration has read it (Strict Mode runs effects twice in dev).
   useEffect(() => {

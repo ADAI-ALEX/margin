@@ -1,11 +1,19 @@
 "use client";
 import type { Run, Scenario } from "@/lib/schema";
-import { SCALES, VERDICT_THRESHOLDS, ROBUSTNESS_FACTORS, classify, type Evaluation, type Robustness, type RankRow, type Scored, type Verdict } from "@/lib/engine";
+import Link from "next/link";
+import { SCALES, VERDICT_THRESHOLDS, ROBUSTNESS_FACTORS, classify, boundaryMargin, type Evaluation, type Robustness, type RankRow, type Scored, type Verdict } from "@/lib/engine";
 import { COUNTS, SNAP, PSI_INVESTIGATIONS } from "@/lib/data";
 import { HAZARDS, INSIGHTS, OLSON_FERKUL_2012, PUBLISHED_GROUPS } from "@/content/curated";
 import { DISCLAIMER, GRAVITY_LABEL, VERDICT_COPY, fmt, fmtSigned, psia } from "@/lib/format";
 import PartialGPlot from "./PartialGPlot";
 import SpecimenCard, { runTitle, sourceLabel } from "./SpecimenCard";
+import AxisGaps from "./AxisGaps";
+import FlowSensitivity from "./FlowSensitivity";
+import { useScenarioQuery } from "@/lib/state/useMargin";
+
+/** An insight renders as a finding only once it has been checked against its primary source. */
+type Checked = { verification?: { status?: string; locator?: string | null; quote?: string | null; checkedBy?: string } };
+const isPrimaryChecked = (i: object) => (i as Checked).verification?.status === "primary-checked";
 
 type Src = { key: string; label: string; url?: string };
 function footnotes() {
@@ -61,6 +69,7 @@ export interface NotesProps {
 export default function FieldNotes(p: NotesProps) {
   const { scenario: s, evaluation: ev, psiOnly, robust } = p;
   const fn = footnotes();
+  const q = useScenarioQuery();
   const n = ev.nearest;
   const verdict: Verdict = ev.verdict;
   const partialG = s.gravity === "moon" || s.gravity === "mars";
@@ -69,10 +78,11 @@ export default function FieldNotes(p: NotesProps) {
   const loc = `At ${fmt(s.o2Pct)}% O₂ and ${fmt(s.pressureKPa)} kPa (${psia(s.pressureKPa)} psia), ${flowTxt}`;
   const unit = `one unit = ${SCALES.o2Pts} pts O₂, ${Math.round((SCALES.pressureRatio - 1) * 100)}% pressure or ${SCALES.flowCmS} cm/s flow`;
   const psiN = psiOnly.nearest;
+  const bm = n ? boundaryMargin(n.d.D) : null;
   const fx = [ROBUSTNESS_FACTORS[0], ROBUSTNESS_FACTORS[ROBUSTNESS_FACTORS.length - 1]];
 
   const verdictCounts = (Object.keys(robust.verdicts) as Verdict[]).filter((v) => robust.verdicts[v] > 0).map((v) => `${v} ${robust.verdicts[v]}`).join(" · ");
-  const insights = INSIGHTS.filter((i) => (partialG ? i.id === "i-lunar" || i.hazards.includes(s.hazard) : i.hazards.includes(s.hazard) && i.id !== "i-lunar"))
+  const insights = INSIGHTS.filter(isPrimaryChecked).filter((i) => (partialG ? i.id === "i-lunar" || i.hazards.includes(s.hazard) : i.hazards.includes(s.hazard) && i.id !== "i-lunar"))
     .sort((a, b) => (partialG ? Number(b.id === "i-lunar") - Number(a.id === "i-lunar") : 0)).slice(0, 3);
   const mylar = OLSON_FERKUL_2012.rows.find((r) => r.material.startsWith("Mylar"));
   const lunarClaim = mylar && mylar.uloi.moon < mylar.uloi.micro && mylar.uloi.moon < mylar.uloi.earth;
@@ -91,6 +101,8 @@ export default function FieldNotes(p: NotesProps) {
           <span className="atlas-disclaimer">{DISCLAIMER}</span>
         </p>
         <p className="atlas-verdict-copy">{VERDICT_COPY[verdict]}{n && <> · <span className="atlas-computed">computed</span> D <span className="atlas-num">{fmt(n.d.D, 2)}</span></>}{fn.ref(ENGINE_SRC)}</p>
+        {bm && Math.abs(bm.delta) < 0.25 && <p className="atlas-verdict-edge">D is <span className="atlas-num">{fmt(Math.abs(bm.delta), 2)}</span> {bm.delta > 0 ? "above" : "below"} the {bm.boundary === VERDICT_THRESHOLDS.near ? "NEAR/DISTANT" : "DIRECT/NEAR"} boundary ({bm.boundary}): a small change in an input or assumption changes the class.</p>}
+        <p className="atlas-verdict-method">DIRECT (D ≤ {VERDICT_THRESHOLDS.direct}), NEAR (≤ {VERDICT_THRESHOLDS.near}) and DISTANT are classes defined by MARGIN&rsquo;s method, not established scientific categories. <Link href="/method#verdicts">How D is computed</Link>.</p>
       </div>
 
       {p.selected && (
@@ -113,7 +125,9 @@ export default function FieldNotes(p: NotesProps) {
               ? <> Best fully-compared test:{" "}<button type="button" className="atlas-runlink" onClick={() => p.onInspect(p.evaluation.nearestComplete!.run)}>{runTitle(p.evaluation.nearestComplete.run)}</button>{fn.ref(runSrc(p.evaluation.nearestComplete.run))}, D <span className="atlas-num">{fmt(p.evaluation.nearestComplete.d.D, 2)}</span> ({classify(p.evaluation.nearestComplete.d.D)}).</>
               : <> No test in this regime is comparable on all three axes.</>)}
             {n.run.pressureBasis === "nominal-stated" && <> Its pressure is nominal (stated), not measured.</>}
-            {n.run.tier === "T3_PUBLISHED" && <> It is a published value, not a PSI table row, transcribed and awaiting verification.</>}
+            {n.run.tier === "T3_PUBLISHED" && (n.run.flags.includes("unverified-transcription")
+              ? <> It is a published value, not a PSI table row, and has not yet been checked against its primary source.</>
+              : <> It is a published value, not a PSI table row{n.run.source.page ? <>, from {n.run.source.page}</> : null}.</>)}
           </p>
         ) : (
           <p>
@@ -122,6 +136,9 @@ export default function FieldNotes(p: NotesProps) {
             {!s.includePublished && s.gravity !== "micro" && <> Turn on published evidence to see the drop-tower and LUCI points for this regime.</>}
           </p>
         )}
+
+        {n && <AxisGaps scored={n} title={n.d.partialMatch ? "Gaps to the nearest test (partial match)" : "Gaps to the nearest test"} />}
+        {n && n.d.partialMatch && p.evaluation.nearestComplete && <AxisGaps scored={p.evaluation.nearestComplete} title="Gaps to the best fully-compared test" />}
 
         {s.includePublished ? (
           psiN?.run.id !== n?.run.id ? (
@@ -138,6 +155,8 @@ export default function FieldNotes(p: NotesProps) {
           {" "}The dashed contours on the map show where the NEAR boundary would sit if the O₂ and pressure scales were halved or doubled{fn.ref(ENGINE_SRC)}.
         </p>
 
+        <FlowSensitivity scenario={s} />
+
         {ev.limits.length > 0 && <p className="atlas-quiet">{ev.limits.length} reported limit {ev.limits.length === 1 ? "point" : "points"} in this regime (ticked rings) are thresholds inferred from test series, not tested conditions; they never set the verdict or the bands.</p>}
         <p className="atlas-quiet">{pct(p.coveragePct)} of this charted window lies within D {VERDICT_THRESHOLDS.near} of comparable evidence (computed on a {p.grid.nx} × {p.grid.ny} grid; uniform in log pressure). {ev.otherGravity.length > 0 && <>{ev.otherGravity.length.toLocaleString("en-US")} placeable runs from other gravity regimes stay on their own sheets.</>}</p>
       </div>
@@ -150,7 +169,7 @@ export default function FieldNotes(p: NotesProps) {
           {lunarClaim && mylar && <p className="atlas-pullquote">For {mylar.material.split(" ")[0]} at {mylar.pressurePsia} psia, NASA drop-tower tests found a lower flammability limit at lunar gravity than at either 0 g or 1 g. Microgravity and Earth results did not bound lunar behaviour for this material.{fn.ref(OF_SRC)}</p>}
           <ul className="atlas-caveats">{OLSON_FERKUL_2012.caveats.map((c) => <li key={c}>{c}</li>)}</ul>
           {fm2 && s.gravity === "moon" && <p className="atlas-prose-sm"><span className="atlas-planned-tag">planned — not evidence</span> {fm2.acronym}: planned — first lunar-surface test. Its condition sets are drawn as dashed rings and never counted{fn.ref({ key: "fm2", label: fm2.title, url: fm2.landingUrl })}.</p>}
-          <p className="atlas-micro">Method: we do not interpolate between gravity levels.</p>
+          <p className="atlas-micro">Each gravity level is a separate regime: no line, curve or estimate is drawn between them.</p>
         </section>
       )}
 
@@ -188,6 +207,7 @@ export default function FieldNotes(p: NotesProps) {
             );
           })}
         </ol>
+        <p className="atlas-prose-sm"><Link href={q ? `/investigations?${q}` : "/investigations"}>Compare all investigations, their runs and sources →</Link></p>
         <p className="atlas-rank-key" aria-hidden="true">
           {(["P", "H", "S", "C", "M"] as const).map((k) => <span key={k}><i className={`atlas-seg atlas-seg-${k}`} />{k}</span>)}
           <span className="atlas-quiet">P proximity · H hazard · S scale · C coverage · M measures</span>
@@ -196,14 +216,16 @@ export default function FieldNotes(p: NotesProps) {
 
       <section className="atlas-notes-sec" aria-labelledby="atlas-ins-title">
         <h3 id="atlas-ins-title" className="atlas-h3">Marginalia</h3>
+        {insights.length === 0 && <p className="atlas-micro">No source-checked findings for this question yet. Findings appear here only after they have been checked against their primary source.</p>}
         {insights.map((i) => (
           <article key={i.id} className="atlas-insight">
-            <p className="atlas-insight-stamps"><span className="atlas-draft">DRAFT — unverified</span><span className="atlas-validity">{i.validity}</span></p>
+            <p className="atlas-insight-stamps"><span className="claim" data-kind={i.validity === "MEASURED" ? "MEASURED" : "ASSUMED"}>{i.validity}</span> <span className="atlas-checked">checked against primary source · human sign-off pending</span></p>
             <p className="atlas-insight-claim">{i.claim}</p>
             <p className="atlas-insight-meta"><span className="atlas-num">{i.value}</span> · {i.conditions}</p>
             <p className="atlas-insight-meta"><b>Scope</b> {i.scope}</p>
             <p className="atlas-insight-meta"><b>Not valid for</b> {i.notValidFor}</p>
-            <p className="atlas-insight-meta"><a href={i.source.url} target="_blank" rel="noreferrer">{i.source.ref} ↗</a></p>
+            {(i as Checked).verification?.quote && <blockquote className="atlas-insight-quote">&ldquo;{(i as Checked).verification!.quote}&rdquo;</blockquote>}
+            <p className="atlas-insight-meta"><a href={i.source.url} target="_blank" rel="noreferrer">{i.source.ref}{(i as Checked).verification?.locator ? `, ${(i as Checked).verification!.locator}` : ""} ↗</a></p>
           </article>
         ))}
       </section>

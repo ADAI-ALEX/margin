@@ -9,6 +9,9 @@ type Snapshot = {
     totalRuns: number; totalSummaryRows: number; plottable: number; solidRuns: number; solidRunsWithO2: number;
     solidRunsAboveMax: number; maxSolidO2: number; maxSolidO2Runs: string[]; partialGravityRuns: number;
     byInvestigation: Record<string, number>;
+    distinctRuns?: number; duplicateRows?: number; placeable?: number; solidRunsWithoutO2?: number;
+    burnerFedOxidizerRuns?: number; nominalPressureRuns?: number; skippedNonRunRows?: number; blankLinesIgnored?: number;
+    byFuelClass?: Record<string, number>; byFlag?: Record<string, number>;
   };
   tableStats: { investigation: string; file: string; kind: string; dataRows: number; kept: number; skippedNonRunRows: number; columns: string[] }[];
   investigations: (Investigation & { psiVersion: number | null; psiModified: string | null })[];
@@ -30,11 +33,14 @@ export const COUNTS = SNAP.counts;
  * planned habitat O₂ level.
  */
 import { PRESETS as _PRESETS } from "@/content/curated";
-const _solidO2 = PSI_RUNS.filter((r) => r.fuelClass.startsWith("solid") && r.o2Pct != null).map((r) => r.o2Pct as number);
+const _solid = PSI_RUNS.filter((r) => r.fuelClass.startsWith("solid"));
+const _solidO2 = _solid.filter((r) => r.o2Pct != null).map((r) => r.o2Pct as number);
 const _artemis = _PRESETS.find((p) => p.id === "artemis")!;
 const _ea = _PRESETS.find((p) => p.id === "ea")!;
 export const HEADLINE = {
+  solidRuns: _solid.length,
   solidRunsWithO2: _solidO2.length,
+  solidRunsNoO2: _solid.length - _solidO2.length,
   maxSolidO2: Math.max(..._solidO2),
   artemisO2: _artemis.o2Pct,
   eaO2: _ea.o2Pct,

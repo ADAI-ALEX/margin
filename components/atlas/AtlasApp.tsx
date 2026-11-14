@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 import type { Gravity, Run } from "@/lib/schema";
 import { distanceField, evaluate, ROBUSTNESS_FACTORS, VERDICT_THRESHOLDS } from "@/lib/engine";
 import { useMargin, DEFAULT_SCENARIO } from "@/lib/state/useMargin";
-import { ALL_RUNS, HEADLINE, PSI_RUNS, SNAP } from "@/lib/data";
+import { ALL_RUNS, HEADLINE, PSI_RUNS } from "@/lib/data";
 import { ATMOSPHERES, HAZARDS, PLANNED, PRESETS, PUBLISHED } from "@/content/curated";
 import { GRAVITY_LABEL } from "@/lib/format";
 import { MAIN_GRID, O2_DOMAIN, P_DOMAIN, SHEET_GRID, fractionWithin, scaledField, scalesTimes } from "./geo";
@@ -60,7 +60,7 @@ export default function AtlasApp() {
   const highlightInv = hoverInv ?? pinnedInv;
 
   const hazardLabel = HAZARDS.find((h) => h.id === s.hazard)!.label;
-  const selectGravity = (g: Gravity) => m.update({ gravity: g });
+  const selectGravity = (g: Gravity) => m.update({ gravity: g }, true);
 
   return (
     <div className="atlas-root" id="main">
@@ -78,6 +78,7 @@ export default function AtlasApp() {
           The highest O₂ in any of PSI&rsquo;s <span className="atlas-num">{HEADLINE.solidRunsWithO2}</span> solid-material tests with a recorded O₂ value is{" "}
           <span className="atlas-num">{HEADLINE.maxSolidO2}%</span>. Artemis surface habitats plan <span className="atlas-num">{HEADLINE.artemisO2}%</span> and the
           Exploration Atmosphere <span className="atlas-num">{HEADLINE.eaO2}%</span>: <em>{HEADLINE.atOrAboveArtemis === 0 ? "none" : <span className="atlas-num">{HEADLINE.atOrAboveArtemis}</span>}</em> of those tests reach either level.
+          {HEADLINE.solidRunsNoO2 > 0 && <span className="atlas-hero-note"> A further <span className="atlas-num">{HEADLINE.solidRunsNoO2}</span> solid-material runs have no O₂ recorded.</span>}
         </p>
       </header>
 
@@ -111,6 +112,12 @@ export default function AtlasApp() {
             onPreset={(id) => { m.applyPreset(id); }}
             onInspect={(r) => setSelectedId(r.id)}
           />
+
+          <p className="atlas-map-caption">
+            <strong>Evidence proximity, not a safety rating.</strong>
+            <span>Shading shows distance to the nearest comparable test under MARGIN&rsquo;s method. It is not a hazard map.</span>
+            {field.omitted > 0 && <span>{field.omitted} comparable {field.omitted === 1 ? "run lacks" : "runs lack"} a recorded pressure, so {field.omitted === 1 ? "it is" : "they are"} not drawn on this plane; {field.omitted === 1 ? "it still counts" : "they still count"} for the verdict as partial matches.</span>}
+          </p>
 
           <section className="atlas-key" aria-labelledby="atlas-key-title">
             <h2 id="atlas-key-title" className="atlas-key-title">Key · Evidence coverage — not a hazard map</h2>

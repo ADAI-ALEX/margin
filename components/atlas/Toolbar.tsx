@@ -1,5 +1,6 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { kPaToPsia, psiaToKPa } from "@/lib/engine";
 import type { Gravity, Hazard, MaterialClass, Scenario } from "@/lib/schema";
 import { HAZARDS, PRESETS } from "@/content/curated";
 import { GRAVITY_LABEL, GRAVITY_SHORT } from "@/lib/format";
@@ -48,20 +49,58 @@ function Segmented<T extends string | number | null>({ label, options, value, on
   );
 }
 
+/** Number field that commits on blur / Enter, so typing "3" on the way to "34" doesn't move the pin. */
+function NumField({ id, label, value, onCommit, min, max, step, unit, children }: {
+  id: string; label: string; value: number; onCommit: (v: number) => void; min: number; max: number; step: number; unit: string; children?: React.ReactNode;
+}) {
+  const [txt, setTxt] = useState(String(value));
+  useEffect(() => { setTxt(String(value)); }, [value]); // eslint-disable-line react-hooks/set-state-in-effect
+  const commit = () => {
+    const v = Number(txt);
+    if (txt.trim() !== "" && Number.isFinite(v)) onCommit(Math.min(max, Math.max(min, v)));
+    else setTxt(String(value));
+  };
+  return (
+    <div className="atlas-field">
+      <label className="atlas-field-label" htmlFor={id}>{label}</label>
+      <span className="atlas-numgroup">
+        <input id={id} className="atlas-numinput" type="number" inputMode="decimal" min={min} max={max} step={step} value={txt}
+          onChange={(e) => setTxt(e.target.value)} onBlur={commit} onKeyDown={(e) => { if (e.key === "Enter") commit(); }} />
+        <span className="atlas-unit">{unit}</span>
+        {children}
+      </span>
+    </div>
+  );
+}
+
 export default function Toolbar({ scenario, preset, update, applyPreset }: {
   scenario: Scenario; preset: string | null;
   update: (patch: Partial<Scenario>, keepPreset?: boolean) => void;
   applyPreset: (id: string) => void;
 }) {
   const flowOpts = FLOW_STOPS.includes(scenario.flowCmS) ? FLOW_STOPS : [...FLOW_STOPS, scenario.flowCmS];
+  const [psiaUnit, setPsiaUnit] = useState(false);
+  const pShown = psiaUnit ? +kPaToPsia(scenario.pressureKPa).toFixed(2) : +scenario.pressureKPa.toFixed(1);
   return (
     <div className="atlas-toolbar" role="toolbar" aria-label="Scenario" data-testid="scenario-toolbar">
+      <div className="atlas-field">
+        <label className="atlas-field-label" htmlFor="atlas-preset">Landmark</label>
+        <select id="atlas-preset" className="atlas-select" value={preset ?? ""} onChange={(e) => e.target.value && applyPreset(e.target.value)}>
+          <option value="">Custom position</option>
+          {PRESETS.map((a) => <option key={a.id} value={a.id}>{a.short} · {a.o2Pct}% O₂ · {a.pressurePsia} psia</option>)}
+        </select>
+      </div>
       <div className="atlas-field">
         <label className="atlas-field-label" htmlFor="atlas-q">Question</label>
         <select id="atlas-q" className="atlas-select" value={scenario.hazard} onChange={(e) => update({ hazard: e.target.value as Hazard }, true)}>
           {HAZARDS.map((h) => <option key={h.id} value={h.id}>{h.label}</option>)}
         </select>
       </div>
+      <NumField id="atlas-o2" label="O₂" value={+scenario.o2Pct.toFixed(2)} min={0.1} max={100} step={0.1} unit="%" onCommit={(v) => update({ o2Pct: v })} />
+      <NumField id="atlas-p" label="Pressure" value={pShown} min={psiaUnit ? 0.2 : 1} max={psiaUnit ? 145 : 1000} step={psiaUnit ? 0.1 : 0.5}
+        unit={psiaUnit ? "psia" : "kPa"} onCommit={(v) => update({ pressureKPa: psiaUnit ? +psiaToKPa(v).toFixed(2) : v })}>
+        <button type="button" className="atlas-unit-toggle" aria-pressed={psiaUnit} onClick={() => setPsiaUnit((u) => !u)} title="Show pressure in psia">psia</button>
+      </NumField>
       <Segmented<MaterialClass>
         label="Material"
         options={["any", "thin", "thick"]}
@@ -73,7 +112,7 @@ export default function Toolbar({ scenario, preset, update, applyPreset }: {
         label="Flow, cm/s"
         options={flowOpts}
         value={scenario.flowCmS}
-        onChange={(v) => update({ flowCmS: v })}
+        onChange={(v) => update({ flowCmS: v }, true)}
         render={(v) => (v == null ? "quiescent" : String(v))}
         aria={(v) => (v == null ? "quiescent" : `${v} centimetres per second`)}
       />
@@ -81,7 +120,7 @@ export default function Toolbar({ scenario, preset, update, applyPreset }: {
         label="Gravity"
         options={GRAVITIES}
         value={scenario.gravity}
-        onChange={(v) => update({ gravity: v })}
+        onChange={(v) => update({ gravity: v }, true)}
         render={(v) => GRAVITY_SHORT[v]}
         aria={(v) => GRAVITY_LABEL[v]}
       />
@@ -98,13 +137,6 @@ export default function Toolbar({ scenario, preset, update, applyPreset }: {
           <span className="atlas-switch-box" aria-hidden="true"><span /></span>
           <span id="atlas-pub-t">Include published evidence</span>
         </button>
-      </div>
-      <div className="atlas-field">
-        <label className="atlas-field-label" htmlFor="atlas-preset">Landmark</label>
-        <select id="atlas-preset" className="atlas-select" value={preset ?? ""} onChange={(e) => e.target.value && applyPreset(e.target.value)}>
-          <option value="">Custom position</option>
-          {PRESETS.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
-        </select>
       </div>
     </div>
   );

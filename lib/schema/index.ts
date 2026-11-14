@@ -1,8 +1,6 @@
 /**
- * MARGIN canonical types (PROVISIONAL — design-exploration phase).
- * Shape follows Kickoff Pack §C.3. The lead freezes this file before the
- * production pipeline starts; prototypes import it so the selected design
- * transitions without rework.
+ * MARGIN canonical types. Shape follows Kickoff Pack §C.3 with documented extensions
+ * (see docs/BUILD_LOG.md). LEAD-OWNED: changes go through the lead.
  */
 export type Tier = "T1_PSI_RUN" | "T3_PUBLISHED" | "T4_PLANNED";
 export type FuelClass =
@@ -16,7 +14,8 @@ export type MaterialClass = "any" | "thin" | "thick";
 export type Flag =
   | "ambiguous-unit" | "out-of-range" | "missing" | "sentinel" | "approximate"
   | "text-parsed" | "nominal-value" | "unverified-transcription" | "conflicting-sources"
-  | "limit-value";
+  | "limit-value"
+  | "duplicate-row" | "derived-value" | "suspect-unit" | "burner-fed-oxidizer" | "assumed-value";
 
 export interface SourceRef {
   kind: "psi-table" | "publication" | "plan";

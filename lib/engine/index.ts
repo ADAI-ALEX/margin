@@ -5,5 +5,6 @@ export * from "./verdict";
 export * from "./robustness";
 export * from "./rank";
 export * from "./field";
+export { flowSensitivity, boundaryMargin, SENSITIVITY_FLOWS, type FlowPoint, type FlowSensitivity } from "./sensitivity";
 export const kPaToPsia = (k: number) => k / 6.894757;
 export const psiaToKPa = (p: number) => p * 6.894757;
