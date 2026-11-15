@@ -59,11 +59,24 @@ export default function GuidePage() {
           </p>
           <div className="g-cta">
             <Link className="g-btn g-btn--primary" href="/?tour=1">Take the interactive tour</Link>
-            <a className="g-btn" href="#demo">Watch the 30-second demo</a>
+            <a className="g-btn" href="#demo">Watch the 30-second demo ↓</a>
             <Link className="g-btn g-btn--quiet" href="/">Open the Atlas</Link>
           </div>
         </div>
         <span className="g-ai">AI-generated illustration</span>
+      </section>
+
+      {/* ------------------------------------------------------------ the demo, first */}
+      <section className="g-watch" id="demo" aria-labelledby="g-demo">
+        <div className="g-watch-head">
+          <p className="g-kicker">Start here · 30 seconds, with sound</p>
+          <h2 id="g-demo" className="g-h2">Watch MARGIN in 30 seconds</h2>
+          <p className="g-p">A screen recording of the live site at margin.adai.systems: the coverage gap, the Exploration Atmosphere, published evidence, the airflow assumption and the Moon. Narration is AI-generated; captions are burned in.</p>
+        </div>
+        <video className="g-video" controls preload="metadata" playsInline poster="/demo/margin-demo-poster.jpg">
+          <source src="/demo/margin-demo-30s.mp4" type="video/mp4" />
+          <a href="/demo/margin-demo-30s.mp4">Download the 30-second demo (MP4)</a>
+        </video>
       </section>
 
       <div className="g-body">
@@ -170,20 +183,9 @@ export default function GuidePage() {
           </div>
         </section>
 
-        {/* ------------------------------------------------------------ demo */}
-        <section className="g-sec" id="demo" aria-labelledby="g-demo">
-          <p className="g-num">05</p>
-          <h2 id="g-demo" className="g-h2">The 30-second demo</h2>
-          <p className="g-p">A screen recording of the live site, with captions: the coverage gap, the Exploration Atmosphere, published evidence, the airflow assumption and the Moon.</p>
-          <video className="g-video" controls preload="metadata" playsInline poster="/demo/margin-demo-poster.jpg">
-            <source src="/demo/margin-demo-30s.mp4" type="video/mp4" />
-            <a href="/demo/margin-demo-30s.mp4">Download the 30-second demo (MP4)</a>
-          </video>
-        </section>
-
         {/* ------------------------------------------------------------ other pages and limits */}
         <section className="g-sec" aria-labelledby="g-more">
-          <p className="g-num">06</p>
+          <p className="g-num">05</p>
           <h2 id="g-more" className="g-h2">The rest of the app</h2>
           <div className="g-links">
             <Link href="/investigations" className="g-link"><span className="g-link-t">Investigations</span><span className="g-link-d">All {PSI_INVESTIGATIONS.length} NASA PSI combustion investigations, ranked by how relevant they are to your scenario, with side-by-side comparison and a ledger of findings.</span></Link>
@@ -201,7 +203,7 @@ export default function GuidePage() {
 
         {/* ------------------------------------------------------------ glossary */}
         <section className="g-sec" aria-labelledby="g-words">
-          <p className="g-num">07</p>
+          <p className="g-num">06</p>
           <h2 id="g-words" className="g-h2">Words you will see</h2>
           <dl className="g-gloss">
             <div><dt>PSI</dt><dd>NASA&rsquo;s Physical Sciences Informatics archive: the public record of experiments flown in space, including the combustion test tables MARGIN reads.</dd></div>

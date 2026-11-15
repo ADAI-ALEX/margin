@@ -1,7 +1,7 @@
 # 30-second demo: script and recording
 
-**Video:** https://margin-two-rho.vercel.app/demo/margin-demo-30s.mp4 (26.8 s, 1440 × 900, H.264, no audio).
-It is also embedded on the Guide page: https://margin-two-rho.vercel.app/guide#demo
+**Video:** https://margin.adai.systems/demo/margin-demo-30s.mp4 (26.8 s, 1440 × 900, H.264, no audio).
+It is also embedded on the Guide page: https://margin.adai.systems/guide#demo
 
 **Hard limit:** 30 s. Over 30 s makes the project ineligible for Global Judging (Project Submission Guide).
 The recording runs 26.8 s.
@@ -34,7 +34,7 @@ information on screen; no AI-generated imagery (the Guide illustrations do not a
 | 0:14–0:18 | Flow 20 cm/s. Verdict **NEAR**, D 1.51. | **Assume 20 cm/s airflow, a different scenario: NEAR, D 1.51. MARGIN shows the sensitivity; it does not pick the flow.** |
 | 0:18–0:22 | Gravity → Lunar. The field changes to the lunar regime; the partial-gravity panel appears. | **The Moon: PSI has no partial-gravity tests. Nothing is borrowed from other gravity levels.** |
 | 0:22–0:25 | The nearest-test link in the field notes opens the run inspector with its NTRS source. | **Every number links to its source: NASA PSI table rows and NTRS papers.** |
-| 0:25–0:27 | End card. | **Evidence proximity, not a safety rating.** · margin-two-rho.vercel.app |
+| 0:25–0:27 | End card. | **Evidence proximity, not a safety rating.** · margin.adai.systems |
 
 The flow-sensitivity beat is deliberate: showing that NEAR at 20 cm/s is a different scenario, not a
 correction, is an honesty point I chose to keep (BUILD_LOG 12:40).

@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Playwright-1.65-2ead33?logo=playwright" alt="Playwright 1.65">
   <img src="https://img.shields.io/badge/Vitest-5.1-6e9f18?logo=vitest" alt="Vitest 5.1">
   <img src="https://img.shields.io/badge/data-NASA%20PSI-56c6dc" alt="Data: NASA PSI">
-  <a href="https://margin-two-rho.vercel.app"><img src="https://img.shields.io/badge/deployed-Vercel-000000?logo=vercel" alt="Deployed on Vercel"></a>
+  <a href="https://margin.adai.systems"><img src="https://img.shields.io/badge/deployed-Vercel-000000?logo=vercel" alt="Deployed on Vercel"></a>
   <img src="https://img.shields.io/badge/licence-Apache--2.0-blue" alt="Licence: Apache-2.0">
 </p>
 
@@ -21,9 +21,9 @@ Created by **Alexander de Gentile-Murnieks** for [NASA Space Apps 2026](https://
 <p align="center"><img src="docs/assets/screenshots/atlas-hero.png" alt="The MARGIN Atlas: the Exploration Atmosphere in microgravity with published evidence included, on a full-screen evidence field. Evidence: DISTANT, D 2.51." width="100%"></p>
 <p align="center"><sub>The Atlas: the Exploration Atmosphere (34% O₂, 56.5 kPa) in microgravity with published evidence on. The amber probe sits outside the coverage bands; the nearest comparable test is Saffire VI-2, D 2.51 (DISTANT). The dashed line marks the highest O₂ in any PSI solid-material test.</sub></p>
 
-- **Live site:** https://margin-two-rho.vercel.app
-- **New here? Start with the Guide:** https://margin-two-rho.vercel.app/guide
-- **30-second demo:** https://margin-two-rho.vercel.app/guide#demo (video file: https://margin-two-rho.vercel.app/demo/margin-demo-30s.mp4)
+- **Live site:** https://margin.adai.systems
+- **New here? Start with the Guide:** https://margin.adai.systems/guide
+- **30-second demo:** https://margin.adai.systems/guide#demo (video file: https://margin.adai.systems/demo/margin-demo-30s.mp4)
 - **Repository:** https://github.com/ADAI-ALEX/margin
 
 ## Contents
@@ -34,8 +34,8 @@ Created by **Alexander de Gentile-Murnieks** for [NASA Space Apps 2026](https://
 
 MARGIN answers one question: **has NASA ever tested fire in conditions like the cabin I am planning, and how close did those tests come?** Two ways in, both in the app:
 
-- **[The Guide](https://margin-two-rho.vercel.app/guide)** explains the problem, the evidence distance D and how to read the screen in plain words, with a worked example computed live by the engine and the 30-second demo.
-- **The tour** (the "Take the tour" button on the Atlas, or [`/?tour=1`](https://margin-two-rho.vercel.app/?tour=1)) puts a spotlight on each part of the live Atlas in turn: the evidence field, your scenario, the scenario panel, the verdict, the gravity regimes, Expeditions and the tools. It works with the mouse, the arrow keys and Esc, and on phones.
+- **[The Guide](https://margin.adai.systems/guide)** explains the problem, the evidence distance D and how to read the screen in plain words, with a worked example computed live by the engine and the 30-second demo.
+- **The tour** (the "Take the tour" button on the Atlas, or [`/?tour=1`](https://margin.adai.systems/?tour=1)) puts a spotlight on each part of the live Atlas in turn: the evidence field, your scenario, the scenario panel, the verdict, the gravity regimes, Expeditions and the tools. It works with the mouse, the arrow keys and Esc, and on phones.
 
 <p align="center"><img src="docs/assets/screenshots/guide.png" alt="The MARGIN Guide: 'Has anyone ever tested fire in air like this?' over an AI-generated illustration of Earth's limb from orbit, labelled as AI-generated" width="100%"></p>
 
@@ -126,7 +126,7 @@ Each investigation has a statically generated dossier (`/investigations/<id>`): 
 
 ## Methodology
 
-Full detail is on the [Method page](https://margin-two-rho.vercel.app/method); the constants live in `lib/engine/constants.ts` and the page reads them from there.
+Full detail is on the [Method page](https://margin.adai.systems/method); the constants live in `lib/engine/constants.ts` and the page reads them from there.
 
 1. **Comparability gate.** A run must match the scenario's gravity regime and be relevant to the hazard question (a gas-burner flame is never evidence for cabin fabrics). Planned experiments are never evidence; reported limits are shown but never set the verdict.
 2. **Distance.** For each comparable run *r* and scenario *s*:

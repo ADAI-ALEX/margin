@@ -24,13 +24,13 @@ _(≈ 140 words.)_
 
 ## 3. Link to Project Demo
 
-> https://margin-two-rho.vercel.app/demo/margin-demo-30s.mp4
+> https://margin.adai.systems/demo/margin-demo-30s.mp4
 
-Also embedded at https://margin-two-rho.vercel.app/guide#demo
+Also embedded at https://margin.adai.systems/guide#demo
 
 ## 4. Link to Final Project
 
-> https://margin-two-rho.vercel.app
+> https://margin.adai.systems
 
 ## 5. Detailed Project Description (target 4,000–6,000 characters)
 
@@ -69,7 +69,7 @@ Also embedded at https://margin-two-rho.vercel.app/guide#demo
 ## 8. Space Agency Partner Data and Other References
 
 > - Space agency partner data: none used.
-> - Publications: every publication MARGIN cites is on NASA's Technical Reports Server or nasa.gov, or is the Space Apps challenge statement; the full list with page-level citations is on the Sources page (https://margin-two-rho.vercel.app/sources).
+> - Publications: every publication MARGIN cites is on NASA's Technical Reports Server or nasa.gov, or is the Space Apps challenge statement; the full list with page-level citations is on the Sources page (https://margin.adai.systems/sources).
 > - Software (open source): Next.js (MIT), React (MIT), d3-array / d3-contour / d3-scale / d3-shape (ISC), zod (MIT); development: TypeScript (Apache-2.0), Vitest (MIT), Playwright (Apache-2.0), axe-core (MPL-2.0), ESLint (MIT), Tailwind CSS (MIT). Full list with licences in NOTICE.
 > - Fonts: Albert Sans, IBM Plex Mono (SIL Open Font License 1.1).
 > - Hosting: Vercel. Repository: GitHub. SI tools: Anthropic Claude (Claude Code), build time only; Higgsfield for the four Guide-page illustrations.

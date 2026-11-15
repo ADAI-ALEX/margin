@@ -29,6 +29,13 @@
 .site-nav a { color: var(--text-2); text-decoration: none; font-size: var(--fs-md); font-weight: 500; padding: 6px 0; border-bottom: 1px solid transparent; transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
 .site-nav a:hover { color: var(--text); }
 .site-nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--text); }
+/* The Guide is the way in for first-time visitors: boxed in the evidence blue so it reads as a button. */
+.site-nav a.site-nav-guide {
+  padding: 5px 12px; border: 1px solid var(--ev); border-radius: var(--r-sm);
+  background: rgba(86, 198, 220, 0.1); color: var(--text);
+}
+.site-nav a.site-nav-guide:hover { background: rgba(86, 198, 220, 0.2); border-color: var(--ev-strong); }
+.site-nav a.site-nav-guide[aria-current="page"] { background: rgba(86, 198, 220, 0.24); border-color: var(--ev-strong); }
 
 .site-actions { margin-left: auto; display: flex; align-items: center; gap: var(--s2); }
 .site-status { display: inline-flex; align-items: center; gap: 8px; color: var(--text-3); font-size: var(--fs-xs); font-weight: 500; letter-spacing: 0.04em; white-space: nowrap; margin-right: var(--s3); font-variant-numeric: tabular-nums; }

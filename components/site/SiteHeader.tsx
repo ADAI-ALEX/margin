@@ -18,7 +18,7 @@ const NAV = [
   { href: "/investigations", label: "Investigations", match: (p: string) => p.startsWith("/investigations") },
   { href: "/method", label: "Method", match: (p: string) => p.startsWith("/method") },
   { href: "/sources", label: "Sources", match: (p: string) => p.startsWith("/sources") },
-  { href: "/guide", label: "Guide", match: (p: string) => p.startsWith("/guide") },
+  { href: "/guide", label: "Guide", match: (p: string) => p.startsWith("/guide"), highlight: true },
 ];
 
 export default function SiteHeader({ status }: { status: string }) {
@@ -37,7 +37,8 @@ export default function SiteHeader({ status }: { status: string }) {
         {NAV.map((n) => {
           const carry = q && (n.href === "/" || n.href === "/investigations");
           return (
-            <Link key={n.href} href={carry ? `${n.href}?${q}` : n.href} aria-current={n.match(pathname) ? "page" : undefined}>{n.label}</Link>
+            <Link key={n.href} href={carry ? `${n.href}?${q}` : n.href} aria-current={n.match(pathname) ? "page" : undefined}
+              className={"highlight" in n && n.highlight ? "site-nav-guide" : undefined}>{n.label}</Link>
           );
         })}
       </nav>
