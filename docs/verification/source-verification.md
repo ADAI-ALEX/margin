@@ -1,6 +1,6 @@
 # Source verification log
 
-Checked 2026-11-14 by an SI-assisted source check. **Human sign-off is still pending** for every item: `verifiedBy` stays null on all insight cards.
+Checked 2026-11-14 against the primary sources (AI-assisted). For every item the page or table and a short verbatim quote are recorded below, so anyone can re-check it. `verifiedBy` stays null on all insight cards because no person is named as the checker.
 
 Method. Each published (non-PSI) value, atmosphere preset and insight card in `content/` was compared with the primary document it cites, downloaded from NTRS (or nasa.gov / standards.nasa.gov for the Researcher's Guide and NASA-STD-6001B). Tables were read from rendered page images as well as the text layer. Quotes are verbatim and at most 25 words; PDF subscripts and superscripts are written with Unicode (O₂, s⁻¹), everything else follows the PDF text. "p." is the printed page number; "PDF p." is given where it differs.
 
@@ -127,14 +127,14 @@ The ranking sanity tests (`tests/science/field-and-ranking.test.ts`) still pass.
 
 ## Contradictions between sources
 
-1. **Saffire flow direction.** ICES-2026 Table 1 caption: "20 cm/s opposed flow" for all seven tests. ICES-2021 Table 1: Concurrent for IV-1, IV-2, V-2, V-3 (Opposed only for V-4, not in our set). ICES-2024 Table 1: Concurrent for IV-1, V-2, VI-2, VI-3, VI-4. ICES-2021 p. 8 also calls IV-2 and V-3 "concurrent samples". Shown as "unknown"; lead to decide.
+1. **Saffire flow direction.** ICES-2026 Table 1 caption: "20 cm/s opposed flow" for all seven tests. ICES-2021 Table 1: Concurrent for IV-1, IV-2, V-2, V-3 (Opposed only for V-4, not in our set). ICES-2024 Table 1: Concurrent for IV-1, V-2, VI-2, VI-3, VI-4. ICES-2021 p. 8 also calls IV-2 and V-3 "concurrent samples". Shown as "unknown".
 2. **Saffire O₂ and pressure.** IV-1: 0.23 / 980 mbar (ICES-2026) vs 22.0% / 100.0 kPa (ICES-2021, ICES-2024). V-2: 0.28 / 741 mbar vs 26.2% / 70.7 kPa. V-3: 0.26 / 745 mbar vs 25.4% / 71.3 kPa. VI-3: 544 mbar vs 54.6 kPa; VI-4: 550 mbar vs 55.2 kPa (O₂ agrees within rounding). IV-2 and VI-2 agree.
 3. **Saffire VI peak HRR.** ICES-2026: VI-2 3376 W, VI-3 3240 W, VI-4 1487 W. ICES-2024 Table 2: 3217, 3080, 1507 W (VI-2 also 3650 W average by fuel-consumption calorimetry). ICES-2024 abstract: "spanned 1.5 to 3.2 kW".
 4. **Saffire IV–V heat release.** ICES-2021 abstract: "heat release rates up to 10 kW"; ICES-2024 p. 2 and ICES-2026 p. 2 say HRR for the thick PMMA in IV–V was not determined. Not used in the app.
 5. **Alarm threshold.** ICES-2024 uses 1 mg/m³ (VI-3 reached at 981 s); ICES-2026 uses 2 mg/m³ (VI-3 at 1037 s). Different thresholds, not a conflict; the app uses ICES-2026.
 6. **Exploration Atmosphere pressure in ICES-2022.** Abstract: "8.3 psia and 34% O2"; body p. 2 and p. 8: 8.2 psia.
 7. **FM2 plans and delivery.** POSTER24: CLPS mission CP-21, then (Future Work) the SpaceX HLS demonstration flight; LPSC26: SpaceX uncrewed demo. Condition sets differ between 2024 and 2026 (both stored as T4, 2026 is current).
-8. **Saffire-III flow speed (PSI data, outside my files).** PSI-100 CSV lists 30 cm/s for S1 and S2; ICES-2021 Table 2 gives III-1 at 25 cm/s. For WS1/lead.
+8. **Saffire-III flow speed (PSI data, outside the curated content).** PSI-100 CSV lists 30 cm/s for S1 and S2; ICES-2021 Table 2 gives III-1 at 25 cm/s. Flagged for the data-pipeline workstream.
 
 ## Could not verify
 
@@ -148,7 +148,7 @@ The ranking sanity tests (`tests/science/field-and-ranking.test.ts`) still pass.
 
 ## Cabin-pressure statements (Kickoff V4)
 
-The lead must not infer a pressure where none is stated. What the primaries actually say:
+MARGIN must not infer a pressure where none is stated. What the primaries actually say:
 
 - **BASS-II (PSI-25), PMMA rod tests (TM §6.1).** No pressure statement in §6.1. The tests ran in the 250 L Microgravity Science Glovebox, with "the initial ISS air filling the MSG working volume … diluted using N2" (p. 67).
 - **BASS-II, elsewhere in the same TM.** §1.5, p. 11: the O₂-consumption calculation uses "free volume of the MSG V = 250,000 cc, … pressure P = 1 atm" (a value used in a calculation, not a measurement). §2.3.5, p. 38 (opposed-flow thin PMMA tests): "The total pressure is also monitored, which varied from 99.2 to 99.5 kPa in the tests reported." §7.1.3, p. 94 (SIBAL fabric concurrent tests): "Ambient pressure was 1 atm."
@@ -156,7 +156,7 @@ The lead must not infer a pressure where none is stated. What the primaries actu
 - **Saffire I–III (PSI-98, -99, -100).** ICES-2017 slides give O₂ as "Initial oxygen concentration 21.7% (ISS reading)" (Saffire-I, slide 14) and "22.1% (ISS reading…)" (Saffire-II, slide 9); no pressure. ICES-2021 Table 2, p. 8 tabulates "Pressure (kPa) 100" for I-1, II-5, II-6 and III-1 — a tabulated test pressure, not a measured value and not worded as "cabin pressure". No statement found for the other Saffire-II samples (silicone, PMMA, Nomex).
 - **Saffire IV–VI.** ICES-2026 p. 4: "The spacecraft was initially at the pressure and oxygen concentration of the ISS but on each flight the Cygnus controllers vented the spacecraft to a predetermined pressure" — pressures are tabulated per test.
 
-Consequence for the curated runs: `PUB-BASS2:micro-min` keeps 101.325 kPa as `nominal-stated` on the strength of the TM's own "P = 1 atm" (with the note above); the lead may prefer `null`. `PUB-BASS2:1g-upward` pressure set to `null` (no statement).
+Consequence for the curated runs: `PUB-BASS2:micro-min` keeps 101.325 kPa as `nominal-stated` on the strength of the TM's own "P = 1 atm" (with the note above); `null` would be the stricter choice. `PUB-BASS2:1g-upward` pressure set to `null` (no statement).
 
 ## Discrepancies with the project spec (`../Discovery/MARGIN_Product_Decision_and_Specification.md`)
 

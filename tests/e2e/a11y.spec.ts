@@ -5,7 +5,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "./helpers/fixtures";
 
-const ROUTES = ["/", "/?preset=ea&g=moon&pub=1", "/investigations", "/method", "/sources", "/investigations/PSI-25"];
+const ROUTES = ["/", "/?preset=ea&g=moon&pub=1", "/investigations", "/method", "/sources", "/guide", "/?tour=1", "/investigations/PSI-25"];
 
 for (const route of ROUTES) {
   test(`axe ${route}`, async ({ page }, info) => {

@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { test, expect, visibleText } from "./helpers/fixtures";
 import { ALL_INVESTIGATIONS } from "./helpers/engine";
 
-const ROUTES = ["/", "/?preset=ea&g=moon&pub=1", "/investigations", "/investigations?g=moon&pub=1", "/method", "/sources",
+const ROUTES = ["/", "/?preset=ea&g=moon&pub=1", "/investigations", "/investigations?g=moon&pub=1", "/method", "/sources", "/guide",
   ...ALL_INVESTIGATIONS.slice(0, 3).map((i) => `/investigations/${i.id}`), "/investigations/PSI-159", "/investigations/PSI-25"];
 
 /** Banned in visible text, case-insensitive. Rule ids match scripts/lint-claims.mjs (and its allow-list). */

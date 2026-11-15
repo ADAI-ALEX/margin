@@ -33,7 +33,7 @@ The question for every reference was the same: *what would make MARGIN read as a
 - The entry redesign article states the goal: make *"important insights and technical details … easily discoverable without overwhelming readers"* — summary first, details one click away.
 
 **Use in MARGIN.** Chart-as-module (title, definition, controls, plot, source line, actions); direct labels on the map (landmarks, scenario) instead of a legend hunt; dashed light gridlines; units on tick labels; ranked list with inline bars for the investigation ranking; summary-first with progressive disclosure for method details.
-**Do not copy.** The white editorial page, Playfair serif titles (exactly the "editorial" feel the owner rejected), the multi-hue categorical palette (MARGIN's encodings must stay restrained and never look like risk colours), cookie-banner yellow.
+**Do not copy.** The white editorial page, Playfair serif titles (exactly the "editorial" feel I rejected), the multi-hue categorical palette (MARGIN's encodings must stay restrained and never look like risk colours), cookie-banner yellow.
 
 ## 3. NASA Eyes — science.nasa.gov/eyes and the Eyes on the Solar System app
 
@@ -75,7 +75,7 @@ The question for every reference was the same: *what would make MARGIN read as a
 | The verdict lives in a long prose column | field notes run ~4 screens | Users must read to find the answer; the class and D are not instrument-like |
 | Toolbar wraps to two rows at 1440 px | `atlas-1440.jpg` | Controls feel improvised |
 | Chart styling is default-like | thin grey grid, small ticks, mixed label weights | Undercuts the scientific claim |
-| Repeated small-caps eyebrow labels everywhere | all routes | The "AI template" feel the owner described |
+| Repeated small-caps eyebrow labels everywhere | all routes | The "AI template" feel I described |
 
 ## 7. Decisions derived from the first research pass (superseded)
 
@@ -93,7 +93,7 @@ The question for every reference was the same: *what would make MARGIN read as a
 
 ## 8. NASA Eyes: interaction anatomy
 
-Research note (workstream R, merged by the lead). Captures, raw measurements and capture scripts: [`research/eyes-deep/`](research/eyes-deep/). Source: the live app at https://eyes.nasa.gov/apps/solar-system/ . All numbers come from the live DOM (`research/eyes-deep/measurements.json`) unless marked "CSS" (read from the app's `app.css` / `vendors.css` rules) or "read off capture".
+Research note (workstream R, merged into this document). Captures, raw measurements and capture scripts: [`research/eyes-deep/`](research/eyes-deep/). Source: the live app at https://eyes.nasa.gov/apps/solar-system/ . All numbers come from the live DOM (`research/eyes-deep/measurements.json`) unless marked "CSS" (read from the app's `app.css` / `vendors.css` rules) or "read off capture".
 
 ### 8.1 Method
 
@@ -267,7 +267,7 @@ Recommendation: keep MARGIN flat 2D SVG with orthographic axes. Reuse Eyes' inte
 
 ## 9. The mapping as built, and the decisions it rests on
 
-The owner selected NASA Eyes on the Solar System as the primary reference (`research/nasa-eyes-app-desktop.jpg`). Section 8 records how it behaves; this section records what MARGIN took, what it changed and why. The design system that implements it is [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
+I selected NASA Eyes on the Solar System as the primary reference (`research/nasa-eyes-app-desktop.jpg`). Section 8 records how it behaves; this section records what MARGIN took, what it changed and why. The design system that implements it is [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
 
 | NASA Eyes element | MARGIN as built | Decision and reason |
 |---|---|---|
@@ -296,4 +296,4 @@ None added. Runtime dependencies remain `d3-array`, `d3-contour`, `d3-scale`, `d
 
 ### 9.3 Imagery
 
-The owner offered generated imagery and video. None is used: the reference's spacecraft renders are explicitly on the "do not copy" list, MARGIN's identity is derived from its own data (contours, the probe, the detents), and every visual on screen must trace to the engine or data. Decorative imagery would also weaken the "honest emptiness" of the three nearly empty regimes.
+I offered generated imagery and video. None is used in the evidence views: the reference's spacecraft renders are explicitly on the "do not copy" list, MARGIN's identity is derived from its own data (contours, the probe, the detents), and every visual on screen must trace to the engine or data. Decorative imagery would also weaken the "honest emptiness" of the three nearly empty regimes. (The Guide page, added later, uses four AI-generated illustrations, each labelled "AI-generated illustration" on screen; see `docs/compliance/si-usage-log.md`.)

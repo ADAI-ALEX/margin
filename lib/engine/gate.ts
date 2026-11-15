@@ -36,7 +36,7 @@ export function gate(run: Run, s: Scenario): GateResult {
   }
   if (s.materialClass === "thin" && run.fuelClass === "solid-thick") return { status: "excluded", reason: "Thick solid; thin material selected" };
   if (s.materialClass === "thick" && run.fuelClass === "solid-thin") return { status: "excluded", reason: "Thin solid; thick material selected" };
-  // [DECIDE, lead] O2 is the anchoring axis: a run with no recorded O2 cannot be placed in
+  // Design decision: O2 is the anchoring axis: a run with no recorded O2 cannot be placed in
   // condition space (otherwise a pressure-only partial match could look deceptively close).
   if (run.o2Pct == null) return { status: "excluded", reason: "No O₂ recorded — not placeable" };
   // Reported flammability LIMITS are thresholds inferred from test series, not tested conditions:

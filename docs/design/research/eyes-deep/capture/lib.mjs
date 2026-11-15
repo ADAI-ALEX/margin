@@ -1,7 +1,8 @@
-import { chromium } from "/Users/alex/Workspace/Projects/Nasa Hackathon/App/node_modules/playwright/index.mjs";
+import { fileURLToPath } from "node:url";
+import { chromium } from "playwright";
 export { chromium };
 export const URL = "https://eyes.nasa.gov/apps/solar-system/";
-export const OUT = "/Users/alex/Workspace/Projects/Nasa Hackathon/App/docs/design/research/eyes-deep";
+export const OUT = fileURLToPath(new URL("..", import.meta.url)).replace(/\/$/, "");
 export async function open(b, { w = 1440, h = 900, mobile = false } = {}) {
   const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, isMobile: mobile, hasTouch: mobile });
   const p = await ctx.newPage();

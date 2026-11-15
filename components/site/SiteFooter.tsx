@@ -25,7 +25,7 @@ export default function SiteFooter() {
           <p>
             Data: NASA Physical Sciences Informatics (PSI), run tables fetched {fetched}; published values from the NASA Technical Reports Server and the cited
             papers. NASA data is used under its stated terms and does not imply NASA endorsement. See <Link href="/sources">Sources</Link> for every reference and
-            licence. MARGIN was created by Alex de Gentile for NASA Space Apps 2026; code under Apache-2.0. AI tools assisted development (disclosed on <Link href="/sources#si">Sources</Link>).
+            licence. MARGIN was created by Alexander de Gentile-Murnieks for NASA Space Apps 2026; code under Apache-2.0. AI tools assisted development (disclosed on <Link href="/sources#si">Sources</Link>).
           </p>
         </div>
       </div>

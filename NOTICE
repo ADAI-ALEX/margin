@@ -1,5 +1,5 @@
 MARGIN — How close is the evidence?
-Copyright 2026 Alex de Gentile
+Copyright 2026 Alexander de Gentile-Murnieks
 
 This product's own source code is licensed under the Apache License, Version 2.0
 (see LICENSE). The licence of the code does NOT apply to the NASA data, the cited
@@ -123,9 +123,11 @@ The full licence text of each package is in node_modules/<package>/LICENSE after
 ===============================================================================
 
 AI (SI) tools assisted the development of the source code, data-pipeline
-code, tests and documentation in this repository. Published scientific values
-were checked against their primary sources with AI assistance; human sign-off
-is pending and the app labels them accordingly. The deployed app makes no AI
-calls at run time, and the project contains no AI-generated images, video or
-audio.
+code, tests and documentation in this repository. Each published scientific
+value was checked against its primary source with AI assistance; the page or
+table and a short verbatim quote are recorded so anyone can re-check it, and
+the app labels the check accordingly. The deployed app makes no AI calls at
+run time. The illustrations on the Guide page are AI-generated (made with
+Higgsfield) and are labelled as such on screen; every chart and screenshot is
+drawn from the data or captured from the app.
 See README.md ("Use of SI") and docs/compliance/si-usage-log.md.

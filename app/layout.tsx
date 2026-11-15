@@ -23,6 +23,9 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 const PENDING_SCRIPT = `(function(){try{var q=new URLSearchParams(location.search),k=["preset","o2","p","u","g","h","m","pub"],path=location.pathname.replace(/\\/$/,"")||"/";if((path==="/"||path==="/investigations")&&k.some(function(x){return q.has(x)})){var d=document.documentElement;d.setAttribute("data-pending","");setTimeout(function(){d.removeAttribute("data-pending")},8000)}}catch(e){}})();`;
 
+/** Hide the first-visit welcome before paint once it has been dismissed on this device (components/guide/Welcome). */
+const WELCOME_SCRIPT = `(function(){try{if(localStorage.getItem("margin.welcome")==="off")document.documentElement.setAttribute("data-welcome","off")}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={fontVars} suppressHydrationWarning>
@@ -30,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* A shared link's scenario is applied on the client (the pages are static). Until then, hide the
             scenario-dependent views so a default verdict is never shown or clickable (see lib/state/useMargin). */}
         <script dangerouslySetInnerHTML={{ __html: PENDING_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: WELCOME_SCRIPT }} />
         <a href="#main" className="skip-link">Skip to content</a>
         <SiteHeader status={`PSI snapshot ${SNAP.fetchedAt.slice(0, 10)} · ${COUNTS.totalRuns.toLocaleString("en-GB")} runs`} />
         {children}

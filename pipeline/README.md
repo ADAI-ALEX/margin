@@ -91,7 +91,7 @@ withO2, withPressure, withFlow, plottable, columns`.
     CFI-G SE → self-extinguished, FT → flow-terminated, no hot ignition → not-ignited, "flash" → other;
     Saffire numeric burn time > 0 → ignited (burn time in `measures.burnTime`), "Insignificant" → other.
 14. **Computed quantities** (Tad) go to `measures` labelled "computed (as reported in PSI)".
-15. **Fuel class** (`mappings/materials.mjs`, [DECIDE] by lead):
+15. **Fuel class** (`mappings/materials.mjs`, a Kickoff [DECIDE] item):
     - `solid-thin`: SIBAL / cotton fabric; any film or sheet with stated thickness ≤ 0.2 mm.
     - `solid-thick`: rods (≥ 6.35 mm), spheres / spherical sections, PMMA with stated thickness ≥ 5.2 mm.
     - `solid-unknown`: everything else, including **PMMA 0.2–5.2 mm** (R3 §2.1 puts the thermal thin/thick transition at

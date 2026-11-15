@@ -5,7 +5,7 @@
 import { test, expect, hasHorizontalScroll } from "./helpers/fixtures";
 import { ALL_INVESTIGATIONS } from "./helpers/engine";
 
-const STATIC_ROUTES = ["/", "/investigations", "/method", "/sources"];
+const STATIC_ROUTES = ["/", "/investigations", "/method", "/sources", "/guide"];
 const DOSSIERS = ALL_INVESTIGATIONS.map((i) => `/investigations/${encodeURIComponent(i.id)}`);
 
 for (const route of [...STATIC_ROUTES, ...DOSSIERS]) {

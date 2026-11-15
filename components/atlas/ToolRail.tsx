@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import { VERDICT_THRESHOLDS } from "@/lib/engine";
 import { IconButton } from "@/components/ui/IconButton";
-import { IconFullscreen, IconExitFullscreen, IconKey, IconLayers, IconMinus, IconPlates, IconPlus, IconReset, IconShare, IconClose } from "@/components/ui/icons";
+import { IconFullscreen, IconExitFullscreen, IconKey, IconLayers, IconMinus, IconPlates, IconPlus, IconReset, IconShare, IconClose, IconHelp } from "@/components/ui/icons";
 import { copyCurrentUrl } from "@/components/ui/Toast";
 import { KeySwatch } from "./marks";
 import type { FieldLayers } from "./EvidenceField";
@@ -43,10 +43,10 @@ export function FieldKey() {
   );
 }
 
-export default function ToolRail({ layers, setLayer, zoomIn, zoomOut, reset, canZoomIn, canZoomOut, isZoomed, overview, toggleOverview }: {
+export default function ToolRail({ layers, setLayer, zoomIn, zoomOut, reset, canZoomIn, canZoomOut, isZoomed, overview, toggleOverview, onTour }: {
   layers: FieldLayers; setLayer: (k: keyof FieldLayers, v: boolean) => void;
   zoomIn: () => void; zoomOut: () => void; reset: () => void; canZoomIn: boolean; canZoomOut: boolean; isZoomed: boolean;
-  overview: boolean; toggleOverview: () => void;
+  overview: boolean; toggleOverview: () => void; onTour?: () => void;
 }) {
   const [pop, setPop] = useState<null | "key" | "layers">(null);
   const [fs, setFs] = useState(false);
@@ -114,6 +114,11 @@ export default function ToolRail({ layers, setLayer, zoomIn, zoomOut, reset, can
         <IconButton label={fs ? "Exit fullscreen" : "Fullscreen"} icon={fs ? <IconExitFullscreen /> : <IconFullscreen />} onClick={toggleFs} />
         <IconButton label="Share: copy link to this view" icon={<IconShare />} onClick={copyCurrentUrl} />
       </div>
+      {onTour && (
+        <div className="rail-group">
+          <IconButton label="Take the tour" icon={<IconHelp />} onClick={onTour} />
+        </div>
+      )}
     </div>
   );
 }

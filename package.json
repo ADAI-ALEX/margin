@@ -46,7 +46,7 @@
   "engines": {
     "node": ">=20"
   },
-  "author": "Alex de Gentile",
+  "author": "Alexander de Gentile-Murnieks",
   "description": "MARGIN: an evidence-coverage atlas of NASA PSI combustion tests for crewed atmospheres.",
   "repository": {
     "type": "git",

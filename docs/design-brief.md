@@ -1,13 +1,13 @@
 # MARGIN design exploration: brief for the concept builders
 
-Read this file in full before you write code. The lead (master agent) owns everything not listed under your concept.
+Read this file in full before you write code. The integrating agent owns everything not listed under your concept.
 
 ## Product, in one paragraph
 MARGIN is an evidence-coverage explorer for NASA's Physical Sciences Informatics (PSI) combustion archive. A user defines a crewed environment: O₂ %, total pressure (kPa or psia), ventilation flow (cm/s or quiescent), gravity regime (micro / Moon / Mars / Earth, **categorical**), a fire-safety question, and a material class. MARGIN then shows how close NASA's actual tests come to that environment, on which axes they differ, and what cannot be concluded.
 - **MARGIN measures evidence coverage. It never predicts fire or rates safety.**
 - Every verdict carries the line "Evidence proximity, not a safety rating."
 
-## Shared layer (lead-owned, READ-ONLY for you)
+## Shared layer (owned by the integrating agent, READ-ONLY for you)
 - `lib/schema/index.ts`: types (`Run`, `Investigation`, `Scenario`, `Atmosphere`).
 - `lib/engine/*`: deterministic engine.
   - `evaluate(runs, scenario)` → `{ verdict, nearest, comparable[], context[], otherGravity[], excludedCount }`
@@ -87,7 +87,7 @@ If you need an engine or data change, **do not edit shared files**. Put the requ
   - the radiogroup works with the arrow keys
   - honour `prefers-reduced-motion`
 - Performance: about 1,900 points in SVG is fine. Memoize scales and filtered arrays.
-- The dev server runs at http://localhost:3000 (the lead runs it; **do not run `next dev` or `next build`**). You may `curl -s localhost:3000/concepts/X` to check that it renders (no 500). You may run `npx tsc --noEmit` and `npx eslint design-exploration/concept-X`. **Do not use the Playwright or browser tools.** The lead does visual QA and may send you fixes.
+- The dev server runs at http://localhost:3000 (the integrating agent runs it; **do not run `next dev` or `next build`**). You may `curl -s localhost:3000/concepts/X` to check that it renders (no 500). You may run `npx tsc --noEmit` and `npx eslint design-exploration/concept-X`. **Do not use the Playwright or browser tools.** The lead does visual QA and may send you fixes.
 - Quality bar: this must read as a credible aerospace research instrument.
   - Deliberate typography, alignment and density.
   - No default component-library look, no gradients for decoration, no glassmorphism, no glow, no oversized marketing headings, no stock imagery.

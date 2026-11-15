@@ -35,9 +35,24 @@ import Inspector from "./Inspector";
 import RegimeStrip from "./RegimeStrip";
 import ToolRail, { FieldKey } from "./ToolRail";
 import Overview, { type PlateData } from "./Overview";
+import Tour, { type TourStep } from "@/components/guide/Tour";
+import Welcome, { dismissWelcome } from "@/components/guide/Welcome";
 import "./atlas.css";
+import "@/components/guide/guide.css";
 
 const runById = new Map(ALL_RUNS.map((r) => [r.id, r]));
+
+/** The guided tour of this screen (components/guide/Tour). Targets that are not on screen get a centred card. */
+const TOUR_STEPS: TourStep[] = [
+  { id: "welcome", title: "Welcome to the Atlas", body: <>MARGIN shows where NASA has tested fire in space, and how close those tests come to the cabin air you choose. Seven quick stops; use the arrow keys or the buttons.</> },
+  { id: "field", targets: [".fld-frame"], title: "The evidence field", body: <>Oxygen runs left to right, total cabin pressure bottom to top. <strong>Every dot is a real NASA test run.</strong> The bright cyan band is everywhere within D {VERDICT_THRESHOLDS.direct} of a comparable test; the faint band within D {VERDICT_THRESHOLDS.near}.</> },
+  { id: "probe", targets: ["[data-role='probe']"], title: "Your scenario", body: <>The amber marker is the cabin you are asking about. <strong>Drag it, click anywhere on the field,</strong> or focus it and use the arrow keys. Everything updates instantly.</> },
+  { id: "scenario", targets: ["#atlas-console"], title: "Set up a cabin", body: <>Pick a real or planned cabin atmosphere, or type oxygen and pressure. Choose the fire question, the material and the assumed airflow, and whether to include results from NASA papers.</> },
+  { id: "verdict", targets: ["[data-testid='verdict']"], title: "The answer", body: <>How close the nearest comparable NASA test is: <strong>DIRECT</strong> (D ≤ {VERDICT_THRESHOLDS.direct}), <strong>NEAR</strong> (D ≤ {VERDICT_THRESHOLDS.near}), <strong>DISTANT</strong> or <strong>NONE</strong>. Below it: the gap on each axis and the source of that test. Evidence proximity, not a safety rating.</> },
+  { id: "regimes", targets: [".atlas-strip-wrap .strip-regimes", ".atlas-strip-wrap"], title: "Gravity regimes", body: <>Microgravity, Moon, Mars and Earth are kept apart: each has only its own evidence, and nothing is estimated between them. Every PSI run was flown in microgravity, so the Moon and Mars are nearly empty.</> },
+  { id: "expeditions", targets: ["#atlas-exp"], title: "Expeditions", body: <>Ready-made starting points. Try <strong>The coverage gap</strong>: the oxygen planned for future habitats sits above every PSI solid-material test.</> },
+  { id: "tools", targets: [".atlas-rail-wrap", ".atlas-sheet-nav"], title: "Tools and help", body: <>Key (what each mark means), layers, zoom, the four-regime overview and share: every view is a link. Search anything with ⌘K. The <strong>Guide</strong> in the header explains it all in plain words.</> },
+];
 const STATUS = { date: SNAP.fetchedAt.slice(0, 10), runs: COUNTS.totalRuns.toLocaleString("en-GB") };
 const GAP = { maxO2: HEADLINE.maxSolidO2, planned: [HEADLINE.artemisO2, HEADLINE.eaO2] as [number, number] };
 const reducedMotion = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -80,9 +95,18 @@ export default function AtlasApp() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [overview, setOverview] = useState(false);
   const [viewReady, setViewReady] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.has("tour")) {
+      // One-shot entry from the Guide (/?tour=1): open the tour and drop the parameter from the URL.
+      sp.delete("tour");
+      const qs = sp.toString();
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+      setTourOpen(true); // eslint-disable-line react-hooks/set-state-in-effect
+    }
     const v = parseViewQuery(new URLSearchParams(window.location.search), (id) => runById.has(id));
-    setSelectedId(v.run); // eslint-disable-line react-hooks/set-state-in-effect
+    setSelectedId(v.run);
     setOverview(v.view === "overview");
     setViewReady(true);
   }, []);
@@ -257,7 +281,7 @@ export default function AtlasApp() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.metaKey || e.ctrlKey || e.altKey || tourOpen) return;
       if (t && (t.closest("input, select, textarea, [role='dialog']") || t.isContentEditable)) return;
       if (e.key === "Escape") {
         if (document.getElementById("atlas-rail-pop")) return; // the popover closes first
@@ -274,6 +298,16 @@ export default function AtlasApp() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
+
+  // ---- tour: start from a clean field with both panels open --------------------------------------------
+  const startTour = useCallback(() => {
+    setSelectedId(null);
+    setOverview(false);
+    setLeftOpen(true);
+    setRightOpen(true);
+    setConsoleOpen(true);
+    setTourOpen(true);
+  }, []);
 
   // ---- copy -------------------------------------------------------------------------------------
   const hazardLabel = HAZARDS.find((h) => h.id === s.hazard)!.label;
@@ -318,13 +352,14 @@ export default function AtlasApp() {
           <>
             <Panel id="atlas-exp" name="Expeditions" label="Expeditions" className="atlas-exp-panel"
               actions={app ? <button type="button" className="ui-sq" onClick={() => setLeftOpen(false)} aria-label="Collapse expeditions and scenario" aria-expanded aria-controls="atlas-exp"><IconCollapse /></button> : undefined}>
+              <Welcome onTour={startTour} />
               <Expeditions scenario={s} preset={m.preset} onGo={applyExpedition} />
             </Panel>
             <Panel id="atlas-console" name="Scenario" label="Scenario" className="atlas-con-panel" collapseAxis="vertical"
               collapsed={app && !consoleOpen} onToggle={app ? () => setConsoleOpen((v) => !v) : undefined} summary={leftSummary}>
               <Console scenario={s} preset={m.preset} update={m.update} applyPreset={(id) => { m.applyPreset(id); setSelectedId(null); }} />
             </Panel>
-            {app && <p className="atlas-credit">MARGIN, created by Alex de Gentile for NASA Space Apps 2026 · Apache-2.0 · NASA PSI data; no NASA endorsement · AI-assisted development, disclosed under <a href="/sources#si">Sources</a></p>}
+            {app && <p className="atlas-credit">MARGIN, created by Alexander de Gentile-Murnieks for NASA Space Apps 2026 · Apache-2.0 · NASA PSI data; no NASA endorsement · AI-assisted development, disclosed under <a href="/sources#si">Sources</a></p>}
           </>
         )}
       </div>
@@ -370,7 +405,7 @@ export default function AtlasApp() {
         <div className="atlas-rail-wrap">
           <ToolRail layers={layerState} setLayer={setLayer} zoomIn={zoomIn} zoomOut={zoomOut} reset={resetView}
             canZoomIn={zoom < MAX_ZOOM - 0.01} canZoomOut={zoom > 1.01} isZoomed={zoom > 1.01}
-            overview={overview} toggleOverview={() => setOverview((v) => !v)} />
+            overview={overview} toggleOverview={() => setOverview((v) => !v)} onTour={startTour} />
         </div>
       )}
       <details className="atlas-mkey">
@@ -384,8 +419,10 @@ export default function AtlasApp() {
           <a href="#atlas-panel-evidence" onClick={() => setTab("evidence")}>Evidence</a>
           <a href="#atlas-panel-sources" onClick={() => setTab("sources")}>Sources</a>
           <button type="button" onClick={() => setOverview((v) => !v)} aria-pressed={overview} aria-label="Regimes overview">Regimes</button>
+          <button type="button" onClick={startTour}>Tour</button>
         </nav>
       )}
+      <Tour steps={TOUR_STEPS} open={tourOpen} onClose={() => setTourOpen(false)} onFinish={dismissWelcome} />
     </main>
   );
 }

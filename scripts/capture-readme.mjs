@@ -8,6 +8,7 @@ const out = process.argv[3] ?? "docs/assets/screenshots";
 mkdirSync(out, { recursive: true });
 
 const SHOTS = [
+  { name: "guide", url: "/guide", w: 1440, h: 900 },
   { name: "atlas-hero", url: "/?preset=ea&pub=1", w: 1440, h: 900 },
   { name: "atlas-regimes-overview", url: "/?preset=ea&pub=1&u=20&view=overview", w: 1440, h: 900 },
   { name: "atlas-moon-partial-gravity", url: "/?preset=ea&g=moon&pub=1&u=20", w: 1440, h: 900 },
@@ -33,6 +34,8 @@ const only = process.env.ONLY;
 for (const s of SHOTS) {
   if (only && s.name !== only) continue;
   const ctx = await browser.newContext({ viewport: { width: s.w, height: s.h }, deviceScaleFactor: 2, reducedMotion: "reduce" });
+  // the first-visit welcome is dismissed so screenshots show the working layout
+  await ctx.addInitScript(() => { try { localStorage.setItem("margin.welcome", "off"); } catch {} });
   const page = await ctx.newPage();
   await page.goto(base + s.url, { waitUntil: "networkidle" });
   await page.waitForTimeout(600);

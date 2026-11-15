@@ -14,6 +14,8 @@ export const IconSearch = (p: P) => <svg {...base(p)}><circle cx="7" cy="7" r="4
 export const IconShare = (p: P) => <svg {...base(p)}><path d="M6.5 9.5 13 3M9 3h4v4" /><path d="M12 9.5V13H3V4h3.5" /></svg>;
 export const IconMenu = (p: P) => <svg {...base(p)}><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" /></svg>;
 export const IconClose = (p: P) => <svg {...base(p)}><path d="m4 4 8 8M12 4l-8 8" /></svg>;
+/** A question mark in a circle: the guided tour. */
+export const IconHelp = (p: P) => <svg {...base(p)}><circle cx="8" cy="8" r="6" /><path d="M6.3 6.2a1.8 1.8 0 0 1 3.5.5c0 1.2-1.8 1.5-1.8 2.6M8 11.2v.01" /></svg>;
 export const IconInfo = (p: P) => <svg {...base(p)}><circle cx="8" cy="8" r="6" /><path d="M8 7.2V11M8 5v.01" /></svg>;
 export const IconLayers = (p: P) => <svg {...base(p)}><path d="M8 2.5 14 5.5 8 8.5 2 5.5Z" /><path d="m2 8.5 6 3 6-3M2 11.2l6 3 6-3" /></svg>;
 export const IconPlus = (p: P) => <svg {...base(p)}><path d="M8 3v10M3 8h10" /></svg>;

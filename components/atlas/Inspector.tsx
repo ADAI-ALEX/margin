@@ -252,7 +252,7 @@ export default function Inspector(p: InspectorProps) {
             {insights.length === 0 && <p className="ins-micro">No source-checked findings for this question yet. Findings appear here only after they have been checked against their primary source.</p>}
             {insights.map((i) => (
               <article key={i.id} className="ins-finding">
-                <p className="ins-finding-stamps"><ClaimBadge kind={i.validity === "MEASURED" ? "MEASURED" : i.validity === "STATED" ? "PUBLISHED" : "ASSUMED"}>{i.validity}</ClaimBadge> <span className="ins-micro">checked against primary source · human sign-off pending</span></p>
+                <p className="ins-finding-stamps"><ClaimBadge kind={i.validity === "MEASURED" ? "MEASURED" : i.validity === "STATED" ? "PUBLISHED" : "ASSUMED"}>{i.validity}</ClaimBadge> <span className="ins-micro">checked against primary source · AI-assisted, page and quote recorded</span></p>
                 <p className="ins-finding-claim">{i.claim}</p>
                 <p className="ins-finding-meta"><span className="num">{i.value}</span> · {i.conditions}</p>
                 <p className="ins-finding-meta"><b>Scope</b> {i.scope}</p>

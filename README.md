@@ -14,7 +14,7 @@
 
 **MARGIN** maps every test run in NASA's Physical Sciences Informatics (PSI) combustion archive against the atmospheres that crewed vehicles and habitats will actually fly. Pick a cabin atmosphere, a fire-safety question and a gravity regime, and MARGIN finds the nearest comparable NASA test, reports how far away it is as a documented evidence distance **D**, and links every number to the PSI table row or paper it came from.
 
-Created and led by **Alex de Gentile**. Built for [NASA Space Apps 2026](https://www.spaceappschallenge.org/), challenge "Flame in Freefall".
+Created by **Alexander de Gentile-Murnieks** for [NASA Space Apps 2026](https://www.spaceappschallenge.org/), challenge "Flame in Freefall".
 
 **Evidence proximity, not a safety rating.** MARGIN measures how close tested conditions come to a scenario. It does not predict fire behaviour, score how dangerous an environment is, certify anything, or claim that two conditions behave the same way.
 
@@ -22,12 +22,22 @@ Created and led by **Alex de Gentile**. Built for [NASA Space Apps 2026](https:/
 <p align="center"><sub>The Atlas: the Exploration Atmosphere (34% O₂, 56.5 kPa) in microgravity with published evidence on. The amber probe sits outside the coverage bands; the nearest comparable test is Saffire VI-2, D 2.51 (DISTANT). The dashed line marks the highest O₂ in any PSI solid-material test.</sub></p>
 
 - **Live site:** https://margin-two-rho.vercel.app
-- **30-second demo:** _TODO: video URL_
+- **New here? Start with the Guide:** https://margin-two-rho.vercel.app/guide
+- **30-second demo:** https://margin-two-rho.vercel.app/guide#demo (video file: https://margin-two-rho.vercel.app/demo/margin-demo-30s.mp4)
 - **Repository:** https://github.com/ADAI-ALEX/margin
 
 ## Contents
 
-[What MARGIN does](#what-margin-does) · [The scientific problem](#the-scientific-problem-the-coverage-gap) · [Features](#features) · [The Atlas](#the-atlas) · [Investigations](#investigations-and-comparison) · [Dossiers](#dossiers-and-run-inspection) · [Methodology](#methodology) · [Data and sources](#nasa-datasets-and-sources) · [Architecture](#architecture) · [Tech stack](#tech-stack) · [Install](#install-and-development) · [Testing](#testing) · [Attribution and licensing](#attribution-ai-use-disclosure-and-licensing)
+[New here?](#new-here-the-guide-and-the-tour) · [What MARGIN does](#what-margin-does) · [The scientific problem](#the-scientific-problem-the-coverage-gap) · [Features](#features) · [The Atlas](#the-atlas) · [Investigations](#investigations-and-comparison) · [Dossiers](#dossiers-and-run-inspection) · [Methodology](#methodology) · [Data and sources](#nasa-datasets-and-sources) · [Architecture](#architecture) · [Tech stack](#tech-stack) · [Install](#install-and-development) · [Testing](#testing) · [Attribution and licensing](#attribution-ai-use-disclosure-and-licensing)
+
+## New here? The Guide and the tour
+
+MARGIN answers one question: **has NASA ever tested fire in conditions like the cabin I am planning, and how close did those tests come?** Two ways in, both in the app:
+
+- **[The Guide](https://margin-two-rho.vercel.app/guide)** explains the problem, the evidence distance D and how to read the screen in plain words, with a worked example computed live by the engine and the 30-second demo.
+- **The tour** (the "Take the tour" button on the Atlas, or [`/?tour=1`](https://margin-two-rho.vercel.app/?tour=1)) puts a spotlight on each part of the live Atlas in turn: the evidence field, your scenario, the scenario panel, the verdict, the gravity regimes, Expeditions and the tools. It works with the mouse, the arrow keys and Esc, and on phones.
+
+<p align="center"><img src="docs/assets/screenshots/guide.png" alt="The MARGIN Guide: 'Has anyone ever tested fire in air like this?' over an AI-generated illustration of Earth's limb from orbit, labelled as AI-generated" width="100%"></p>
 
 ## What MARGIN does
 
@@ -57,6 +67,7 @@ And every PSI run in the snapshot was flown in microgravity: PSI holds **no** pa
 - **A verdict you can audit.** Class word and D, the per-axis gaps, partial-match qualifiers, boundary proximity, 27-combination robustness and flow sensitivity.
 - **One run inspector everywhere.** Conditions with units and basis, the distance decomposition to your scenario, flags in plain words, the source row or paper locator with a verbatim quote, and the original cells.
 - **Investigations, ranked and compared.** All 24 PSI combustion investigations plus published groups, ranked by a transparent, reweightable score, with footprints, a compare tray and a claim ledger.
+- **A plain-language Guide and a guided tour** for first-time visitors and judges, plus a dismissible welcome on the Atlas.
 - **Command search (⌘K / Ctrl K)** over atmospheres, investigations, findings and runs, entirely on the device.
 - **Static, deterministic, auditable.** No backend, no database, no runtime AI. The deployed app makes no calls to NASA.
 
@@ -204,31 +215,31 @@ The first Playwright run may need `npx playwright install chromium`. To run the 
 ## Testing
 
 - **Unit and science tests (Vitest):** golden distances (identical → 0; one unit on each axis → 1; √2), verdict thresholds at their boundaries, cross-gravity refusal, real-data anchors, URL-state parsing and clamping of hostile parameters, view-only URL params, and collision-free label placement.
-- **End-to-end (Playwright, `tests/e2e`, desktop 1440×900 and mobile 390×844):** the 30-second demo path with expectations computed by the engine itself; URL state and hostile parameters; run inspection, the regimes overview, view params, Esc and focus return, expeditions and command search; every route returns 200 with no console errors and no horizontal scroll at 390 px; axe-core WCAG 2 A/AA checks; rendered-text rules (no banned claims, gravity is a four-option radiogroup, the partial-gravity plot draws points only, no NASA insignia).
+- **End-to-end (Playwright, `tests/e2e`, desktop 1440×900 and mobile 390×844):** the 30-second demo path with expectations computed by the engine itself; URL state and hostile parameters; run inspection, the regimes overview, view params, Esc and focus return, expeditions and command search; the Guide (its worked example must match the engine, every illustration must carry its AI label) and the guided tour (opens, steps by keyboard, closes, returns focus); every route returns 200 with no console errors and no horizontal scroll at 390 px; axe-core WCAG 2 A/AA checks; rendered-text rules (no banned claims, gravity is a four-option radiogroup, the partial-gravity plot draws points only, no NASA insignia).
 - **Banned-claims lint (`npm run lint:claims`):** scans `app/`, `components/`, `content/`, `lib/`, this README and the submission drafts for wording that would turn evidence proximity into a hazard judgement, a prediction or a certification. Negated disclaimers are allowed; reviewed exceptions live in `scripts/claims-allowlist.json`.
 - **CI (`.github/workflows/ci.yml`):** typecheck, ESLint, claims lint, Vitest and `next build` on every push and pull request to `main`, then Playwright (desktop) against `next start`.
 
-Last full local run, 2026-11-14, against a production build: Vitest **202 passed**; Playwright **221 passed, 1 skipped** (desktop and mobile; the skipped test checks the desktop tool rail and does not apply on phones).
+Last full local run, 2026-11-15, against a production build: Vitest **202 passed**; Playwright **240 passed, 2 skipped** (desktop and mobile; the two skipped tests use the desktop tool rail, which phones do not have).
 
 ## Attribution, AI-use disclosure and licensing
 
-Created and led by **Alex de Gentile** for NASA Space Apps 2026.
+Created by **Alexander de Gentile-Murnieks** for NASA Space Apps 2026.
 
 ### Use of SI (AI)
 
-The Space Apps rules ask every team to say how they used AI, so here it is plainly.
+The Space Apps rules ask every participant to say how they used AI, so here it is plainly.
 
-MARGIN is Alex de Gentile's project. Alex chose the challenge and the concept, decided what the tool may and may not claim (evidence proximity, never a safety rating; no borrowing evidence across gravity levels), signed off the distance method and its thresholds, picked the design direction and reviewed every change before it shipped. We used Anthropic's Claude, through Claude Code, the way you would work with a fast pair programmer and research assistant:
+I built MARGIN for NASA Space Apps 2026. I chose the challenge and the concept, decided what the tool may and may not claim (evidence proximity, never a safety rating; no borrowing evidence across gravity levels), approved the distance method and its thresholds, picked the design direction and reviewed every change before it shipped. I used Anthropic's Claude, through Claude Code, as a pair programmer and research assistant:
 
-- **Research.** Before the event it helped us read through the competition rules, combustion papers and the NASA PSI archive.
-- **Building.** It wrote a large share of the code, tests and documentation to our specification. We steered it over many rounds, rejected what did not fit, and changed direction when something looked or read wrong.
-- **Checking.** It helped cross-check every published value against its NASA source; each check records a page or table and a short quote in `docs/verification/source-verification.md`. A human sign-off on those checks is still pending, and the app says so. Findings not yet checked stay hidden (currently 1 of 19).
+- **Research.** Before the event it helped me read through the competition rules, combustion papers and the NASA PSI archive.
+- **Building.** It wrote a large share of the code, tests and documentation to my specification. I steered it over many rounds, rejected what did not fit, and changed direction when something looked or read wrong.
+- **Checking.** It helped transcribe and cross-check every published value against its NASA source, and AI review agents checked the code and the science. Each value was checked against its primary source (AI-assisted; the page or table and a short verbatim quote are recorded in `docs/verification/source-verification.md` so anyone can re-check it). Findings not yet checked stay hidden (currently 1 of 19).
 
-What it does not do: the running app makes no AI calls. Every number on screen comes from the deterministic engine and the cited data, and no AI-generated images, video or audio are used.
+What it does not do: the running app makes no AI calls. Every number on screen comes from the deterministic engine and the cited data. The illustrations on the Guide page are AI-generated (made with Higgsfield) and are labelled as such on screen; everything else, including every chart and screenshot, is drawn from the data or captured from the app.
 
 The phase-by-phase record is in [`docs/compliance/si-usage-log.md`](docs/compliance/si-usage-log.md).
 
 ### Licence
 
-Code: [Apache License 2.0](LICENSE), Copyright 2026 Alex de Gentile.
+Code: [Apache License 2.0](LICENSE), Copyright 2026 Alexander de Gentile-Murnieks.
 NASA data, cited publications, fonts and third-party packages keep their own terms; see [`NOTICE`](NOTICE).

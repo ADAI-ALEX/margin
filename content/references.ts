@@ -1,5 +1,6 @@
 /**
- * Every source the app cites, for the Sources page. Checked 2026-11-14 (SI-assisted; human sign-off pending).
+ * Every source the app cites, for the Sources page. Checked 2026-11-14 (AI-assisted; page or table and a short verbatim
+ * quote recorded in docs/verification/source-verification.md).
  * `terms` repeats what the source itself states (for NTRS documents: the NTRS record's copyright field), or "not stated".
  */
 export interface Reference {

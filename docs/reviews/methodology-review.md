@@ -1,6 +1,6 @@
 # MARGIN — independent methodology review
 
-Reviewer: methodology / data-pipeline workstream. Date: 2026-11-14 (after lead commit `17bc62a`).
+Reviewer: methodology / data-pipeline workstream. Date: 2026-11-14 (after commit `17bc62a`).
 Scope: `lib/engine/*` (distance, gate, verdict, robustness, rank, field, sensitivity), `lib/schema`, `lib/data`,
 `pipeline/*`, `data/generated/snapshot.json`, `content/curated.ts` (read only), against Kickoff Pack §C.3–§C.10 and §H.
 Method: re-derived each rule from the Kickoff text; hand arithmetic for 8 real cases (below); independent tests in
@@ -21,7 +21,7 @@ Severity: **BLOCKER** = must be resolved (or disclosed exactly as stated) before
 | Quiescent vs ventilated = categorical, dU not computed, `flow-regime-mismatch` | `distance.ts` | ✔; also natural-convection run vs forced flow (documented extension); regime `quiescent` with null speed ≡ flow 0 (tested) |
 | DIRECT ≤ 1, NEAR ≤ 2.5 inclusive, NONE if nothing comparable | `classify` | ✔, 1e-9 tolerance (1.0000000000000002 → DIRECT, 1.0000001 → NEAR) |
 | Robustness: 3³ = 27 combos of ½,1,2 per scale | `robustness.ts` | ✔ (each (a,b,c) once; per-cell D = hand value) |
-| Gate (a) fuel relevance per hazard; (b) gravity equality | `gate.ts` | ✔ with lead extensions: O₂ required ("placeable"), limits separated, smoke = smoke-source or solids with alarm data. Suppression broader than spec (m-5) |
+| Gate (a) fuel relevance per hazard; (b) gravity equality | `gate.ts` | ✔ with extensions: O₂ required ("placeable"), limits separated, smoke = smoke-source or solids with alarm data. Suppression broader than spec (m-5) |
 | No cross-gravity distance | `distance()` throws; gate returns `other-gravity` first | ✔ (all 12 cross pairs throw; 3,456-scenario grid never mixes regimes) |
 | T4 never evidence; T3 only with toggle | `gate.ts`, `rank.ts` | ✔ (grid test incl. context / other-gravity / limits lists) |
 | R = 100·(0.40P + 0.20H + 0.15S + 0.15C + 0.10M), renormalised; P = e^(−Dmin); ties Dmin then accession | `rank.ts` | ✔; no-comparable rows sorted last (F-08 fix verified on every preset × regime × toggle). Accession tie-break is lexicographic, not numeric (m-7) |
@@ -71,11 +71,11 @@ Preset pressures: ISS 14.7 psia × 6.894757 = 101.35 → 101.4 kPa; Artemis 10.2
 | m-3 | MINOR | Rank `C` (share of runs within NEAR) and `comparableRuns` count exact duplicate rows (CFI 8, SPICE 34). | data | D-3: skip `duplicate-row` in totals and counts. |
 | m-4 | MINOR | Natural-convection run vs quiescent scenario (partial-g) drops flow silently (no flag). Defensible (buoyant flow is not forced flow) but undisclosed. | distance.ts | Add the mismatch flag in that case too, or document. |
 | m-5 | MINOR | Suppression gate admits every solid (Saffire I/II/VI have no N₂ dilution or flow-reduction protocol); spec lists BASS-II O₂ reduction and Saffire IV–V. | gate.ts | Restrict via hazard map or a run-level `suppressionRelevant` flag; low impact (FLEX dominates). |
-| m-6 | MINOR | T3 Saffire "PMMA 1-sided (0.5 cm)" (5 mm) is `solid-thick` in content, while the pipeline rule (cited 5.2 mm transition) makes 5 mm PMMA `solid-unknown`. | content vs mappings | Content owner: align, or the lead sets `THICK_MIN_MM`. |
+| m-6 | MINOR | T3 Saffire "PMMA 1-sided (0.5 cm)" (5 mm) is `solid-thick` in content, while the pipeline rule (cited 5.2 mm transition) makes 5 mm PMMA `solid-unknown`. | content vs mappings | Content workstream: align, or set `THICK_MIN_MM` in the engine. |
 | m-7 | MINOR | Accession tie-break is lexicographic (`PSI-10` < `PSI-100` < `PSI-25`). Deterministic, so acceptable. | rank.ts | Optional numeric compare. |
 | m-8 | MINOR | `distance()` does not guard scenario P ≤ 0 (NaN). Covered by `clampScenario` in lib/state. | distance.ts | None needed if all callers clamp. |
 
-## 4. Proposed engine diffs (lead to apply)
+## 4. Proposed engine diffs (for the integrating agent to apply)
 
 **D-1 (M-1, M-2) `lib/engine/verdict.ts`** — qualify the headline verdict.
 ```diff

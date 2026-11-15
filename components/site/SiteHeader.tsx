@@ -18,6 +18,7 @@ const NAV = [
   { href: "/investigations", label: "Investigations", match: (p: string) => p.startsWith("/investigations") },
   { href: "/method", label: "Method", match: (p: string) => p.startsWith("/method") },
   { href: "/sources", label: "Sources", match: (p: string) => p.startsWith("/sources") },
+  { href: "/guide", label: "Guide", match: (p: string) => p.startsWith("/guide") },
 ];
 
 export default function SiteHeader({ status }: { status: string }) {

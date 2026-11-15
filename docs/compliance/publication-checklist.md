@@ -4,7 +4,7 @@ Checked 2026-11-14 (≈13:20 GMT) by the QA/compliance workstream against the lo
 (`git log --all`, 4 commits on `main`, no remote yet) and the working tree. Re-run the commands
 below immediately before `git push` to the public remote and again before tagging `v1.0-submission`.
 
-Legend: **PASS** · **ACTION** (owner or lead must act) · **NOTE** (informational).
+Legend: **PASS** · **DONE** (resolved since the first check) · **NOTE** (informational).
 
 ## 1. Secrets
 
@@ -19,11 +19,11 @@ Legend: **PASS** · **ACTION** (owner or lead must act) · **NOTE** (information
 
 | Check | Result |
 |---|---|
-| Commit author / committer identity (`git log --all --format='%an <%ae> \| %cn <%ce>'`) | **PASS**: all 4 commits are `Alex <263986709+ADAI-ALEX@users.noreply.github.com>` (GitHub no-reply). No personal or work e-mail in history. **NOTE:** the author *name* "Alex" and the GitHub handle `ADAI-ALEX` will be public; the owner confirmed this account (Kickoff §I.6 item 7). |
+| Commit author / committer identity (`git log --all --format='%an <%ae> \| %cn <%ce>'`) | **PASS**: all 4 commits are `Alex <263986709+ADAI-ALEX@users.noreply.github.com>` (GitHub no-reply). No personal or work e-mail in history. **NOTE:** the author *name* "Alex" and the GitHub handle `ADAI-ALEX` will be public; I confirmed this account (Kickoff §I.6 item 7). |
 | E-mail addresses in history diffs | **PASS**: only the GitHub no-reply address |
 | E-mail addresses in tracked files | **PASS**: none |
 | Absolute local paths (`/Users/…`) in tracked files | **PASS**: none |
-| Handles in tracked files | **NOTE:** `docs/ARCHITECTURE_DECISION.md` line 44 names the Vercel team "adai-alex's projects" and the plan tier. Harmless, but the owner may prefer to drop it. |
+| Handles in tracked files | **DONE:** `docs/ARCHITECTURE_DECISION.md`, which named the Vercel team and the plan tier, was replaced by `docs/ARCHITECTURE.md`, which does not. |
 | Discovery documents (pre-event research) | **PASS**: not in the repository (they live in `../Discovery/`). |
 
 ## 3. `.gitignore` coverage
@@ -58,7 +58,7 @@ No binary blobs, archives, videos or raw PSI downloads are tracked. **PASS**
 | Check | Result |
 |---|---|
 | NASA logo / insignia ("meatball") / logotype ("worm") / seal / mission patches | **PASS**: none. The only image asset is `app/icon.svg`, a hand-written 6-element SVG (paper rectangle, two ellipses, one dot). The create-next-app SVGs and favicon (Vercel/Next marks) have been removed from `public/`. |
-| SI-generated imagery | **PASS**: none in the repository. |
+| SI-generated imagery | **PASS** at the time of the check: none. **NOTE (15 Nov):** the four illustrations on the Guide page are AI-generated (Higgsfield); each is labelled 'AI-generated illustration' on screen and disclosed in the README and `si-usage-log.md`. |
 | Third-party images, icons, music | **PASS**: none. Charts are drawn in code (SVG). |
 | Rendered pages | `tests/e2e/content-rules.spec.ts` asserts no `img`/icon source mentions nasa/meatball/worm/insignia/logo. |
 
@@ -66,28 +66,28 @@ No binary blobs, archives, videos or raw PSI downloads are tracked. **PASS**
 
 | Item | Result |
 |---|---|
-| `LICENSE` | **PASS**: canonical Apache-2.0 text; appendix line `Copyright 2026 The MARGIN team`. Matches `"license": "Apache-2.0"` in package.json. |
+| `LICENSE` | **PASS**: canonical Apache-2.0 text; appendix line `Copyright 2026 Alexander de Gentile-Murnieks`. Matches `"license": "Apache-2.0"` in package.json. |
 | `NOTICE` | **PASS**: third-party production tree (37 packages), fonts, NASA data section, SI acknowledgement. |
 | Production dependency licences | MIT, ISC, Apache-2.0, BSD-3-Clause, 0BSD, CC-BY-4.0 (caniuse-lite data). All OSI-compatible or data licences. **NOTE:** `@img/sharp-libvips-*` (LGPL-3.0-or-later) is an *optional* platform binary of `next` for image optimisation; MARGIN does not use `next/image`, nothing of it is in this repo, and it is not modified. Listed in NOTICE for completeness. |
-| Fonts | Newsreader, Public Sans, JetBrains Mono (`lib/fonts.ts`; the Investigations view's Archivo fonts were removed): SIL OFL 1.1, self-hosted by `next/font/google` at build time. **NOTE:** `next build` therefore fetches font files from Google Fonts at build time (not PSI/NTRS; Kickoff §H.11 is about NASA calls). |
-| NASA data | PSI: licence as stated per record; 23 of 24 records state CC0-1.0. **ACTION (lead/WS1, Kickoff V9):** PSI-10 (ACME / Flame Design, DOI 10.60555/w4zy-bt45) has an empty licence field; the Sources page and dossier must say "licence not stated by PSI" (the NOTICE already does). NTRS documents are cited, not redistributed. |
+| Fonts | Albert Sans, IBM Plex Mono (`lib/fonts.ts`): SIL OFL 1.1, self-hosted by `next/font/google` at build time. **NOTE:** `next build` therefore fetches font files from Google Fonts at build time (not PSI/NTRS; Kickoff §H.11 is about NASA calls). |
+| NASA data | PSI: licence as stated per record; 23 of 24 records state CC0-1.0. **DONE (Kickoff V9):** PSI-10 (ACME / Flame Design, DOI 10.60555/w4zy-bt45) has an empty licence field; the Sources page and its dossier say "not stated in PSI record", and so does the NOTICE. NTRS documents are cited, not redistributed. |
 | Development tools | `@axe-core/playwright` / `axe-core` are MPL-2.0 (dev only, not shipped). |
 
 ## 7. SI disclosure in metadata
 
 | Check | Result |
 |---|---|
-| Commit trailers | **DONE (2026-11-14):** history was rewritten so every commit is authored and committed by Alex de Gentile (GitHub no-reply address) with no co-author trailers; SI use is disclosed in the README and `si-usage-log.md`. |
+| Commit trailers | **DONE (2026-11-14):** history was rewritten so every commit is authored and committed by me under my GitHub account (no-reply address) with no co-author trailers; SI use is disclosed in the README and `si-usage-log.md`. |
 | README "Use of SI" | **PASS** (written) |
-| `docs/compliance/si-usage-log.md` | **PASS** (written; owner to confirm the pre-event section) |
+| `docs/compliance/si-usage-log.md` | **PASS** (written, including the pre-event section) |
 
 ## 8. Timing (pre-event rule)
 
 | Check | Result |
 |---|---|
-| First commit time | `cad3090` dated 2026-11-14 12:59 +0000 (history rebuilt at 13:15; the BUILD_LOG records the scaffold at ~11:10 GMT). All after 09:00 GMT on 14 Nov. **NOTE:** the start clock follows the Team Owner's local time (assumed GMT; Kickoff §I.6 item 2 still open). |
+| First commit time | `cad3090` dated 2026-11-14 12:59 +0000 (history rebuilt at 13:15; the BUILD_LOG records the scaffold at ~11:10 GMT). All after 09:00 GMT on 14 Nov. **NOTE:** the start clock follows my local time, GMT. |
 | Pre-event material in the repo | **PASS**: none. Discovery documents and the 13 Nov feasibility probes stay outside the repo; the pipeline re-fetched PSI after kickoff (BUILD_LOG 11:18–11:21). |
-| Public text that cites internal research ids | **NOTE (lead / source-verification workstream):** several curated `source.page` strings and notes say "as transcribed in R3 §2.2" or "R3 §4". R3 is a pre-event research note that is not in the repository, so a judge cannot follow that reference. Prefer the primary citation (document, page/table) alone. |
+| Public text that cites internal research ids | **NOTE:** several curated `source.page` strings and notes say "as transcribed in R3 §2.2" or "R3 §4". R3 is a pre-event research note that is not in the repository, so a judge cannot follow that reference. Prefer the primary citation (document, page/table) alone. |
 
 ## 9. Before pushing — commands to re-run
 

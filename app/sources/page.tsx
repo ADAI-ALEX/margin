@@ -28,7 +28,7 @@ const SECTIONS = [
 const sec = (id: (typeof SECTIONS)[number][0]) => ({ id, n: SECTIONS.findIndex(([s]) => s === id) + 1, title: SECTIONS.find(([s]) => s === id)![1] });
 
 const STATUS_LABEL: Record<Verification["status"], string> = {
-  "primary-checked": "checked against primary source; human sign-off pending",
+  "primary-checked": "checked against primary source (AI-assisted; page and quote recorded)",
   "secondary-only": "secondary source only (the original was not reachable)",
   unverified: "not yet checked",
   contradicted: "contradicted by the primary source",
@@ -110,7 +110,7 @@ export default function SourcesPage() {
           <DocSection {...sec("published")}>
             <p>
               {checked.length === published.length
-                ? <>All {published.length} published or planned values have been checked against their primary source (SI-assisted; human sign-off pending), each with its page or table and a short verbatim quote.</>
+                ? <>All {published.length} published or planned values have been checked against their primary source (AI-assisted), each with its page or table and a short verbatim quote recorded so anyone can re-check it.</>
                 : <>{checked.length} of {published.length} published or planned values have been checked against their primary source; the rest are labelled as not yet checked wherever they appear.</>}
               {" "}Reported limits are thresholds inferred by the authors, not tested conditions. Planned experiments are never counted as evidence.
             </p>
@@ -209,10 +209,11 @@ export default function SourcesPage() {
           <DocSection {...sec("si")}>
             <div className="doc-disclosure">
               <p>
-                MARGIN was created by Alex de Gentile for NASA Space Apps 2026. Alex chose the concept, decided what the tool may and may not claim, signed off the
-                method and reviewed every change. The competition asks teams to disclose AI (SI) use, so: we used an AI coding assistant (Anthropic&rsquo;s Claude) as a
-                pair programmer and research aid. It helped with background research, wrote a large share of the code and tests under our direction, and helped
-                cross-check published values against their primary sources. Every scientific value shown is traced to a source listed on this page, and values not yet
+                MARGIN was created by Alexander de Gentile-Murnieks for NASA Space Apps 2026. I chose the concept, decided what the tool may and may not claim, approved
+                the method and reviewed every change. The competition asks participants to disclose AI (SI) use, so: I used an AI coding assistant (Anthropic&rsquo;s
+                Claude) as a pair programmer and research aid. It helped with background research, wrote a large share of the code and tests under my direction, and helped
+                cross-check published values against their primary sources. The illustrations on the Guide page are AI-generated (made with Higgsfield) and are labelled
+                as such. Every scientific value shown is traced to a source listed on this page, and values not yet
                 checked are labelled as such. The running app uses no AI: every result is computed by deterministic code from the bundled data.
               </p>
             </div>

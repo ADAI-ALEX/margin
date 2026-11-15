@@ -2,7 +2,8 @@
  * Curated, NON-PSI content.
  *
  * STATUS (2026-11-14): every published (T3) and planned (T4) value below was checked against the primary NASA
- * document it cites (SI-assisted source check; human sign-off pending — `verifiedBy` stays null on insights).
+ * document it cites (AI-assisted source check; page or table and a short verbatim quote recorded — `verifiedBy`
+ * stays null on insights).
  * Values that could not be checked keep the flag "unverified-transcription". Where NASA papers disagree, the
  * value from the cited primary table is kept and the others are listed in `alternatives` with the flag
  * "conflicting-sources". Evidence for each value: docs/verification/source-verification.md.
@@ -24,7 +25,7 @@ export const ATMOSPHERES: Atmosphere[] = [
   { id: "artemis", label: "Artemis surface habitat (nominal)", short: "Artemis hab", o2Pct: 26.5, pressurePsia: 10.2, pressureKPa: +(10.2 * PSIA).toFixed(1), flowCmS: 10, gravity: "micro", source: "Kessler et al., Artemis Deep Space Habitation, IEEE Aerospace 2022 (NTRS 20220000245)" },
   { id: "ea", label: "Pressurized rover / lunar base — Exploration Atmosphere", short: "Exploration Atm.", o2Pct: 34, pressurePsia: 8.2, pressureKPa: +(8.2 * PSIA).toFixed(1), flowCmS: 10, gravity: "micro", source: "HEO-DM-1006 (8.2 psia, O₂ ≥ 33.7%) as quoted in ICES-2022-45; FM2 LPSC 2026 slides" },
   { id: "legacy", label: "Legacy staging certification (reference)", short: "30% / 10.2 psia", o2Pct: 30, pressurePsia: 10.2, pressureKPa: +(10.2 * PSIA).toFixed(1), flowCmS: 10, gravity: "micro", source: "Olson & Ferkul, ICES-2012-3492, p. 1; ICES-2022-45" },
-  { id: "mars", label: "Mars transit vehicle (assumed)", short: "Mars transit", o2Pct: 34, pressurePsia: 8.2, pressureKPa: +(8.2 * PSIA).toFixed(1), flowCmS: 10, gravity: "micro", note: "Assumed; no authoritative Mars-transit cabin specification found (R3 §13)", source: "Exploration Atmosphere assumption" },
+  { id: "mars", label: "Mars transit vehicle (assumed)", short: "Mars transit", o2Pct: 34, pressurePsia: 8.2, pressureKPa: +(8.2 * PSIA).toFixed(1), flowCmS: 10, gravity: "micro", note: "Assumed; no authoritative Mars-transit cabin specification was found", source: "Exploration Atmosphere assumption" },
   { id: "suit", label: "Spacesuit", short: "Suit", o2Pct: 100, pressurePsia: 4.3, pressureKPa: 29.6, flowCmS: null, gravity: "micro", offChart: true, source: "Challenge statement; FM2 LPSC 2026 slides" },
 ];
 export const PRESETS = ATMOSPHERES.filter((a) => !a.offChart);
@@ -250,7 +251,7 @@ export const PUBLISHED_GROUPS: Investigation[] = [
   pubInv("PLAN-FM2", "FM2", "Flammability of Materials on the Moon (planned)", "T4_PLANNED", "bench", ntrs("20260001966"), "Lunar surface (planned)"),
 ];
 
-// ---------------------------------------------------------------- Hazard map (DRAFT — lead-reviewed in production)
+// ---------------------------------------------------------------- Hazard map (reviewed for production)
 // `measures` (Kickoff §C.8 M): 1 = outcome plus a hazard-relevant metric; 0.5 = outcome only (or metric only, as noted); 0 = neither.
 // Checked 14 Nov against the PSI CSV headers and the published sources.
 const H = (investigation: string, hazard: Hazard, match: HazardMapEntry["match"], measures: HazardMapEntry["measures"], rationale: string): HazardMapEntry => ({ investigation, hazard, match, measures, rationale });

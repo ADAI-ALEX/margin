@@ -1,6 +1,6 @@
 /**
  * MARGIN canonical types. Shape follows Kickoff Pack §C.3 with documented extensions
- * (see docs/BUILD_LOG.md). LEAD-OWNED: changes go through the lead.
+ * (see docs/BUILD_LOG.md). Shared contract: change with care; engine, tests and UI all depend on it.
  */
 export type Tier = "T1_PSI_RUN" | "T3_PUBLISHED" | "T4_PLANNED";
 export type FuelClass =

@@ -1,4 +1,4 @@
-// Material text -> fuel class. Reviewed lookup (Kickoff §C.3-8, [DECIDE] by lead).
+// Material text -> fuel class. Reviewed lookup (Kickoff §C.3-8, a [DECIDE] item).
 //
 // Basis: a solid is "thermally thin" when the whole thickness heats through during flame
 // spread, "thermally thick" when only a surface layer does. R3 §2.1 cites a thin/thick

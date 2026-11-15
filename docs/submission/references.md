@@ -1,9 +1,9 @@
 # References
 
-Draft for the project page fields 7 (NASA Data) and 8 (Space Agency Partner Data and Other
-References), and the README. The authoritative in-app list is the Sources page (`/sources`), built
+Reference list behind the project page fields 7 (NASA Data) and 8 (Space Agency Partner Data and
+Other References), and the README. The authoritative in-app list is the Sources page (`/sources`), built
 from `content/` and the snapshot; if the two disagree, the Sources page wins and this file must be
-updated. Source verification is complete (SI-assisted, human sign-off pending); `content/references.ts` is authoritative.
+updated. Every source has been checked against its primary document (AI-assisted; the page or table and a short verbatim quote are recorded in `docs/verification/source-verification.md` so anyone can re-check it); `content/references.ts` is authoritative.
 
 ## 1. NASA Physical Sciences Informatics (PSI) — combustion science
 
@@ -46,8 +46,8 @@ remaining 861 lines in that file are blank.
 
 ## 2. NASA publications, standards and other references
 
-Generated from `content/references.ts` (the Sources page data; checked 2026-11-14 by the
-source-verification workstream, SI-assisted, **human sign-off pending**). Values transcribed from
+Generated from `content/references.ts` (the Sources page data; checked 2026-11-14 against the
+primary sources, AI-assisted, with the page or table and a short verbatim quote recorded). Values transcribed from
 these documents appear in the app as "published (not in PSI)" or "planned — not evidence", each with
 its page or table. Documents are cited and linked, not redistributed. Regenerate this table if
 `content/references.ts` changes.
@@ -84,7 +84,7 @@ Full licence inventory: [`NOTICE`](../../NOTICE).
 
 - Next.js 16.4.6 (MIT), React 19.3.0 (MIT), d3-array / d3-contour / d3-scale / d3-shape (ISC), zod (MIT).
 - Development: TypeScript (Apache-2.0), Vitest (MIT), Playwright (Apache-2.0), axe-core and @axe-core/playwright (MPL-2.0), ESLint (MIT), Tailwind CSS (MIT).
-- Fonts: Newsreader, Public Sans, JetBrains Mono — SIL Open Font License 1.1, self-hosted via `next/font/google`.
+- Fonts: Albert Sans, IBM Plex Mono — SIL Open Font License 1.1, self-hosted via `next/font/google`.
 - Hosting: Vercel. Source control and CI: GitHub, GitHub Actions.
-- SI: Anthropic Claude via Claude Code (build time only; see `docs/compliance/si-usage-log.md`).
+- SI: Anthropic Claude via Claude Code (build time only); Higgsfield for the four illustrations on the Guide page, each labelled 'AI-generated illustration' on screen. See `docs/compliance/si-usage-log.md`.
 - Images, icons, music: none from third parties.
