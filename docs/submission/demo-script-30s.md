@@ -1,40 +1,48 @@
 # 30-second demo: script and recording
 
-**Video:** https://margin.adai.systems/demo/margin-demo-30s.mp4 (26.8 s, 1440 × 900, H.264, no audio).
-It is also embedded on the Guide page: https://margin.adai.systems/guide#demo
+**Video:** https://margin.adai.systems/demo/margin-demo-30s.mp4 (25.2 s, 1920 × 1080, H.264 + AAC stereo, −16 LUFS).
+It is also the first thing on the Guide page: https://margin.adai.systems/guide#demo
 
 **Hard limit:** 30 s. Over 30 s makes the project ineligible for Global Judging (Project Submission Guide).
-The recording runs 26.8 s.
+The recording runs 25.2 s.
 
 ## How it is made
-The video is a real screen recording of a production build of the app, driven by
-[`scripts/record-demo.mjs`](../../scripts/record-demo.mjs) with Playwright. The script clicks through the
-same path as `tests/e2e/hero-flow.spec.ts`, shows a visible pointer for each click, and burns in an
-English caption for each beat. Every number in a caption is read from the page as it renders (the
-coverage-gap card and the verdict's `data-verdict` / `data-d`), so the captions cannot drift from the app.
+- **Picture.** A real screen recording of the live site, https://margin.adai.systems, driven by
+  [`scripts/record-demo.mjs`](../../scripts/record-demo.mjs) with Playwright along the same path as
+  `tests/e2e/hero-flow.spec.ts`. It is framed in a browser window whose tab shows the MARGIN favicon and
+  whose address bar shows margin.adai.systems; the title and end cards carry the MARGIN mark. A visible
+  pointer shows each click, and every beat has a burned-in English caption whose numbers are read from
+  the page as it renders (the coverage-gap card and the verdict's `data-verdict` / `data-d`).
+- **Voiceover.** I wrote the narration; it was voiced with Higgsfield (Seed Audio, preset voice
+  "Arthur") and is stored as [`scripts/demo/narration.flac`](../../scripts/demo/narration.flac). The
+  recorder cuts it into its phrases and places each one on the beat it describes. The browser frame
+  carries the label "AI voiceover (Higgsfield)" for the whole video, and the end card repeats it.
+- **Music and sounds.** An ambient pad (A minor, F, C, G) with soft high plucks, a click for each
+  interaction, a whoosh on the title and end cards and a chime when the verdict class changes, all
+  synthesised in code by [`scripts/demo/synth_audio.py`](../../scripts/demo/synth_audio.py): no samples,
+  no licensed music. The music ducks under the voice; the mix is set to −16 LUFS with a peak limiter.
 
-To re-record after a change:
+To re-record (needs ffmpeg and Python with numpy):
 
 ```sh
-npm run build && npx next start -p 3100
-BASE=http://localhost:3100 FFMPEG=$(which ffmpeg) node scripts/record-demo.mjs
+FFMPEG=$(which ffmpeg) PYTHON=$(which python3) node scripts/record-demo.mjs
 ```
 
-Rules the recording follows: no NASA logos, insignia or mission patches; no music; no personal
-information on screen; no AI-generated imagery (the Guide illustrations do not appear in it).
+Rules the recording follows: no NASA logos, insignia or mission patches; no personal information on
+screen; no AI-generated imagery (the Guide illustrations do not appear in it).
 
 ## Script (as recorded)
 
-| Time | On screen | Caption |
-|---|---|---|
-| 0:00–0:03 | Title card: "NASA Space Apps 2026 · Flame in Freefall", MARGIN, tagline. | **How close is NASA's fire evidence to the habitats we're about to fly?** |
-| 0:03–0:06 | The Atlas, ISS cabin in microgravity; the dashed line marks the highest O₂ in any PSI solid-material test. | **NASA's space fire tests (PSI): 140 solid-material tests with recorded O₂ top out at 22.2%. Planned habitats: 26.5–34%.** |
-| 0:06–0:10 | Landmark → Exploration Atmosphere. The probe jumps to 34% / 56.5 kPa; verdict **DISTANT**, D 6.28. | **Exploration Atmosphere, 34% O₂ at 56.5 kPa: nearest PSI test is DISTANT, D 6.28.** |
-| 0:10–0:14 | Switch on "Include published evidence". Saffire results appear; verdict stays **DISTANT**, D 2.51. | **Add published NASA results (Saffire): still DISTANT at 10 cm/s, D 2.51.** |
-| 0:14–0:18 | Flow 20 cm/s. Verdict **NEAR**, D 1.51. | **Assume 20 cm/s airflow, a different scenario: NEAR, D 1.51. MARGIN shows the sensitivity; it does not pick the flow.** |
-| 0:18–0:22 | Gravity → Lunar. The field changes to the lunar regime; the partial-gravity panel appears. | **The Moon: PSI has no partial-gravity tests. Nothing is borrowed from other gravity levels.** |
-| 0:22–0:25 | The nearest-test link in the field notes opens the run inspector with its NTRS source. | **Every number links to its source: NASA PSI table rows and NTRS papers.** |
-| 0:25–0:27 | End card. | **Evidence proximity, not a safety rating.** · margin.adai.systems |
+| Time | On screen | Voiceover | Caption |
+|---|---|---|---|
+| 0:00–0:04 | Title card with the MARGIN mark: "NASA Space Apps 2026 · Flame in Freefall". | "How close is NASA's fire evidence to the air we'll breathe?" | (title card) |
+| 0:04–0:08 | The Atlas, ISS cabin in microgravity; the dashed line marks the highest O₂ in any PSI solid-material test. | "Its space tests stop at twenty-two percent oxygen." | **NASA's 140 space fire tests on solid materials top out at 22.2% O₂. Planned habitats: 26.5–34%.** |
+| 0:08–0:11 | Landmark → Exploration Atmosphere; verdict **DISTANT**, D 6.28. | "Future habitats plan thirty-four." | **Exploration Atmosphere, 34% O₂ at 56.5 kPa: nearest test DISTANT, D 6.28** |
+| 0:11–0:14 | "Include published evidence" on; still **DISTANT**, D 2.51. | "Add results," | **+ published NASA results (Saffire): still DISTANT, D 2.51** |
+| 0:14–0:17 | Flow 20 cm/s; **NEAR**, D 1.51. | "change the airflow: MARGIN shows the shift." | **Assume 20 cm/s airflow: NEAR, D 1.51 · a different scenario, not a correction** |
+| 0:17–0:20 | Gravity → Lunar. | "The Moon? No tests." | **The Moon: no PSI tests. Nothing is borrowed from other gravity levels.** |
+| 0:20–0:22 | The nearest-test link opens the run inspector with its NTRS source. | "Every number, sourced." | **Every number links to its NASA source.** |
+| 0:22–0:25 | End card with the MARGIN mark and margin.adai.systems. | (music) | **Evidence proximity, not a safety rating.** |
 
 The flow-sensitivity beat is deliberate: showing that NEAR at 20 cm/s is a different scenario, not a
 correction, is an honesty point I chose to keep (BUILD_LOG 12:40).

@@ -111,3 +111,9 @@ After the redesign merged (`a2dff28`), production rendered unstyled: serif text,
 - **Demo video** (`public/demo/margin-demo-30s.mp4`, 26.8 s) recorded from a production build by `scripts/record-demo.mjs`: Playwright drives the hero-flow path with a visible pointer and burned-in captions whose numbers are read from the page.
 - **Copy**: TODOs removed and the documentation written in my own voice under my full name, Alexander de Gentile-Murnieks. Source checks are described as AI-assisted with page and quote recorded; no human sign-off is claimed.
 - **Tests**: `tests/e2e/guide-tour.spec.ts` (Guide numbers agree with the engine, every illustration is labelled, demo assets are served, the tour opens, steps, closes and returns focus, the welcome stays dismissed); `/guide` added to the route, accessibility and rendered-text suites, and `/?tour=1` to the accessibility suite.
+
+### 2026-11-15 00:55 — narrated demo, Guide link, margin.adai.systems
+
+- The public URL is now https://margin.adai.systems (README, submission copy, demo, metadata base, GitHub homepage).
+- The demo is re-recorded from the live site in a browser frame (MARGIN favicon in the tab, margin.adai.systems in the address bar, the MARGIN mark on the title and end cards) at 1920 × 1080, 25.2 s. Narration I wrote was voiced with Higgsfield Seed Audio and is placed phrase by phrase on its beats; the frame carries "AI voiceover (Higgsfield)" throughout. Music and interface sounds are synthesised in code (`scripts/demo/synth_audio.py`); the remaining Higgsfield credits did not cover generated music. Mix: voice ducks the music; one fixed gain to −16 LUFS plus a peak limiter.
+- The Guide link in the header is boxed in the evidence blue, and the demo video is the first thing on the Guide.

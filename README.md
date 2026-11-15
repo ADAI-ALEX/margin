@@ -235,7 +235,7 @@ I built MARGIN for NASA Space Apps 2026. I chose the challenge and the concept, 
 - **Building.** It wrote a large share of the code, tests and documentation to my specification. I steered it over many rounds, rejected what did not fit, and changed direction when something looked or read wrong.
 - **Checking.** It helped transcribe and cross-check every published value against its NASA source, and AI review agents checked the code and the science. Each value was checked against its primary source (AI-assisted; the page or table and a short verbatim quote are recorded in `docs/verification/source-verification.md` so anyone can re-check it). Findings not yet checked stay hidden (currently 1 of 19).
 
-What it does not do: the running app makes no AI calls. Every number on screen comes from the deterministic engine and the cited data. The illustrations on the Guide page are AI-generated (made with Higgsfield) and are labelled as such on screen; everything else, including every chart and screenshot, is drawn from the data or captured from the app.
+What it does not do: the running app makes no AI calls. Every number on screen comes from the deterministic engine and the cited data. The illustrations on the Guide page are AI-generated (made with Higgsfield) and are labelled as such on screen. The demo video's voiceover is AI-generated (Higgsfield, Seed Audio) and labelled in the video; its music and interface sounds are synthesised in code, and its picture is a screen recording of the live app. Everything else, including every chart and screenshot, is drawn from the data or captured from the app.
 
 The phase-by-phase record is in [`docs/compliance/si-usage-log.md`](docs/compliance/si-usage-log.md).
 

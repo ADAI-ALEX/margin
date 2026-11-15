@@ -225,7 +225,7 @@ export default function GuidePage() {
             <Link className="g-btn" href={href({ ...base, includePublished: true }, "ea")}>Open the worked example</Link>
             <Link className="g-btn g-btn--quiet" href="/">Open the Atlas</Link>
           </div>
-          <p className="g-fine">The four illustrations on this page are AI-generated and labelled as such. Every chart, number and screenshot comes from the app and its NASA data.</p>
+          <p className="g-fine">The four illustrations on this page and the demo&rsquo;s voiceover are AI-generated and labelled as such. Every chart, number and screenshot comes from the app and its NASA data.</p>
         </section>
       </div>
     </main>

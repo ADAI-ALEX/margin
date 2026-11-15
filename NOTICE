@@ -128,6 +128,8 @@ value was checked against its primary source with AI assistance; the page or
 table and a short verbatim quote are recorded so anyone can re-check it, and
 the app labels the check accordingly. The deployed app makes no AI calls at
 run time. The illustrations on the Guide page are AI-generated (made with
-Higgsfield) and are labelled as such on screen; every chart and screenshot is
-drawn from the data or captured from the app.
+Higgsfield) and are labelled as such on screen. The demo video's voiceover is
+AI-generated (Higgsfield, Seed Audio) and labelled in the video; its music and
+interface sounds are synthesised in code. Every chart and screenshot is drawn
+from the data or captured from the app.
 See README.md ("Use of SI") and docs/compliance/si-usage-log.md.
