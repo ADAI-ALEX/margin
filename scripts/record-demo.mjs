@@ -318,7 +318,12 @@ const meter = spawnSync(FFMPEG, ["-hide_banner", "-i", raw, "-vn", "-af", "ebur1
 const measured = Number(/I:\s+(-?[\d.]+) LUFS/.exec(meter.stderr)?.[1]);
 if (!Number.isFinite(measured)) throw new Error("demo: loudness not measured");
 execFileSync(FFMPEG, ["-y", "-loglevel", "error", "-i", raw, "-c:v", "copy", "-af", `volume=${(-16 - measured).toFixed(2)}dB,alimiter=limit=0.84:level=false`,
-  "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart", join(OUT, "margin-demo-30s.mp4")]);
+  "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart",
+  // SI disclosure carried in the file itself (competition rule: AI audio is acknowledged in text and metadata)
+  "-metadata", "title=MARGIN demo (NASA Space Apps 2026, Flame in Freefall)",
+  "-metadata", "comment=SI disclosure: the narration is AI-generated speech (Kokoro v1.0, open-weight text-to-speech, voice af_heart) reading a script written by the author. The picture is a screen recording of https://margin.adai.systems; its final shot shows the Guide page with an AI-generated illustration (Higgsfield), labelled on screen. Music and interface sounds are synthesised in code. See docs/compliance/si-usage-log.md at https://github.com/ADAI-ALEX/margin",
+  "-metadata", "description=Narration: AI-generated voice (Kokoro text-to-speech). Picture: screen recording of margin.adai.systems.",
+  join(OUT, "margin-demo-30s.mp4")]);
 execFileSync(FFMPEG, ["-y", "-loglevel", "error", "-ss", "10.5", "-i", join(OUT, "margin-demo-30s.mp4"), "-frames:v", "1", "-q:v", "2", join(OUT, "margin-demo-poster.jpg")]);
 const beats = marks.filter((m) => m.name === "vo").map((m) => `${m.beat}@${m.t.toFixed(1)}`);
 console.log(`demo: ${dur.toFixed(2)} s, ${zooms.length} zooms, ${captions.length} captions → ${OUT}/margin-demo-30s.mp4`, beats.join(" "));

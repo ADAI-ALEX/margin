@@ -51,15 +51,15 @@ Legend: **PASS** · **DONE** (resolved since the first check) · **NOTE** (infor
 | 48 KB | `docs/reviews/science-review-prototype.md` | Internal review; fine to publish. Contains no personal data. |
 | ≤ 40 KB | everything else | Source, CSS, docs |
 
-No binary blobs, archives, videos or raw PSI downloads are tracked. **PASS**
+No binary blobs, archives, videos or raw PSI downloads are tracked. **PASS** **NOTE (15 Nov):** since this check, the demo video (`public/demo/margin-demo-30s.mp4`, ~9.5 MB), its poster, the Guide illustrations and README screenshots of the app have been added deliberately.
 
 ## 5. Images, logos and SI imagery
 
 | Check | Result |
 |---|---|
-| NASA logo / insignia ("meatball") / logotype ("worm") / seal / mission patches | **PASS**: none. The only image asset is `app/icon.svg`, a hand-written 6-element SVG (paper rectangle, two ellipses, one dot). The create-next-app SVGs and favicon (Vercel/Next marks) have been removed from `public/`. |
+| NASA logo / insignia ("meatball") / logotype ("worm") / seal / mission patches | **PASS**: none. The only image asset is `app/icon.svg`, a hand-written 6-element SVG (paper rectangle, two ellipses, one dot). The create-next-app SVGs and favicon (Vercel/Next marks) have been removed from `public/`. **NOTE (15 Nov):** design-research screen captures of NASA, JPL, Our World in Data and Linear websites (some showing the NASA insignia) had been committed under `docs/design/research/`; they were removed from the repository on 15 Nov and are kept locally only (earlier commits still contain them; history was not rewritten). |
 | SI-generated imagery | **PASS** at the time of the check: none. **NOTE (15 Nov):** the four illustrations on the Guide page are AI-generated (Higgsfield) and labelled 'AI-generated illustration' on screen; the demo-video narration is an AI voice (Kokoro, open-weight text-to-speech); both are disclosed in the README and `si-usage-log.md`. |
-| Third-party images, icons, music | **PASS**: none. Charts are drawn in code (SVG). |
+| Third-party images, icons, music | **PASS**: none in the app or the published repository (see the 15 Nov note above). Charts are drawn in code (SVG). |
 | Rendered pages | `tests/e2e/content-rules.spec.ts` asserts no `img`/icon source mentions nasa/meatball/worm/insignia/logo. |
 
 ## 6. Licences
