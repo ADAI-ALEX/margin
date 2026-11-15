@@ -58,7 +58,7 @@ No binary blobs, archives, videos or raw PSI downloads are tracked. **PASS**
 | Check | Result |
 |---|---|
 | NASA logo / insignia ("meatball") / logotype ("worm") / seal / mission patches | **PASS**: none. The only image asset is `app/icon.svg`, a hand-written 6-element SVG (paper rectangle, two ellipses, one dot). The create-next-app SVGs and favicon (Vercel/Next marks) have been removed from `public/`. |
-| SI-generated imagery | **PASS** at the time of the check: none. **NOTE (15 Nov):** the four illustrations on the Guide page and the demo-video voiceover are AI-generated (Higgsfield); the illustrations are labelled 'AI-generated illustration' on screen, the voiceover is labelled in the video, and both are disclosed in the README and `si-usage-log.md`. |
+| SI-generated imagery | **PASS** at the time of the check: none. **NOTE (15 Nov):** the four illustrations on the Guide page are AI-generated (Higgsfield) and labelled 'AI-generated illustration' on screen; the demo-video narration is an AI voice (Kokoro, open-weight text-to-speech); both are disclosed in the README and `si-usage-log.md`. |
 | Third-party images, icons, music | **PASS**: none. Charts are drawn in code (SVG). |
 | Rendered pages | `tests/e2e/content-rules.spec.ts` asserts no `img`/icon source mentions nasa/meatball/worm/insignia/logo. |
 

@@ -1,0 +1,52 @@
+{
+ "voice": "af_heart",
+ "speed": 1.05,
+ "model": "Kokoro v1.0 (kokoro-onnx)",
+ "lines": [
+  {
+   "beat": "title",
+   "text": "How close is Nasa's fire evidence to the air future crews will breathe?",
+   "seconds": 4.099
+  },
+  {
+   "beat": "gap",
+   "text": "Nasa's space fire tests on solid materials stop at twenty-two percent oxygen.",
+   "seconds": 4.915
+  },
+  {
+   "beat": "ea",
+   "text": "Future habitats plan thirty-four. Distant.",
+   "seconds": 2.771
+  },
+  {
+   "beat": "pub",
+   "text": "Add published results. Still distant.",
+   "seconds": 2.098
+  },
+  {
+   "beat": "flow",
+   "text": "Assume faster airflow, and it's near.",
+   "seconds": 2.033
+  },
+  {
+   "beat": "moon",
+   "text": "On the Moon: no tests at all.",
+   "seconds": 1.701
+  },
+  {
+   "beat": "src",
+   "text": "Every number is sourced.",
+   "seconds": 1.238
+  },
+  {
+   "beat": "inv",
+   "text": "Then rank all twenty-four Nasa studies for your cabin.",
+   "seconds": 2.873
+  },
+  {
+   "beat": "end",
+   "text": "Evidence proximity. Not a safety rating.",
+   "seconds": 2.595
+  }
+ ]
+}

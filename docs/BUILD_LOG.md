@@ -117,3 +117,9 @@ After the redesign merged (`a2dff28`), production rendered unstyled: serif text,
 - The public URL is now https://margin.adai.systems (README, submission copy, demo, metadata base, GitHub homepage).
 - The demo is re-recorded from the live site in a browser frame (MARGIN favicon in the tab, margin.adai.systems in the address bar, the MARGIN mark on the title and end cards) at 1920 × 1080, 25.2 s. Narration I wrote was voiced with Higgsfield Seed Audio and is placed phrase by phrase on its beats; the frame carries "AI voiceover (Higgsfield)" throughout. Music and interface sounds are synthesised in code (`scripts/demo/synth_audio.py`); the remaining Higgsfield credits did not cover generated music. Mix: voice ducks the music; one fixed gain to −16 LUFS plus a peak limiter.
 - The Guide link in the header is boxed in the evidence blue, and the demo video is the first thing on the Guide.
+
+### 2026-11-15 01:30 — demo re-cut
+
+- No browser frame and no in-video labels: the page fills the 1920 × 1080 frame. Title card with the MARGIN mark beside the wordmark (as in the header); no end card. 29.5 s with nine beats, now including the source inspector, the ranked Investigations catalogue and the Guide.
+- Narration re-voiced with Kokoro (open-weight text-to-speech, `af_heart`), one clip per beat (`scripts/demo/narrate.py`), because the Higgsfield voice was unclear and mispronounced "NASA" and no Higgsfield credits remained for a retake. "NASA" is passed as "Nasa" so it is spoken as a word. The Higgsfield narration file was removed.
+- Edit: pacing driven by the narration (each line starts once the previous line and its action are done); smooth punch-in zooms in post; captions rendered in the site's typeface; swish per pointer glide (matched to distance), two-part click per click, low swoosh on page changes; music ducks under the voice; −16 LUFS with a peak limiter.

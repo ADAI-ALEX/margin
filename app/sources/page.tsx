@@ -212,8 +212,8 @@ export default function SourcesPage() {
                 MARGIN was created by Alexander de Gentile-Murnieks for NASA Space Apps 2026. I chose the concept, decided what the tool may and may not claim, approved
                 the method and reviewed every change. The competition asks participants to disclose AI (SI) use, so: I used an AI coding assistant (Anthropic&rsquo;s
                 Claude) as a pair programmer and research aid. It helped with background research, wrote a large share of the code and tests under my direction, and helped
-                cross-check published values against their primary sources. The illustrations on the Guide page and the demo video&rsquo;s voiceover are AI-generated (made with
-                Higgsfield) and are labelled as such. Every scientific value shown is traced to a source listed on this page, and values not yet
+                cross-check published values against their primary sources. The illustrations on the Guide page are AI-generated (made with Higgsfield) and labelled as such,
+                and the demo video&rsquo;s narration is an AI voice (Kokoro, open-weight text-to-speech) reading a script I wrote. Every scientific value shown is traced to a source listed on this page, and values not yet
                 checked are labelled as such. The running app uses no AI: every result is computed by deterministic code from the bundled data.
               </p>
             </div>

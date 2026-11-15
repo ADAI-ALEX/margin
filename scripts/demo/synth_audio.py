@@ -3,7 +3,8 @@ Music bed and sound effects for the demo video, synthesised from code (no sample
 
     python3 scripts/demo/synth_audio.py OUT_DIR [SECONDS]
 
-Writes OUT_DIR/music.wav (ambient pad, 48 kHz stereo) and click.wav, whoosh.wav, chime.wav.
+Writes OUT_DIR/music.wav (ambient pad, 48 kHz stereo), click.wav (mouse click), swish300…700.wav
+(cursor glides, by duration) and transition.wav (page or card change).
 Requires numpy. Used by scripts/record-demo.mjs.
 """
 import sys
@@ -102,42 +103,55 @@ def music(seconds):
     return out / (np.max(np.abs(out)) + 1e-9) * 0.7
 
 
+def bandnoise(L, lo_fc, hi_fc):
+    """Noise between two one-pole corners; hi_fc may be an array (a sweep)."""
+    n = rng.standard_normal(L)
+    hi = np.broadcast_to(np.asarray(hi_fc, dtype=float), (L,))
+    y, acc, lo = np.empty(L), 0.0, 0.0
+    a_lo = np.exp(-2 * np.pi * lo_fc / SR)
+    for i in range(L):
+        a = np.exp(-2 * np.pi * hi[i] / SR)
+        acc = (1 - a) * n[i] + a * acc
+        lo = (1 - a_lo) * acc + a_lo * lo
+        y[i] = acc - lo
+    return y
+
+
 def click():
-    L = int(0.09 * SR)
+    """A mouse click: a sharp press and a quieter release 70 ms later."""
+    L = int(0.16 * SR)
     t = np.arange(L) / SR
-    tick = np.sin(2 * np.pi * 1850 * t) * np.exp(-t * 90) * 0.6
-    noise = onepole_lp(rng.standard_normal(L), 6000) * np.exp(-t * 160) * 0.5
-    thump = np.sin(2 * np.pi * 140 * t) * np.exp(-t * 60) * 0.5
-    x = tick + noise + thump
-    return reverb(np.stack([x, x], axis=1), 0.4, 0.15) * 0.8
+    x = np.zeros(L)
+    for start, amp in ((0.0, 1.0), (0.07, 0.45)):
+        i0 = int(start * SR)
+        tt = t[: L - i0]
+        body = bandnoise(len(tt), 1800, 9000) * np.exp(-tt * 420)
+        knock = np.sin(2 * np.pi * 2600 * tt) * np.exp(-tt * 300) * 0.35
+        x[i0:] += amp * (body + knock)
+    x /= np.max(np.abs(x)) + 1e-9
+    return reverb(np.stack([x, x], axis=1), 0.25, 0.08) * 0.9
 
 
-def whoosh(seconds=1.1):
+def swish(seconds):
+    """Air moving past: the cursor gliding across the screen (short, bright, panned left to right)."""
     L = int(seconds * SR)
     t = np.arange(L) / SR
-    n = rng.standard_normal(L)
-    # band sweep via time-varying one-pole lowpass minus a slower one (crude band-pass)
-    fc = 300 + 5000 * np.sin(np.pi * t / seconds) ** 2
-    y, lo, a2 = np.empty(L), 0.0, np.exp(-2 * np.pi * 180 / SR)
-    acc = 0.0
-    for i in range(L):
-        a = np.exp(-2 * np.pi * fc[i] / SR)
-        acc = (1 - a) * n[i] + a * acc
-        lo = (1 - a2) * acc + a2 * lo
-        y[i] = acc - lo
-    y *= np.sin(np.pi * t / seconds) ** 1.5
-    st = np.stack([y * (0.6 + 0.4 * t / seconds), y * (1.0 - 0.4 * t / seconds)], axis=1)
-    st = reverb(st, 1.2, 0.3)
+    u = t / seconds
+    y = bandnoise(L, 900, 2500 + 6500 * np.sin(np.pi * u) ** 2)
+    y *= np.sin(np.pi * u) ** 2.2
+    st = np.stack([y * (1.1 - 0.6 * u), y * (0.5 + 0.6 * u)], axis=1)
     return st / (np.max(np.abs(st)) + 1e-9) * 0.5
 
 
-def chime():
-    L = int(1.6 * SR)
+def transition(seconds=0.9):
+    """A softer, lower swoosh for a page or card change."""
+    L = int(seconds * SR)
     t = np.arange(L) / SR
-    x = (np.sin(2 * np.pi * 1318.5 * t) + 0.6 * np.sin(2 * np.pi * 1975.5 * t) + 0.25 * np.sin(2 * np.pi * 2637 * t)) * np.exp(-t * 3.5)
-    x *= np.minimum(1, t / 0.004)
-    st = reverb(np.stack([x, x], axis=1), 1.5, 0.35)
-    return st / (np.max(np.abs(st)) + 1e-9) * 0.35
+    u = t / seconds
+    y = bandnoise(L, 120, 400 + 2600 * np.sin(np.pi * u) ** 2)
+    y *= np.sin(np.pi * u) ** 1.6
+    st = reverb(np.stack([y, np.roll(y, 300)], axis=1), 1.2, 0.35)
+    return st / (np.max(np.abs(st)) + 1e-9) * 0.5
 
 
 if __name__ == "__main__":
@@ -145,6 +159,7 @@ if __name__ == "__main__":
     secs = float(sys.argv[2]) if len(sys.argv) > 2 else 30.0
     write(f"{out}/music.wav", music(secs))
     write(f"{out}/click.wav", click())
-    write(f"{out}/whoosh.wav", whoosh())
-    write(f"{out}/chime.wav", chime())
-    print(f"synth: music {secs:.1f}s, click, whoosh, chime → {out}")
+    for ms in (300, 400, 500, 600, 700):
+        write(f"{out}/swish{ms}.wav", swish(ms / 1000))
+    write(f"{out}/transition.wav", transition())
+    print(f"synth: music {secs:.1f}s, click, swish 300-700 ms, transition → {out}")

@@ -86,5 +86,5 @@ Full licence inventory: [`NOTICE`](../../NOTICE).
 - Development: TypeScript (Apache-2.0), Vitest (MIT), Playwright (Apache-2.0), axe-core and @axe-core/playwright (MPL-2.0), ESLint (MIT), Tailwind CSS (MIT).
 - Fonts: Albert Sans, IBM Plex Mono — SIL Open Font License 1.1, self-hosted via `next/font/google`.
 - Hosting: Vercel. Source control and CI: GitHub, GitHub Actions.
-- SI: Anthropic Claude via Claude Code (build time only); Higgsfield for the four illustrations on the Guide page, each labelled 'AI-generated illustration' on screen, and for the demo-video voiceover, labelled in the video. See `docs/compliance/si-usage-log.md`.
+- SI: Anthropic Claude via Claude Code (build time only); Higgsfield for the four illustrations on the Guide page, each labelled 'AI-generated illustration' on screen; Kokoro (open-weight text-to-speech, Apache-2.0) for the demo-video narration. See `docs/compliance/si-usage-log.md`.
 - Images, icons, music: none from third parties.
