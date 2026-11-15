@@ -231,7 +231,7 @@ The Space Apps rules ask every participant to say how they used AI, so here it i
 
 I built MARGIN for NASA Space Apps 2026. I chose the challenge and the concept, decided what the tool may and may not claim (evidence proximity, never a safety rating; no borrowing evidence across gravity levels), approved the distance method and its thresholds, picked the design direction and reviewed every change before it shipped. I used Anthropic's Claude, through Claude Code, as a pair programmer and research assistant:
 
-- **Research.** Before the event it helped me read through the competition rules, combustion papers and the NASA PSI archive.
+- **Research and planning.** On 13 November, the day before the event, it helped me read through the competition rules, combustion papers and the NASA PSI archive, and helped me write up the concept and plan. No code was written before the event started. The Space Apps rules permit SI tools as long as their use is disclosed, which is what this section does.
 - **Building.** It wrote a large share of the code, tests and documentation to my specification. I steered it over many rounds, rejected what did not fit, and changed direction when something looked or read wrong.
 - **Checking.** It helped transcribe and cross-check every published value against its NASA source, and AI review agents checked the code and the science. Each value was checked against its primary source (AI-assisted; the page or table and a short verbatim quote are recorded in `docs/verification/source-verification.md` so anyone can re-check it). Findings not yet checked stay hidden (currently 1 of 19).
 

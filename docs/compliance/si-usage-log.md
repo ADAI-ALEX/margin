@@ -3,7 +3,8 @@
 NASA Space Apps 2026 requires that SI use is disclosed, that SI-generated code and data are
 acknowledged "in descriptive text and metadata", that SI images and video carry a visible
 watermark, and that SI "should not be used to (come up with your idea of how to solve the
-challenge)" (Project Submission Guide, "Use of Super Intelligence (SI)" field). This log records
+challenge)" (Project Submission Guide, "Use of Super Intelligence (SI)" field). The same guide states that
+the use of SI tools "is permitted for the NASA Space Apps Challenge". This log records
 what SI was used for, phase by phase. It backs the README "Use of SI" section and the SI field of
 the project page.
 
@@ -22,6 +23,10 @@ its music and interface sounds are synthesised in code (`scripts/demo/synth_audi
 | Background science and data-access research (combustion literature, PSI and NTRS access) | Research assistant | I read the findings and decided | `../Discovery/research/03_*`, `04_*` (not in this repo) |
 | Concept analysis and specification | Assisted analysis and drafting of the concept and specification documents | The idea came from the challenge itself: NASA's PSI archive holds 1,870 combustion test runs, but there was no quick way to ask how close any of them come to the atmospheres future habitats will actually use. I chose the concept and approved the specification | `../Discovery/MARGIN_Product_Decision_and_Specification.md`, `MARGIN_Kickoff_Pack.md` (not in this repo) |
 | Read-only feasibility probes of PSI and NTRS | SI agent made read-only requests; results kept in a temporary scratchpad, **not** copied into the repo | I reviewed the results | none in repo; the pipeline re-fetched all data after kickoff |
+
+**Timing.** On 13 November I used SI for research (competition rules, combustion literature, PSI and NTRS
+data access) and to write up a concept and specification. No code, repository, interface design or data
+processing for MARGIN existed before 09:00 on 14 November.
 
 ## Phase 1 — Build (from 14 Nov 2026, 09:00 local time)
 
